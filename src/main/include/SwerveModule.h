@@ -36,8 +36,12 @@ public:
     frc::SwerveModuleState GetState();// const;
     frc::SwerveModulePosition GetPosition();// const;
     void SetDesiredState(const frc::SwerveModuleState& state);
+    void Periodic();
 
 private:
+    units::meters_per_second_t CalcMetersPerSec();
+    double CalcTicksPer100Ms(units::meters_per_second_t speed);
+
     static constexpr double kWheelRadius = 0.0508;
     static constexpr int kEncoderResolution = 4096;
     static constexpr double kTurnMotorRevsPerWheelRev = 12.8;
@@ -45,12 +49,20 @@ private:
     static constexpr auto kModuleMaxAngularVelocity = std::numbers::pi * 1_rad_per_s;  // radians per second
     static constexpr auto kModuleMaxAngularAcceleration = std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
+    static constexpr int kEncoderCPR = 2048;
+    static constexpr int kEncoderTicksPerSec = 10;                 //!< TalonFX::GetSelectedSensorVelocity() returns ticks/100ms = 10 ticks/sec
+    static constexpr double kWheelDiameterMeters = .1016;          //!< 4"
+    static constexpr double kDriveGearRatio = 8.16;                //!< MK3 swerve modules w/NEOs 12.1 ft/sec w/Falcon 13.6 ft/sec
+    /// Assumes the encoders are directly mounted on the wheel shafts
+    /// ticks / 100 ms -> ticks / s -> motor rev / s -> wheel rev / s -> m / s
+    static constexpr double kDriveEncoderMetersPerSec = kEncoderTicksPerSec / static_cast<double>(kEncoderCPR) / kDriveGearRatio * (kWheelDiameterMeters * std::numbers::pi);
+
     TalonFX m_driveMotor;
     CANSparkMax m_turningMotor;
 
     std::string m_id;
 
-    SparkMaxAlternateEncoder m_turningEncoder = m_turningMotor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, kEncoderResolution);//320);
+    SparkMaxAlternateEncoder m_turningEncoder = m_turningMotor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, kEncoderResolution);
 
     frc::DutyCycleEncoder m_absEnc;
 

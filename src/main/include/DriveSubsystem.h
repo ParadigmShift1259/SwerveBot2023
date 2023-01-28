@@ -30,6 +30,9 @@ public:
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
              bool fieldRelative);
   void UpdateOdometry();
+  void Periodic() override;
+  void WheelsForward();
+  void WheelsLeft();
 
   static constexpr units::meters_per_second_t kMaxSpeed = 3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
@@ -43,10 +46,10 @@ private:
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-  SwerveModule m_frontLeft{1, 2, false, 0.5};//159.8};
-  SwerveModule m_frontRight{3, 4, false, 0.633333};//228.9};
-  SwerveModule m_backRight{5, 6, false, 0.01};
-  SwerveModule m_backLeft{7, 8, true, 0.01};
+  SwerveModule m_frontLeft{1, 2, false, 0.444};
+  SwerveModule m_frontRight{3, 4, false, 0.633333};
+  SwerveModule m_backRight{5, 6, false, 0.488};
+  SwerveModule m_backLeft{7, 8, false, 0.462};
 
   Gyro m_gyro;
 

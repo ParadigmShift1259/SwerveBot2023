@@ -9,6 +9,7 @@
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/RunCommand.h>
+#include <frc2/command/InstantCommand.h>
 
 #include <DriveSubsystem.h>
 
@@ -18,6 +19,7 @@ public:
   RobotContainer();
   
   frc2::CommandPtr GetAutonomousCommand();
+  void Periodic() { m_drive.Periodic(); }
 
 private:
   void SetDefaultCommands();
@@ -29,5 +31,8 @@ private:
   frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
 
-  bool m_fieldRelative = true;
+  bool m_fieldRelative = false;//true;
+
+  frc2::InstantCommand m_wheelsForward{[this] { m_drive.WheelsForward(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsLeft{[this] { m_drive.WheelsLeft(); }, {&m_drive} };
 };
