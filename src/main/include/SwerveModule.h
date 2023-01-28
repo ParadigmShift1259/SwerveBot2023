@@ -15,6 +15,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/DutyCycleEncoder.h>
+#include <frc/Timer.h>
 
 #include <rev/CANSparkMax.h>
 #include <ctre/phoenix/motorcontrol/can/TalonFX.h>
@@ -37,6 +38,7 @@ public:
     frc::SwerveModulePosition GetPosition();// const;
     void SetDesiredState(const frc::SwerveModuleState& state);
     void Periodic();
+    void ResyncAbsRelEnc();
 
 private:
     units::meters_per_second_t CalcMetersPerSec();
@@ -44,7 +46,7 @@ private:
 
     static constexpr double kWheelRadius = 0.0508;
     static constexpr int kEncoderResolution = 4096;
-    static constexpr double kTurnMotorRevsPerWheelRev = 12.8;
+    static constexpr double kTurnMotorRevsPerWheelRev = 6.4; //12.8;
 
     static constexpr auto kModuleMaxAngularVelocity = std::numbers::pi * 1_rad_per_s;  // radians per second
     static constexpr auto kModuleMaxAngularAcceleration = std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
@@ -65,6 +67,7 @@ private:
     SparkMaxAlternateEncoder m_turningEncoder = m_turningMotor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, kEncoderResolution);
 
     frc::DutyCycleEncoder m_absEnc;
+    double m_offset = 0.0;
 
     frc2::PIDController m_drivePIDController{1.0, 0, 0};
     
@@ -72,4 +75,7 @@ private:
 
     frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V, 3_V / 1_mps};
     // frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{1_V, 0.5_V / 1_rad_per_s};
+
+    /// Timer used to sync absolute and relative encoders on robot turn on
+    frc::Timer m_timer;
 };

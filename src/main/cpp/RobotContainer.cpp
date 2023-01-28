@@ -20,16 +20,16 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 
 void RobotContainer::SetDefaultCommands()
 {
-  // m_drive.SetDefaultCommand(frc2::RunCommand(
-  //   [this] 
-  //   {
-  //     const auto xSpeed = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetLeftY(), 0.02)) * DriveSubsystem::kMaxSpeed;
-  //     const auto ySpeed = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetLeftX(), 0.02)) * DriveSubsystem::kMaxSpeed;
-  //     const auto rot = -m_rotLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetRightX(), 0.02)) * DriveSubsystem::kMaxAngularSpeed;
-  //     m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
-  //   },
-  //   {&m_drive}
-  // ));
+  m_drive.SetDefaultCommand(frc2::RunCommand(
+    [this] 
+    {
+      const auto xSpeed = m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetLeftY(), 0.02)) * DriveSubsystem::kMaxSpeed;
+      const auto ySpeed = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetLeftX(), 0.02)) * DriveSubsystem::kMaxSpeed;
+      const auto rot = -m_rotLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetRightX(), 0.02)) * DriveSubsystem::kMaxAngularSpeed;
+      m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
+    },
+    {&m_drive}
+  ));
 }
 
 void RobotContainer::ConfigureBindings()
@@ -43,8 +43,13 @@ void RobotContainer::ConfigureBindings()
     // Primary
     // Keep the bindings in this order
     // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-    //JoystickButton(&primary, xbox::kA).WhenHeld(&m_wheelsForward);
+    JoystickButton(&primary, xbox::kA).WhileTrue(&m_wheelsBackward);
     JoystickButton(&primary, xbox::kB).WhileTrue(&m_wheelsLeft);
-    // JoystickButton(&primaryController, xbox::kX).WhenPressed(&m_zeroHeading);  REMOVED FOR GAME PLAY!
+    JoystickButton(&primary, xbox::kX).WhileTrue(&m_wheelsRight);
     JoystickButton(&primary, xbox::kY).WhileTrue(&m_wheelsForward);
+
+    JoystickButton(&primary, xbox::kStart).WhileTrue(&m_OverrideOn);
+    JoystickButton(&primary, xbox::kBack).WhileTrue(&m_OverrideOff);
+
+    JoystickButton(&primary, xbox::kRightBumper).WhileTrue(&m_resyncAbsRelEnc);
 }

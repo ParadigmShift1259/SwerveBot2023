@@ -8,26 +8,37 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
                        units::radians_per_second_t rot, bool fieldRelative)
 {
-  auto states = m_kinematics.ToSwerveModuleStates(fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                                                                : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+  if (m_bOverrideXboxInput == false)
+  {
+    auto states = m_kinematics.ToSwerveModuleStates(fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+                                                                  : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
+    m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
 
-  auto [fl, fr, bl, br] = states;
+    auto [fl, fr, bl, br] = states;
 
-  m_frontLeft.SetDesiredState(fl);
-  m_frontRight.SetDesiredState(fr);
-  m_backLeft.SetDesiredState(bl);
-  m_backRight.SetDesiredState(br);
+    m_frontLeft.SetDesiredState(fl);
+    m_frontRight.SetDesiredState(fr);
+    m_backLeft.SetDesiredState(bl);
+    m_backRight.SetDesiredState(br);
+  }
 }
 
 void DriveSubsystem::Periodic()
 {
-  UpdateOdometry();
+  //UpdateOdometry();
   m_frontLeft.Periodic();
   m_frontRight.Periodic();
   m_backLeft.Periodic();
   m_backRight.Periodic();
+}
+
+void DriveSubsystem::ResyncAbsRelEnc()
+{
+  m_frontLeft.ResyncAbsRelEnc();
+  m_frontRight.ResyncAbsRelEnc();
+  m_backLeft.ResyncAbsRelEnc();
+  m_backRight.ResyncAbsRelEnc();
 }
 
 void DriveSubsystem::UpdateOdometry()
@@ -52,6 +63,28 @@ void DriveSubsystem::WheelsLeft()
 {
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{90.0_deg};
+  sms.speed = 0.0_mps;
+  m_frontLeft.SetDesiredState(sms);
+  m_frontRight.SetDesiredState(sms);
+  m_backLeft.SetDesiredState(sms);
+  m_backRight.SetDesiredState(sms);
+}
+
+void DriveSubsystem::WheelsBackward()
+{
+  frc::SwerveModuleState sms;
+  sms.angle = frc::Rotation2d{150.0_deg};
+  sms.speed = 0.0_mps;
+  m_frontLeft.SetDesiredState(sms);
+  m_frontRight.SetDesiredState(sms);
+  m_backLeft.SetDesiredState(sms);
+  m_backRight.SetDesiredState(sms);
+}
+
+void DriveSubsystem::WheelsRight()
+{
+  frc::SwerveModuleState sms;
+  sms.angle = frc::Rotation2d{-45.0_deg};
   sms.speed = 0.0_mps;
   m_frontLeft.SetDesiredState(sms);
   m_frontRight.SetDesiredState(sms);

@@ -31,8 +31,13 @@ public:
              bool fieldRelative);
   void UpdateOdometry();
   void Periodic() override;
+
+  void ResyncAbsRelEnc();
+  void SetOverrideXboxInput(bool bOverride) { m_bOverrideXboxInput = bOverride; }
   void WheelsForward();
   void WheelsLeft();
+  void WheelsBackward();
+  void WheelsRight();
 
   static constexpr units::meters_per_second_t kMaxSpeed = 3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
@@ -46,10 +51,16 @@ private:
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-  SwerveModule m_frontLeft{1, 2, false, 0.444};
-  SwerveModule m_frontRight{3, 4, false, 0.633333};
-  SwerveModule m_backRight{5, 6, false, 0.488};
-  SwerveModule m_backLeft{7, 8, false, 0.462};
+//#define ZERO_OFFSETS
+#ifdef ZERO_OFFSETS
+  SwerveModule m_frontLeft{1, 2, false, 0.0};
+  SwerveModule m_frontRight{3, 4, false, 0.0};
+  SwerveModule m_backRight{5, 6, false, 0.0};
+  SwerveModule m_backLeft{7, 8, false, 0.0};
+#else
+  SwerveModule m_frontLeft{1, 2, false, 0.440};  SwerveModule m_frontRight{3, 4, false, 0.631};
+  SwerveModule m_backLeft {7, 8, false, 0.960};  SwerveModule m_backRight {5, 6, false, 0.986};
+#endif
 
   Gyro m_gyro;
 
@@ -62,4 +73,6 @@ private:
       m_gyro.GetRotation2d(),
       {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
        m_backLeft.GetPosition(), m_backRight.GetPosition()}};
+
+  bool m_bOverrideXboxInput = false;
 };

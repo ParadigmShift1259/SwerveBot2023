@@ -35,4 +35,11 @@ private:
 
   frc2::InstantCommand m_wheelsForward{[this] { m_drive.WheelsForward(); }, {&m_drive} };
   frc2::InstantCommand m_wheelsLeft{[this] { m_drive.WheelsLeft(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsBackward{[this] { m_drive.WheelsBackward(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsRight{[this] { m_drive.WheelsRight(); }, {&m_drive} };
+
+  frc2::InstantCommand m_OverrideOn{[this] { m_drive.SetOverrideXboxInput(true); }, {&m_drive} };
+  frc2::InstantCommand m_OverrideOff{[this] { m_drive.SetOverrideXboxInput(false); }, {&m_drive} };
+
+  frc2::InstantCommand m_resyncAbsRelEnc{[this] { m_drive.ResyncAbsRelEnc(); }, {&m_drive} };
 };
