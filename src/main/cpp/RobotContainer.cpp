@@ -23,9 +23,14 @@ void RobotContainer::SetDefaultCommands()
   m_drive.SetDefaultCommand(frc2::RunCommand(
     [this] 
     {
-      const auto xSpeed = m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetLeftY(), 0.02)) * DriveSubsystem::kMaxSpeed;
-      const auto ySpeed = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetLeftX(), 0.02)) * DriveSubsystem::kMaxSpeed;
-      const auto rot = -m_rotLimiter.Calculate(frc::ApplyDeadband(m_primaryController.GetRightX(), 0.02)) * DriveSubsystem::kMaxAngularSpeed;
+      const auto xInput = frc::ApplyDeadband(m_primaryController.GetLeftY(), 0.02);
+      const auto yInput = frc::ApplyDeadband(m_primaryController.GetLeftX(), 0.02);
+      const auto rotInput = frc::ApplyDeadband(m_primaryController.GetRightX(), 0.02);
+
+      const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * DriveSubsystem::kMaxSpeed;
+      const auto ySpeed = -m_yspeedLimiter.Calculate(yInput) * DriveSubsystem::kMaxSpeed;
+      const auto rot = -m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
+      
       m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
     },
     {&m_drive}

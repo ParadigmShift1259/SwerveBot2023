@@ -10,9 +10,12 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 {
   if (m_bOverrideXboxInput == false)
   {
-    auto states = m_kinematics.ToSwerveModuleStates(fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-                                                                  : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+    // auto states = m_kinematics.ToSwerveModuleStates(fieldRelative 
+    //   ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+    //   : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+    auto states = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
+    // Renormalizes the wheel speeds if any individual speed is above the specified maximum
     m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
 
     auto [fl, fr, bl, br] = states;
@@ -53,10 +56,7 @@ void DriveSubsystem::WheelsForward()
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{0.0_deg};
   sms.speed = 0.0_mps;
-  m_frontLeft.SetDesiredState(sms);
-  m_frontRight.SetDesiredState(sms);
-  m_backLeft.SetDesiredState(sms);
-  m_backRight.SetDesiredState(sms);
+  SetAllDesiredState(sms);
 }
 
 void DriveSubsystem::WheelsLeft()
@@ -64,10 +64,7 @@ void DriveSubsystem::WheelsLeft()
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{90.0_deg};
   sms.speed = 0.0_mps;
-  m_frontLeft.SetDesiredState(sms);
-  m_frontRight.SetDesiredState(sms);
-  m_backLeft.SetDesiredState(sms);
-  m_backRight.SetDesiredState(sms);
+  SetAllDesiredState(sms);
 }
 
 void DriveSubsystem::WheelsBackward()
@@ -75,10 +72,7 @@ void DriveSubsystem::WheelsBackward()
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{150.0_deg};
   sms.speed = 0.0_mps;
-  m_frontLeft.SetDesiredState(sms);
-  m_frontRight.SetDesiredState(sms);
-  m_backLeft.SetDesiredState(sms);
-  m_backRight.SetDesiredState(sms);
+  SetAllDesiredState(sms);
 }
 
 void DriveSubsystem::WheelsRight()
@@ -86,6 +80,11 @@ void DriveSubsystem::WheelsRight()
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{-45.0_deg};
   sms.speed = 0.0_mps;
+  SetAllDesiredState(sms);
+}
+
+void DriveSubsystem::SetAllDesiredState(const frc::SwerveModuleState& sms)
+{
   m_frontLeft.SetDesiredState(sms);
   m_frontRight.SetDesiredState(sms);
   m_backLeft.SetDesiredState(sms);

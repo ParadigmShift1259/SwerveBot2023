@@ -43,9 +43,10 @@ public:
   static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
 
 private:
+  void SetAllDesiredState(const frc::SwerveModuleState& sms);
+
   static constexpr auto kTrackWidth = 20_in;
   static constexpr auto kWheelBase = 28_in;
-
   frc::Translation2d m_frontLeftLocation{kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_frontRightLocation{kWheelBase / 2, -kTrackWidth / 2};
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
@@ -53,13 +54,11 @@ private:
 
 //#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
-  SwerveModule m_frontLeft{1, 2, false, 0.0};
-  SwerveModule m_frontRight{3, 4, false, 0.0};
-  SwerveModule m_backRight{5, 6, false, 0.0};
-  SwerveModule m_backLeft{7, 8, false, 0.0};
+  SwerveModule m_frontLeft { 1, 2, 0.000 };  SwerveModule m_frontRight { 3, 4, 0.000 };
+  SwerveModule m_backRight { 5, 6, 0.000 };  SwerveModule m_backLeft   { 7, 8, 0.000 };
 #else
-  SwerveModule m_frontLeft{1, 2, false, 0.440};  SwerveModule m_frontRight{3, 4, false, 0.631};
-  SwerveModule m_backLeft {7, 8, false, 0.960};  SwerveModule m_backRight {5, 6, false, 0.986};
+  SwerveModule m_frontLeft { 1, 2, 0.440 };  SwerveModule m_frontRight { 3, 4, 0.631 };
+  SwerveModule m_backLeft  { 7, 8, 0.960 };  SwerveModule m_backRight  { 5, 6, 0.986 };
 #endif
 
   Gyro m_gyro;

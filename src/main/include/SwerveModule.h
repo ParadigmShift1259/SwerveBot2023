@@ -33,9 +33,9 @@ using namespace rev;
 class SwerveModule
 {
 public:
-    SwerveModule(int driveMotorChannel, int turningMotorChannel, bool bInverted, double offset);
-    frc::SwerveModuleState GetState();// const;
-    frc::SwerveModulePosition GetPosition();// const;
+    SwerveModule(int driveMotorCanId, int turningMotorCanId, double offset);
+    frc::SwerveModuleState GetState();
+    frc::SwerveModulePosition GetPosition();
     void SetDesiredState(const frc::SwerveModuleState& state);
     void Periodic();
     void ResyncAbsRelEnc();
@@ -44,20 +44,33 @@ private:
     units::meters_per_second_t CalcMetersPerSec();
     double CalcTicksPer100Ms(units::meters_per_second_t speed);
 
-    static constexpr double kWheelRadius = 0.0508;
+    //static constexpr double kWheelRadius = 0.0508;
     static constexpr int kEncoderResolution = 4096;
-    static constexpr double kTurnMotorRevsPerWheelRev = 6.4; //12.8;
+    static constexpr double kTurnMotorRevsPerWheelRev = 150.0 / 7.0; //!< The steering gear ratio of the MK4i is 150/7:1
+    //static constexpr double kTurnMotorRevsPerWheelRev = 12.8;        //!< The steering gear ratio of the MK4 is 12.8:1
 
     static constexpr auto kModuleMaxAngularVelocity = std::numbers::pi * 1_rad_per_s;  // radians per second
     static constexpr auto kModuleMaxAngularAcceleration = std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
-    static constexpr int kEncoderCPR = 2048;
-    static constexpr int kEncoderTicksPerSec = 10;                 //!< TalonFX::GetSelectedSensorVelocity() returns ticks/100ms = 10 ticks/sec
+    // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
+    static constexpr double kEncoderCPR = 2048.0;                  //!< Falcon internal encoder is 2048 CPR
+    static constexpr double kEncoderTicksPerSec = 10.0;            //!< TalonFX::GetSelectedSensorVelocity() returns ticks/100ms = 10 ticks/sec
+    static constexpr double kEncoderRevPerSec = kEncoderTicksPerSec / kEncoderCPR;  //!< CPR counts per rev is the same as ticks per rev
     static constexpr double kWheelDiameterMeters = .1016;          //!< 4"
-    static constexpr double kDriveGearRatio = 8.16;                //!< MK3 swerve modules w/NEOs 12.1 ft/sec w/Falcon 13.6 ft/sec
-    /// Assumes the encoders are directly mounted on the wheel shafts
+    static constexpr double kWheelCircumfMeters = kWheelDiameterMeters * std::numbers::pi;  //!< Distance driven per wheel rev
+
+    // https://www.swervedrivespecialties.com/products/mk4i-swerve-module
+    // The MK4i is available in 3 different drive gear ratios. 
+    // The table below shows the drive gear ratios and free speeds with NEO and Falcon 500 motors. 
+    // L1 and L2 ratios are the most popular ratios and are suitable for standard full weight competition robots. 
+    // The L3 ratio is more aggressive and is recommended for light weight robots.
+    static constexpr double kDriveGearRatioL1 = 8.14;    //!< MK4i swerve modules L1 gearing w/Falcon 13.5 ft/sec
+    static constexpr double kDriveGearRatioL2 = 6.75;    //!< MK4i swerve modules L2 gearing w/Falcon 16.3 ft/sec
+    static constexpr double kDriveGearRatioL3 = 6.12;    //!< MK4i swerve modules L3 gearing w/Falcon 18.0 ft/sec
+    static constexpr double kDriveGearRatio = kDriveGearRatioL1;
+    /// Assumes the encoders are mounted on the motor shaft
     /// ticks / 100 ms -> ticks / s -> motor rev / s -> wheel rev / s -> m / s
-    static constexpr double kDriveEncoderMetersPerSec = kEncoderTicksPerSec / static_cast<double>(kEncoderCPR) / kDriveGearRatio * (kWheelDiameterMeters * std::numbers::pi);
+    static constexpr double kDriveEncoderMetersPerSec = kEncoderRevPerSec / kDriveGearRatio * kWheelCircumfMeters;
 
     TalonFX m_driveMotor;
     CANSparkMax m_turningMotor;
