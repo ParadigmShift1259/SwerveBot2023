@@ -29,7 +29,7 @@ void RobotContainer::SetDefaultCommands()
 
       const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * DriveSubsystem::kMaxSpeed;
       const auto ySpeed = -m_yspeedLimiter.Calculate(yInput) * DriveSubsystem::kMaxSpeed;
-      const auto rot = -m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
+      const auto rot = m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
       
       m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
     },
