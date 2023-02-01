@@ -4,6 +4,8 @@
 
 #include "RobotContainer.h"
 
+#include <frc/MathUtil.h>
+
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/JoystickButton.h>
 
@@ -29,7 +31,7 @@ void RobotContainer::SetDefaultCommands()
 
       const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * DriveSubsystem::kMaxSpeed;
       const auto ySpeed = -m_yspeedLimiter.Calculate(yInput) * DriveSubsystem::kMaxSpeed;
-      const auto rot = m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
+      const auto rot = -m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
       
       m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
     },
@@ -56,5 +58,9 @@ void RobotContainer::ConfigureBindings()
     JoystickButton(&primary, xbox::kStart).WhileTrue(&m_OverrideOn);
     JoystickButton(&primary, xbox::kBack).WhileTrue(&m_OverrideOff);
 
-    JoystickButton(&primary, xbox::kRightBumper).WhileTrue(&m_resyncAbsRelEnc);
+    //JoystickButton(&primary, xbox::kRightBumper).WhileTrue(&m_resyncAbsRelEnc);
+    // Triggers field relative driving
+    JoystickButton(&primary, xbox::kLeftBumper).WhileTrue(&m_setFieldRelative);
+    JoystickButton(&primary, xbox::kLeftBumper).WhileFalse(&m_clearFieldRelative);
+
 }

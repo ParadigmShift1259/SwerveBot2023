@@ -31,7 +31,10 @@ private:
   frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
 
-  bool m_fieldRelative = false;//true; TODO
+  bool m_fieldRelative = true;
+
+  frc2::InstantCommand m_setFieldRelative{[this] { m_fieldRelative = true; }, {}};
+  frc2::InstantCommand m_clearFieldRelative{[this] { m_fieldRelative = false; }, {}};
 
   frc2::InstantCommand m_wheelsForward{[this] { m_drive.WheelsForward(); }, {&m_drive} };
   frc2::InstantCommand m_wheelsLeft{[this] { m_drive.WheelsLeft(); }, {&m_drive} };

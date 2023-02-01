@@ -8,8 +8,8 @@
 #include <string>
 
 #include <frc/Encoder.h>
-#include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+//#include <frc/controller/PIDController.h>
+//#include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
@@ -33,7 +33,7 @@ using namespace rev;
 class SwerveModule
 {
 public:
-    SwerveModule(int driveMotorCanId, int turningMotorCanId, double offset);
+    SwerveModule(int driveMotorCanId, int turningMotorCanId, double offset, bool driveMotorReversed);
     frc::SwerveModuleState GetState();
     frc::SwerveModulePosition GetPosition();
     void SetDesiredState(const frc::SwerveModuleState& state);
@@ -82,7 +82,7 @@ private:
     frc::DutyCycleEncoder m_absEnc;
     double m_offset = 0.0;
 
-    frc2::PIDController m_drivePIDController{1.0, 0, 0};
+    //frc2::PIDController m_drivePIDController{1.0, 0, 0};
     
     SparkMaxPIDController m_turningPIDController = m_turningMotor.GetPIDController();
 

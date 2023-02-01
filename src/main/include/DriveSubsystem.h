@@ -52,13 +52,18 @@ private:
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
+  // static constexpr bool kFrontLeftDriveMotorReversed  = true;
+  // static constexpr bool kRearLeftDriveMotorReversed   = true;
+  // static constexpr bool kFrontRightDriveMotorReversed = false;
+  // static constexpr bool kRearRightDriveMotorReversed  = false;
+
 //#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
   SwerveModule m_frontLeft { 1, 2, 0.000 };  SwerveModule m_frontRight { 3, 4, 0.000 };
   SwerveModule m_backRight { 5, 6, 0.000 };  SwerveModule m_backLeft   { 7, 8, 0.000 };
 #else
-  SwerveModule m_frontLeft { 1, 2, 0.440 };  SwerveModule m_frontRight { 3, 4, 0.631 };
-  SwerveModule m_backLeft  { 7, 8, 0.960 };  SwerveModule m_backRight  { 5, 6, 0.986 };
+  SwerveModule m_frontLeft { 1, 2, 0.440, false };  SwerveModule m_frontRight { 3, 4, 0.631, true };
+  SwerveModule m_backLeft  { 7, 8, 0.960, false };  SwerveModule m_backRight  { 5, 6, 0.986, true };
 #endif
 
   Gyro m_gyro;

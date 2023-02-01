@@ -10,10 +10,10 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 {
   if (m_bOverrideXboxInput == false)
   {
-    // auto states = m_kinematics.ToSwerveModuleStates(fieldRelative 
-    //   ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
-    //   : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
-    auto states = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+    auto states = m_kinematics.ToSwerveModuleStates(fieldRelative 
+       ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+       : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
+    //auto states = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
     // Renormalizes the wheel speeds if any individual speed is above the specified maximum
     m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
