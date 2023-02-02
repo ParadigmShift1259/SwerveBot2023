@@ -106,10 +106,8 @@ void SwerveModule::Periodic()
   frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
   frc::SmartDashboard::PutNumber("Abs Pos Offset" + m_id, angle);
 
-  //frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, m_turningEncoder.GetPosition() * 2 * std::numbers::pi);
-  //frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, m_turningEncoder.GetPosition() * 2 * std::numbers::pi * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
-  frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, m_turningEncoder.GetPosition());
-  frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
+  frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, -1.0 * m_turningEncoder.GetPosition());
+  frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }
 
 void SwerveModule::ResyncAbsRelEnc()
@@ -130,17 +128,14 @@ void SwerveModule::ResyncAbsRelEnc()
         , time.to<double>()
         , angle
         , angle * 2 * std::numbers::pi
-        //, m_turningEncoder.GetPosition() * 2 * std::numbers::pi
-        //, m_turningEncoder.GetPosition() * 2 * std::numbers::pi * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
-        , m_turningEncoder.GetPosition()
-        , m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
+        , -1.0 * m_turningEncoder.GetPosition()
+        , -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }
 
 frc::SwerveModuleState SwerveModule::GetState()
 {
   return {units::meters_per_second_t{ CalcMetersPerSec() },
-          units::radian_t{ m_turningEncoder.GetPosition() } };
-          //units::radian_t{ m_turningEncoder.GetPosition() * 2 * std::numbers::pi } };
+          units::radian_t{ -1.0 * m_turningEncoder.GetPosition() } };
 }
 
 units::meters_per_second_t SwerveModule::CalcMetersPerSec()
@@ -157,15 +152,13 @@ double SwerveModule::CalcTicksPer100Ms(units::meters_per_second_t speed)
 frc::SwerveModulePosition SwerveModule::GetPosition()
 {
   return {units::meter_t{ m_driveMotor.GetSelectedSensorPosition() }, // TODO raw sensor units
-          units::radian_t{ m_turningEncoder.GetPosition() } };
-          //units::radian_t{ m_turningEncoder.GetPosition() * 2 * std::numbers::pi } };
+          units::radian_t{ -1.0 * m_turningEncoder.GetPosition() } };
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
 {
   // Optimize the reference state to avoid spinning further than 90 degrees
-  //double currPosition = m_turningEncoder.GetPosition() * 2 * std::numbers::pi;
-  double currPosition = m_turningEncoder.GetPosition();
+  double currPosition = -1.0 * m_turningEncoder.GetPosition();
   const auto state = frc::SwerveModuleState::Optimize(referenceState, frc::Rotation2d{ units::radian_t(currPosition) });
   frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, currPosition);
   frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, currPosition * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
@@ -195,7 +188,7 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   //double newRef = state.angle.Radians().to<double>() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi);
   // double newRef = referenceState.angle.Radians().to<double>() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi);
   frc::SmartDashboard::PutNumber("Turn Ref Motor" + m_id, newRef);
-  m_turningPIDController.SetReference(newRef, CANSparkMax::ControlType::kPosition);
+  m_turningPIDController.SetReference(-1.0 * newRef, CANSparkMax::ControlType::kPosition);
 
   // const auto turnFeedforward = m_turnFeedforward.Calculate(m_turningPIDController.GetSetpoint().velocity);
 

@@ -31,8 +31,11 @@ private:
   frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
 
-  bool m_fieldRelative = true;
-
+  // TODO If we set field relative as default, we also need to swap the 
+  //      button bindings here (while button is true (pressed) it should clear field relative (be robo relative))
+  //      in ConfigureBindings()
+  bool m_fieldRelative = false; //true;
+  
   frc2::InstantCommand m_setFieldRelative{[this] { m_fieldRelative = true; }, {}};
   frc2::InstantCommand m_clearFieldRelative{[this] { m_fieldRelative = false; }, {}};
 

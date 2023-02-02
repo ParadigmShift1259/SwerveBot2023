@@ -3,11 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "DriveSubsystem.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
                        units::radians_per_second_t rot, bool fieldRelative)
 {
+  frc::SmartDashboard::PutNumber("Input x speed", xSpeed.to<double>());
+  frc::SmartDashboard::PutNumber("Input y speed", ySpeed.to<double>());
+  frc::SmartDashboard::PutNumber("Input rot", rot.to<double>());
+
   if (m_bOverrideXboxInput == false)
   {
     auto states = m_kinematics.ToSwerveModuleStates(fieldRelative 
@@ -55,7 +60,7 @@ void DriveSubsystem::WheelsForward()
 {
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{0.0_deg};
-  sms.speed = 0.0_mps;
+  sms.speed = -1.0_mps;
   SetAllDesiredState(sms);
 }
 

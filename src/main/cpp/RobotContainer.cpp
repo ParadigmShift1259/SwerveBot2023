@@ -25,13 +25,15 @@ void RobotContainer::SetDefaultCommands()
   m_drive.SetDefaultCommand(frc2::RunCommand(
     [this] 
     {
-      const auto xInput = frc::ApplyDeadband(m_primaryController.GetLeftY(), 0.02);
-      const auto yInput = frc::ApplyDeadband(m_primaryController.GetLeftX(), 0.02);
-      const auto rotInput = frc::ApplyDeadband(m_primaryController.GetRightX(), 0.02);
+      //const double kDeadband = 0.02;
+      const double kDeadband = 0.1;
+      const auto xInput = frc::ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
+      const auto yInput = frc::ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
+      const auto rotInput = frc::ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
 
       const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * DriveSubsystem::kMaxSpeed;
-      const auto ySpeed = -m_yspeedLimiter.Calculate(yInput) * DriveSubsystem::kMaxSpeed;
-      const auto rot = -m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
+      const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * DriveSubsystem::kMaxSpeed;
+      const auto rot = m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
       
       m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
     },
@@ -60,6 +62,8 @@ void RobotContainer::ConfigureBindings()
 
     //JoystickButton(&primary, xbox::kRightBumper).WhileTrue(&m_resyncAbsRelEnc);
     // Triggers field relative driving
+    // TODO If we set field relative as default, we also need to swap the 
+    //      button bindings here (while button is true (pressed) it should clear field relative (be robo relative))
     JoystickButton(&primary, xbox::kLeftBumper).WhileTrue(&m_setFieldRelative);
     JoystickButton(&primary, xbox::kLeftBumper).WhileFalse(&m_clearFieldRelative);
 
