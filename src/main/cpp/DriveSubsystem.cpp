@@ -9,6 +9,18 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
                        units::radians_per_second_t rot, bool fieldRelative)
 {
+  wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+
+  m_StateHist.reserve(10000);
+  m_StateHist.clear();
+
+  m_logRobotPoseX = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseX");
+  m_logRobotPoseY = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseY");
+  m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseTheta");   
+  m_logRobotSpeed = wpi::log::DoubleLogEntry(log, "/odometry/robotSpeed");
+  m_logRobotAccel = wpi::log::DoubleLogEntry(log, "/odometry/robotAccel");
+
+
   frc::SmartDashboard::PutNumber("Input x speed", xSpeed.to<double>());
   frc::SmartDashboard::PutNumber("Input y speed", ySpeed.to<double>());
   frc::SmartDashboard::PutNumber("Input rot", rot.to<double>());
@@ -18,7 +30,6 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
     auto states = m_kinematics.ToSwerveModuleStates(fieldRelative 
        ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
        : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
-    //auto states = m_kinematics.ToSwerveModuleStates(frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
     // Renormalizes the wheel speeds if any individual speed is above the specified maximum
     m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
@@ -39,6 +50,25 @@ void DriveSubsystem::Periodic()
   m_frontRight.Periodic();
   m_backLeft.Periodic();
   m_backRight.Periodic();
+
+  //Log Odometry Values
+  frc::Pose2d pose = m_odometry.GetPose();
+  frc::Trajectory::State state;
+  state.t = m_timer.GetFPGATimestamp();
+  state.pose = pose;
+	auto& prevState = m_StateHist.back();
+  state.velocity = (pose - prevState.pose).Translation().Norm() / (state.t - prevState.t);
+  state.acceleration = (state.velocity - prevState.velocity) / (state.t - prevState.t);
+  m_StateHist.push_back(state);
+
+  m_velocity = (double)state.velocity;
+  m_acceleration = (double)state.acceleration;
+
+  m_logRobotPoseX.Append(pose.X().to<double>());
+  m_logRobotPoseY.Append(pose.Y().to<double>());
+  m_logRobotPoseTheta.Append(pose.Rotation().Degrees().to<double>());
+  m_logRobotSpeed.Append(m_velocity);
+  m_logRobotAccel.Append(m_acceleration);
 }
 
 void DriveSubsystem::ResyncAbsRelEnc()

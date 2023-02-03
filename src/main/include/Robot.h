@@ -5,8 +5,11 @@
 #pragma once
 
 #include <optional>
+#include <wpi/DataLog.h>
 
 #include <frc/TimedRobot.h>
+#include <frc/DataLogManager.h>
+#include <frc/DriverStation.h>
 #include <frc2/command/CommandPtr.h>
 
 #include "RobotContainer.h"
@@ -33,4 +36,5 @@ private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
+  bool m_hasAutoRun = false;
 };

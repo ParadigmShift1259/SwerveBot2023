@@ -5,12 +5,15 @@
 #pragma once
 
 #include <numbers>
+#include <wpi/DataLog.h>
 
 #include <frc/AnalogGyro.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
-
+#include <frc/DataLogManager.h>
+#include <frc/Timer.h>
+#include <frc/trajectory/Trajectory.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <ctre/phoenix.h>
@@ -55,11 +58,6 @@ private:
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-  // static constexpr bool kFrontLeftDriveMotorReversed  = true;
-  // static constexpr bool kRearLeftDriveMotorReversed   = true;
-  // static constexpr bool kFrontRightDriveMotorReversed = false;
-  // static constexpr bool kRearRightDriveMotorReversed  = false;
-
 //#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
   SwerveModule m_frontLeft { 1, 2, 0.000 };  SwerveModule m_frontRight { 3, 4, 0.000 };
@@ -82,4 +80,16 @@ private:
        m_backLeft.GetPosition(), m_backRight.GetPosition()}};
 
   bool m_bOverrideXboxInput = false;
+
+  // Logging Member Variables
+  frc::Timer m_timer;
+  std::vector<frc::Trajectory::State> m_StateHist;
+  double m_velocity;
+  double m_acceleration;
+
+  wpi::log::DoubleLogEntry m_logRobotPoseX;
+  wpi::log::DoubleLogEntry m_logRobotPoseY;
+  wpi::log::DoubleLogEntry m_logRobotPoseTheta;
+  wpi::log::DoubleLogEntry m_logRobotSpeed;
+  wpi::log::DoubleLogEntry m_logRobotAccel;
 };

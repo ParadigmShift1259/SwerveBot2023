@@ -17,17 +17,16 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   , m_absEnc((turningMotorCanId / 2) - 1)
   , m_offset(offset)
 {
+  wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+
+  m_logTurningEncoderPosition = wpi::log::DoubleLogEntry(log, "/swerveModule/turningEncoderPosition");
+  m_logAbsoluteEncoderPosition = wpi::log::DoubleLogEntry(log, "/swerveModule/absoluteEncoderPosition");
+  m_logAbsoluteEncoderPositionWithOffset = wpi::log::DoubleLogEntry(log, "/swerveModule/absoluteEncoderPositionWithOffset");
+
   m_turningEncoder.SetInverted(true);               // SDS Mk4i motors are mounted upside down compared to the Mk4
-  m_turningEncoder.SetPositionConversionFactor(2.0 * std::numbers::pi);
+  m_turningEncoder.SetPositionConversionFactor(2.0 * std::numbers::pi); //<! Converts from wheel rotations to radians
 
   m_absEnc.SetConnectedFrequencyThreshold(200);
-  // auto absPos = m_absEnc.GetAbsolutePosition();
-  // double angle = absPos - m_offset;
-  // if (absPos < m_offset)
-  // {
-  //   angle = absPos + (1 - m_offset);
-  // }
-  //auto angle = fmod(1 + m_absEnc.GetAbsolutePosition() - m_offset, 1.0);
   auto angle = fmod(1 + m_offset - m_absEnc.GetAbsolutePosition(), 1.0);
   m_turningEncoder.SetPosition(angle * 2 * std::numbers::pi);
 
@@ -70,8 +69,6 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   frc::SmartDashboard::PutNumber("Turn D", kTurnD);
   m_turningMotor.SetSmartCurrentLimit(20);
   m_turningMotor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
-
-  //m_drivePIDController.SetP(0.5);
   
   m_timer.Reset();
   m_timer.Start();
@@ -84,6 +81,13 @@ void SwerveModule::Periodic()
   {
     ResyncAbsRelEnc();
   }
+
+  // Log relative encoder and absolute encoder positions (radians)
+  auto absPos = m_absEnc.GetAbsolutePosition();
+  auto angle = fmod(1 + m_offset - absPos, 1.0);
+  m_logTurningEncoderPosition.Append(m_turningEncoder.GetPosition());
+  m_logAbsoluteEncoderPosition.Append(absPos);
+  m_logAbsoluteEncoderPositionWithOffset.Append(angle);
 
   bool bLoadPID = frc::SmartDashboard::GetBoolean("Load Turn PID", false);
   if (bLoadPID)
@@ -98,11 +102,8 @@ void SwerveModule::Periodic()
     frc::SmartDashboard::PutNumber("Turn I echo", kTurnI);
     frc::SmartDashboard::PutNumber("Turn D echo", kTurnD);
     printf("Loaded Turn PID values P %.3f I %.3f D %.3f\n", kTurnP, kTurnI, kTurnD);
-    //frc::SmartDashboard::PutBoolean("Load Turn PID", false);
   }
 
-  auto absPos = m_absEnc.GetAbsolutePosition();
-  auto angle = fmod(1 + m_offset - absPos, 1.0);
   frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
   frc::SmartDashboard::PutNumber("Abs Pos Offset" + m_id, angle);
 
@@ -113,13 +114,6 @@ void SwerveModule::Periodic()
 void SwerveModule::ResyncAbsRelEnc()
 {
   auto time = m_timer.Get();
-  // auto absPos = m_absEnc.GetAbsolutePosition();
-  // double angle = absPos - m_offset;
-  // if (absPos < m_offset)
-  // {
-  //   angle = absPos + (1 - m_offset);
-  // }
-  //auto angle = fmod(1 + m_absEnc.GetAbsolutePosition() - m_offset, 1.0);
   auto angle = fmod(1 + m_offset - m_absEnc.GetAbsolutePosition(), 1.0);
   m_turningEncoder.SetPosition(angle * 2 * std::numbers::pi);
   printf("%.3f abs enc set pos\n", angle);
@@ -163,11 +157,6 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, currPosition);
   frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, currPosition * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 
-  // Calculate the drive output from the drive PID controller.
-  //const auto driveOutput = m_drivePIDController.Calculate(m_driveMotor.GetSelectedSensorVelocity(), state.speed.value());
-  //const auto driveOutput = m_drivePIDController.Calculate(CalcMetersPerSec().to<double>(), state.speed.value());
-
-  // const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed); Not Used
   if (state.speed != 0_mps)
   {
 #ifdef DISABLE_DRIVE
@@ -185,13 +174,6 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   frc::SmartDashboard::PutNumber("Turn Ref Opt" + m_id, state.angle.Radians().to<double>());
   frc::SmartDashboard::PutNumber("Turn Ref" + m_id, referenceState.angle.Radians().to<double>());
   double newRef = state.angle.Radians().to<double>();
-  //double newRef = state.angle.Radians().to<double>() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi);
-  // double newRef = referenceState.angle.Radians().to<double>() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi);
   frc::SmartDashboard::PutNumber("Turn Ref Motor" + m_id, newRef);
   m_turningPIDController.SetReference(-1.0 * newRef, CANSparkMax::ControlType::kPosition);
-
-  // const auto turnFeedforward = m_turnFeedforward.Calculate(m_turningPIDController.GetSetpoint().velocity);
-
-  // Set the motor outputs.
-  //m_driveMotor.Set(ControlMode::Velocity, driveOutput);
 }

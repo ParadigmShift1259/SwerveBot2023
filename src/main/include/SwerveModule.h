@@ -6,16 +6,16 @@
 
 #include <numbers>
 #include <string>
+#include <wpi/DataLog.h>
 
 #include <frc/Encoder.h>
-//#include <frc/controller/PIDController.h>
-//#include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/DutyCycleEncoder.h>
 #include <frc/Timer.h>
+#include <frc/DataLogManager.h>
 
 #include <rev/CANSparkMax.h>
 #include <ctre/phoenix/motorcontrol/can/TalonFX.h>
@@ -81,14 +81,16 @@ private:
 
     frc::DutyCycleEncoder m_absEnc;
     double m_offset = 0.0;
-
-    //frc2::PIDController m_drivePIDController{1.0, 0, 0};
     
     SparkMaxPIDController m_turningPIDController = m_turningMotor.GetPIDController();
 
     frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V, 3_V / 1_mps};
-    // frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{1_V, 0.5_V / 1_rad_per_s};
 
     /// Timer used to sync absolute and relative encoders on robot turn on
     frc::Timer m_timer;
+
+    // Logging Member Variables
+    wpi::log::DoubleLogEntry m_logTurningEncoderPosition;
+    wpi::log::DoubleLogEntry m_logAbsoluteEncoderPosition;
+    wpi::log::DoubleLogEntry m_logAbsoluteEncoderPositionWithOffset;
 };
