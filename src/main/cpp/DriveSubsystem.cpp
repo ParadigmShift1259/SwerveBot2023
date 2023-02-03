@@ -11,8 +11,8 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
-  m_StateHist.reserve(10000);
-  m_StateHist.clear();
+  // m_StateHist.reserve(10000);
+  // m_StateHist.clear();
 
   m_logRobotPoseX = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseX");
   m_logRobotPoseY = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseY");
@@ -56,10 +56,10 @@ void DriveSubsystem::Periodic()
   frc::Trajectory::State state;
   state.t = m_timer.GetFPGATimestamp();
   state.pose = pose;
-	auto& prevState = m_StateHist.back();
-  state.velocity = (pose - prevState.pose).Translation().Norm() / (state.t - prevState.t);
-  state.acceleration = (state.velocity - prevState.velocity) / (state.t - prevState.t);
-  m_StateHist.push_back(state);
+	//auto& prevState = m_StateHist.back();
+  //state.velocity = (pose - prevState.pose).Translation().Norm() / (state.t - prevState.t);
+  //state.acceleration = (state.velocity - prevState.velocity) / (state.t - prevState.t);
+  //m_StateHist.push_back(state);
 
   m_velocity = (double)state.velocity;
   m_acceleration = (double)state.acceleration;

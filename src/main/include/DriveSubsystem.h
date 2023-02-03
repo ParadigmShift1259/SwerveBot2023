@@ -83,7 +83,7 @@ private:
 
   // Logging Member Variables
   frc::Timer m_timer;
-  std::vector<frc::Trajectory::State> m_StateHist;
+  //std::vector<frc::Trajectory::State> m_StateHist;
   double m_velocity;
   double m_acceleration;
 

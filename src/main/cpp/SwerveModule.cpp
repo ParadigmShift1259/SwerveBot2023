@@ -19,9 +19,10 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
-  m_logTurningEncoderPosition = wpi::log::DoubleLogEntry(log, "/swerveModule/turningEncoderPosition");
-  m_logAbsoluteEncoderPosition = wpi::log::DoubleLogEntry(log, "/swerveModule/absoluteEncoderPosition");
-  m_logAbsoluteEncoderPositionWithOffset = wpi::log::DoubleLogEntry(log, "/swerveModule/absoluteEncoderPositionWithOffset");
+  std::string logHeader = "/swerveModule" + m_id + "/";
+  m_logTurningEncoderPosition = wpi::log::DoubleLogEntry(log, logHeader + "turningEncoderPosition");
+  m_logAbsoluteEncoderPosition = wpi::log::DoubleLogEntry(log, logHeader + "absoluteEncoderPosition");
+  m_logAbsoluteEncoderPositionWithOffset = wpi::log::DoubleLogEntry(log, logHeader + "absoluteEncoderPositionWithOffset");
 
   m_turningEncoder.SetInverted(true);               // SDS Mk4i motors are mounted upside down compared to the Mk4
   m_turningEncoder.SetPositionConversionFactor(2.0 * std::numbers::pi); //<! Converts from wheel rotations to radians
@@ -82,12 +83,19 @@ void SwerveModule::Periodic()
     ResyncAbsRelEnc();
   }
 
+  // static int count = 0;
+  // if (count++ % 5)
+  // {
+  //   ResyncAbsRelEnc();
+  // }
+
   // Log relative encoder and absolute encoder positions (radians)
   auto absPos = m_absEnc.GetAbsolutePosition();
   auto angle = fmod(1 + m_offset - absPos, 1.0);
   m_logTurningEncoderPosition.Append(m_turningEncoder.GetPosition());
-  m_logAbsoluteEncoderPosition.Append(absPos);
-  m_logAbsoluteEncoderPositionWithOffset.Append(angle);
+  //m_logAbsoluteEncoderPosition.Append(absPos * 2 * std::numbers::pi);
+  m_logAbsoluteEncoderPosition.Append(((m_offset - absPos) * 2 * std::numbers::pi) - (m_turningEncoder.GetPosition()));
+  m_logAbsoluteEncoderPositionWithOffset.Append((m_offset - absPos) * 2 * std::numbers::pi);
 
   bool bLoadPID = frc::SmartDashboard::GetBoolean("Load Turn PID", false);
   if (bLoadPID)
