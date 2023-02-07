@@ -9,6 +9,8 @@
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/RunCommand.h>
+#include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/ConditionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 
 #include <DriveSubsystem.h>
@@ -24,6 +26,11 @@ public:
 private:
   void SetDefaultCommands();
   void ConfigureBindings();
+  frc2::SequentialCommandGroup* GetParkCommand();
+  frc2::ConditionalCommand* GetParkAndBalanceCommand();
+
+ private:
+  // The robot's subsystems and commands are defined here...
   DriveSubsystem m_drive;
 
   frc::XboxController m_primaryController{0};

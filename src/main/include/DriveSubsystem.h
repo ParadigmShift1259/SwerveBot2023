@@ -34,6 +34,7 @@ public:
              bool fieldRelative);
   void UpdateOdometry();
   void Periodic() override;
+  double GetPitch() { return m_gyro.GetPitch(); }
 
   void ResyncAbsRelEnc();
   void SetOverrideXboxInput(bool bOverride) { m_bOverrideXboxInput = bOverride; }
@@ -58,10 +59,10 @@ private:
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-//#define ZERO_OFFSETS
+// #define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
-  SwerveModule m_frontLeft { 1, 2, 0.000 };  SwerveModule m_frontRight { 3, 4, 0.000 };
-  SwerveModule m_backRight { 5, 6, 0.000 };  SwerveModule m_backLeft   { 7, 8, 0.000 };
+  SwerveModule m_frontLeft { 1, 2, 0.000, false };  SwerveModule m_frontRight { 3, 4, 0.000, true };
+  SwerveModule m_backRight { 5, 6, 0.000, false };  SwerveModule m_backLeft   { 7, 8, 0.000, true };
 #else
   SwerveModule m_frontLeft { 1, 2, 0.440, false };  SwerveModule m_frontRight { 3, 4, 0.631, true };
   SwerveModule m_backLeft  { 7, 8, 0.960, false };  SwerveModule m_backRight  { 5, 6, 0.986, true };
@@ -92,4 +93,5 @@ private:
   wpi::log::DoubleLogEntry m_logRobotPoseTheta;
   wpi::log::DoubleLogEntry m_logRobotSpeed;
   wpi::log::DoubleLogEntry m_logRobotAccel;
+  wpi::log::DoubleLogEntry m_logGyroPitch;
 };

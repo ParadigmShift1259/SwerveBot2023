@@ -7,6 +7,9 @@
 #include <frc/MathUtil.h>
 
 #include <frc2/command/Commands.h>
+#include <frc2/command/ParallelDeadlineGroup.h>
+#include <frc2/command/WaitCommand.h>
+#include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 
 RobotContainer::RobotContainer() : m_drive()
@@ -53,9 +56,11 @@ void RobotContainer::ConfigureBindings()
     // Keep the bindings in this order
     // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
     JoystickButton(&primary, xbox::kA).WhileTrue(&m_wheelsBackward);
-    JoystickButton(&primary, xbox::kB).WhileTrue(&m_wheelsLeft);
+    // JoystickButton(&primary, xbox::kB).WhileTrue(&m_wheelsLeft);
     JoystickButton(&primary, xbox::kX).WhileTrue(&m_wheelsRight);
     JoystickButton(&primary, xbox::kY).WhileTrue(&m_wheelsForward);
+
+  JoystickButton(&primary, xbox::kY).WhileTrue(GetParkAndBalanceCommand());
 
     JoystickButton(&primary, xbox::kStart).WhileTrue(&m_OverrideOn);
     JoystickButton(&primary, xbox::kBack).WhileTrue(&m_OverrideOff);
@@ -67,4 +72,37 @@ void RobotContainer::ConfigureBindings()
     JoystickButton(&primary, xbox::kLeftBumper).WhileTrue(&m_setFieldRelative);
     JoystickButton(&primary, xbox::kLeftBumper).WhileFalse(&m_clearFieldRelative);
 
+}
+
+frc2::SequentialCommandGroup* RobotContainer::GetParkCommand()
+{
+    return new frc2::SequentialCommandGroup
+    (
+        frc2::ParallelDeadlineGroup
+        (
+              frc2::WaitUntilCommand([this]() { return m_drive.GetPitch() < -7.0; })
+            , frc2::RunCommand([this]() { m_drive.Drive(0.25_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+        )
+        , frc2::ParallelDeadlineGroup
+        (
+            frc2::WaitCommand(1.600_s)
+          , frc2::RunCommand([this]() { m_drive.Drive(0.25_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+        )
+        , frc2::InstantCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+    );
+}
+
+frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
+{
+    return new frc2::ConditionalCommand
+    (
+        frc2::RunCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
+      , frc2::RunCommand([this]()                                                                            // Cmd if false
+        { 
+          double driveSpeed = std::clamp(-0.0125 * m_drive.GetPitch(), -0.1, 0.1);
+          m_drive.Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false); 
+        }
+        , {&m_drive})
+      , [this]() { return m_drive.GetPitch() > -1.0 && m_drive.GetPitch() < 1.0; }    // Condition
+    );
 }

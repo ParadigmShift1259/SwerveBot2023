@@ -19,6 +19,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseTheta");   
   m_logRobotSpeed = wpi::log::DoubleLogEntry(log, "/odometry/robotSpeed");
   m_logRobotAccel = wpi::log::DoubleLogEntry(log, "/odometry/robotAccel");
+  m_logGyroPitch = wpi::log::DoubleLogEntry(log, "/gyro/pitch");
 
 
   frc::SmartDashboard::PutNumber("Input x speed", xSpeed.to<double>());
@@ -69,6 +70,8 @@ void DriveSubsystem::Periodic()
   m_logRobotPoseTheta.Append(pose.Rotation().Degrees().to<double>());
   m_logRobotSpeed.Append(m_velocity);
   m_logRobotAccel.Append(m_acceleration);
+  frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
+  m_logGyroPitch.Append(m_gyro.GetPitch()); 
 }
 
 void DriveSubsystem::ResyncAbsRelEnc()
