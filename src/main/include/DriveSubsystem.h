@@ -43,11 +43,11 @@ public:
   void WheelsBackward();
   void WheelsRight();
 
-  //static constexpr units::meters_per_second_t kMaxSpeed = 3.0_mps;  // 3 meters per second
-  //static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
+  static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ratio Falcon Max Speed
+  static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
 // Safer sppeds for lab testing
-  static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
+  // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
+  // static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
 
 private:
   void SetAllDesiredState(const frc::SwerveModuleState& sms);
@@ -64,8 +64,8 @@ private:
   SwerveModule m_frontLeft { 1, 2, 0.000, false };  SwerveModule m_frontRight { 3, 4, 0.000, true };
   SwerveModule m_backRight { 5, 6, 0.000, false };  SwerveModule m_backLeft   { 7, 8, 0.000, true };
 #else
-  SwerveModule m_frontLeft { 1, 2, 0.440, false };  SwerveModule m_frontRight { 3, 4, 0.631, true };
-  SwerveModule m_backLeft  { 7, 8, 0.960, false };  SwerveModule m_backRight  { 5, 6, 0.986, true };
+  SwerveModule m_frontLeft { 1, 2, 0.982, false };  SwerveModule m_frontRight { 3, 4, 0.242, true };
+  SwerveModule m_backLeft  { 7, 8, 0.469, false };  SwerveModule m_backRight  { 5, 6, 0.762, true };
 #endif
 
   Gyro m_gyro;
