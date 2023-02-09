@@ -21,7 +21,7 @@ public:
   RobotContainer();
   
   frc2::CommandPtr GetAutonomousCommand();
-  void Periodic() { m_drive.Periodic(); }
+  void Periodic();
 
 private:
   void SetDefaultCommands();
@@ -55,4 +55,7 @@ private:
   frc2::InstantCommand m_OverrideOff{[this] { m_drive.SetOverrideXboxInput(false); }, {&m_drive} };
 
   frc2::InstantCommand m_resyncAbsRelEnc{[this] { m_drive.ResyncAbsRelEnc(); }, {&m_drive} };
+
+  double m_pitchFactor = 0.033;
+  double m_maxAutoBalanceSpeed = 0.5;
 };
