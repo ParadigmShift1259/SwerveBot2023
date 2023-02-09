@@ -64,8 +64,8 @@ private:
   // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
 
   // Mk4 swerve modules with L3 gear set
-  static constexpr double kFLoffset = 0.004;    static constexpr double kFRoffset = 0.252;
-  static constexpr double kBLoffset = 0.522;    static constexpr double kBRoffset = 0.240;
+  static constexpr double kFLoffset = 0.982;    static constexpr double kFRoffset = 0.242;
+  static constexpr double kBLoffset = 0.469;    static constexpr double kBRoffset = 0.762;
 
 //#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
