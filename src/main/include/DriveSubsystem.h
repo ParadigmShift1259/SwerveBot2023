@@ -59,13 +59,21 @@ private:
   frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-// #define ZERO_OFFSETS
+  // Mk4 swerve modules with L1 gear set
+  // static constexpr double kFLoffset = 0.440;   static constexpr double kFRoffset = 0.631;
+  // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
+
+  // Mk4 swerve modules with L3 gear set
+  static constexpr double kFLoffset = 0.004;    static constexpr double kFRoffset = 0.252;
+  static constexpr double kBLoffset = 0.522;    static constexpr double kBRoffset = 0.240;
+
+//#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
   SwerveModule m_frontLeft { 1, 2, 0.000, false };  SwerveModule m_frontRight { 3, 4, 0.000, true };
   SwerveModule m_backRight { 5, 6, 0.000, false };  SwerveModule m_backLeft   { 7, 8, 0.000, true };
 #else
-  SwerveModule m_frontLeft { 1, 2, 0.440, false };  SwerveModule m_frontRight { 3, 4, 0.631, true };
-  SwerveModule m_backLeft  { 7, 8, 0.960, false };  SwerveModule m_backRight  { 5, 6, 0.986, true };
+  SwerveModule m_frontLeft { 1, 2, kFLoffset, false };  SwerveModule m_frontRight { 3, 4, kFRoffset, true };
+  SwerveModule m_backLeft  { 7, 8, kBLoffset, false };  SwerveModule m_backRight  { 5, 6, kBRoffset, true };
 #endif
 
   Gyro m_gyro;
