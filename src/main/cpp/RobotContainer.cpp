@@ -60,7 +60,8 @@ void RobotContainer::ConfigureBindings()
     JoystickButton(&primary, xbox::kX).WhileTrue(&m_wheelsRight);
     JoystickButton(&primary, xbox::kY).WhileTrue(&m_wheelsForward);
 
-  JoystickButton(&primary, xbox::kY).WhileTrue(GetParkAndBalanceCommand());
+    JoystickButton(&primary, xbox::kY).WhileTrue(GetParkAndBalanceCommand());
+    JoystickButton(&primary, xbox::kB).OnTrue(GetParkCommand());
 
     JoystickButton(&primary, xbox::kStart).WhileTrue(&m_OverrideOn);
     JoystickButton(&primary, xbox::kBack).WhileTrue(&m_OverrideOff);
@@ -81,12 +82,12 @@ frc2::SequentialCommandGroup* RobotContainer::GetParkCommand()
         frc2::ParallelDeadlineGroup
         (
               frc2::WaitUntilCommand([this]() { return m_drive.GetPitch() < -7.0; })
-            , frc2::RunCommand([this]() { m_drive.Drive(0.25_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+            , frc2::RunCommand([this]() { m_drive.Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
         )
         , frc2::ParallelDeadlineGroup
         (
             frc2::WaitCommand(1.600_s)
-          , frc2::RunCommand([this]() { m_drive.Drive(0.25_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+          , frc2::RunCommand([this]() { m_drive.Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
         )
         , frc2::InstantCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
     );
@@ -99,7 +100,7 @@ frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
         frc2::RunCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
       , frc2::RunCommand([this]()                                                                            // Cmd if false
         { 
-          double driveSpeed = std::clamp(-0.0125 * m_drive.GetPitch(), -0.1, 0.1);
+          double driveSpeed = std::clamp(0.033 * m_drive.GetPitch(), -0.5, 0.5);
           m_drive.Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false); 
         }
         , {&m_drive})

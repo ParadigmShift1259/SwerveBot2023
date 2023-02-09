@@ -43,11 +43,11 @@ public:
   void WheelsBackward();
   void WheelsRight();
 
-  //static constexpr units::meters_per_second_t kMaxSpeed = 3.0_mps;  // 3 meters per second
-  //static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
+  static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ratio Falcon Max Speed
+  static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
 // Safer sppeds for lab testing
-  static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
+  // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
+  // static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
 
 private:
   void SetAllDesiredState(const frc::SwerveModuleState& sms);
