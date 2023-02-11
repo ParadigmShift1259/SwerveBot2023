@@ -12,26 +12,31 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/ConditionalCommand.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc2/command/SwerveControllerCommand.h>
 
 #include <DriveSubsystem.h>
+#include <Vision.h>
 
 class RobotContainer
 {
 public:
   RobotContainer();
   
-  frc2::CommandPtr GetAutonomousCommand();
-  void Periodic() { m_drive.Periodic(); }
+  //frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
+  void Periodic() { m_drive.Periodic(); m_vision.Periodic(); }
 
 private:
   void SetDefaultCommands();
   void ConfigureBindings();
   frc2::SequentialCommandGroup* GetParkCommand();
   frc2::ConditionalCommand* GetParkAndBalanceCommand();
+  frc2::SwerveControllerCommand<4>* GetSwerveCommandPath(frc::Trajectory trajectory); 
 
  private:
   // The robot's subsystems and commands are defined here...
   DriveSubsystem m_drive;
+  Vision m_vision;
 
   frc::XboxController m_primaryController{0};
   frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};

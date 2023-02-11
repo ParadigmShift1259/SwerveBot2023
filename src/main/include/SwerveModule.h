@@ -42,6 +42,7 @@ public:
 
 private:
     units::meters_per_second_t CalcMetersPerSec();
+    units::meter_t CalcMeters();
     double CalcTicksPer100Ms(units::meters_per_second_t speed);
 
     //static constexpr double kWheelRadius = 0.0508;
@@ -67,10 +68,11 @@ private:
     static constexpr double kDriveGearRatioL1 = 8.14;    //!< MK4i swerve modules L1 gearing w/Falcon 13.5 ft/sec
     static constexpr double kDriveGearRatioL2 = 6.75;    //!< MK4i swerve modules L2 gearing w/Falcon 16.3 ft/sec
     static constexpr double kDriveGearRatioL3 = 6.12;    //!< MK4i swerve modules L3 gearing w/Falcon 18.0 ft/sec
-    static constexpr double kDriveGearRatio = kDriveGearRatioL1;
+    static constexpr double kDriveGearRatio = kDriveGearRatioL3;
     /// Assumes the encoders are mounted on the motor shaft
     /// ticks / 100 ms -> ticks / s -> motor rev / s -> wheel rev / s -> m / s
     static constexpr double kDriveEncoderMetersPerSec = kEncoderRevPerSec / kDriveGearRatio * kWheelCircumfMeters;
+    static constexpr double kDriveEncoderMetersPerTick = kWheelCircumfMeters / (kEncoderCPR * kDriveGearRatio);
 
     TalonFX m_driveMotor;
     CANSparkMax m_turningMotor;

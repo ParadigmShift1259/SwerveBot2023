@@ -46,7 +46,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
 void DriveSubsystem::Periodic()
 {
-  //UpdateOdometry();
+  UpdateOdometry();
   m_frontLeft.Periodic();
   m_frontRight.Periodic();
   m_backLeft.Periodic();
@@ -72,6 +72,11 @@ void DriveSubsystem::Periodic()
   m_logRobotAccel.Append(m_acceleration);
   frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
   m_logGyroPitch.Append(m_gyro.GetPitch()); 
+}
+
+frc::Pose2d DriveSubsystem::GetPose()
+{
+  return m_odometry.GetPose();
 }
 
 void DriveSubsystem::ResyncAbsRelEnc()
@@ -127,4 +132,13 @@ void DriveSubsystem::SetAllDesiredState(const frc::SwerveModuleState& sms)
   m_frontRight.SetDesiredState(sms);
   m_backLeft.SetDesiredState(sms);
   m_backRight.SetDesiredState(sms);
+}
+
+void DriveSubsystem::SetModuleStates(SwerveModuleStates desiredStates)
+{
+    m_kinematics.DesaturateWheelSpeeds(&desiredStates, kMaxSpeed);
+    m_frontLeft.SetDesiredState(desiredStates[0]);
+    m_frontRight.SetDesiredState(desiredStates[1]);
+    m_backRight.SetDesiredState(desiredStates[3]);
+    m_backLeft.SetDesiredState(desiredStates[2]);
 }

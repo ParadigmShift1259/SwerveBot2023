@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/MathUtil.h>
+#include <frc/trajectory/TrajectoryGenerator.h>
 
 #include <frc2/command/Commands.h>
 #include <frc2/command/ParallelDeadlineGroup.h>
@@ -18,9 +19,25 @@ RobotContainer::RobotContainer() : m_drive()
   ConfigureBindings();
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand()
+//frc2::CommandPtr RobotContainer::GetAutonomousCommand()
+frc2::Command* RobotContainer::GetAutonomousCommand()
 {
-  return frc2::cmd::Print("No autonomous command configured");
+  std::vector<frc::Pose2d> waypoints
+  {
+    frc::Pose2d(3.95_m, 4.17_m, 0_deg),
+    frc::Pose2d(3.95_m, 2.17_m, 0_deg),
+    frc::Pose2d(2.95_m, 2.17_m, 0_deg),
+    frc::Pose2d(2.95_m, 4.17_m, 0_deg),
+    frc::Pose2d(3.95_m, 4.17_m, 0_deg)
+  };
+
+  auto config = frc::TrajectoryConfig(units::velocity::meters_per_second_t{3.5}, units::meters_per_second_squared_t{1.0});
+  config.SetKinematics(m_drive.m_kinematics);
+  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(waypoints, config);
+  
+  //return (frc2::CommandPtr)GetSwerveCommandPath(trajectory);
+  return GetSwerveCommandPath(trajectory);
+  // return frc2::cmd::Print("No autonomous command configured");
 }
 
 void RobotContainer::SetDefaultCommands()
@@ -34,9 +51,9 @@ void RobotContainer::SetDefaultCommands()
       const auto yInput = frc::ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
       const auto rotInput = frc::ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
 
-      const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * DriveSubsystem::kMaxSpeed;
-      const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * DriveSubsystem::kMaxSpeed;
-      const auto rot = m_rotLimiter.Calculate(rotInput) * DriveSubsystem::kMaxAngularSpeed;
+      const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * kMaxSpeed;
+      const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
+      const auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;
       
       m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
     },
@@ -106,4 +123,28 @@ frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
         , {&m_drive})
       , [this]() { return m_drive.GetPitch() > -1.0 && m_drive.GetPitch() < 1.0; }    // Condition
     );
+}
+
+const frc::TrapezoidProfile<units::radians>::Constraints
+    kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
+
+
+frc2::SwerveControllerCommand<4>* RobotContainer::GetSwerveCommandPath(frc::Trajectory trajectory)
+{
+    frc::ProfiledPIDController<units::radians> thetaController{2.0, 0, 1.0, kThetaControllerConstraints};
+
+    thetaController.EnableContinuousInput(units::radian_t(-std::numbers::pi), units::radian_t(std::numbers::pi));
+
+    frc2::SwerveControllerCommand<4>* swerveControllerCommand = new frc2::SwerveControllerCommand<4>(
+        trajectory,                                                             // frc::Trajectory
+        [this]() { return m_drive.GetPose(); },                                 // std::function<frc::Pose2d()>
+        m_drive.m_kinematics,                                               // frc::SwerveDriveKinematics<NumModules>
+        frc2::PIDController(1.0, 0, 0.0),                // frc2::PIDController
+        frc2::PIDController(1.0, 0, 0.0),                // frc2::PIDController
+        thetaController,                                                        // frc::ProfiledPIDController<units::radians>
+        [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
+        {&m_drive}                                                              // std::initializer_list<Subsystem*> requirements
+    );
+
+    return swerveControllerCommand;
 }

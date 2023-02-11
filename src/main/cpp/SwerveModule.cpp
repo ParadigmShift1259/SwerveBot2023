@@ -153,8 +153,14 @@ double SwerveModule::CalcTicksPer100Ms(units::meters_per_second_t speed)
 
 frc::SwerveModulePosition SwerveModule::GetPosition()
 {
-  return {units::meter_t{ m_driveMotor.GetSelectedSensorPosition() }, // TODO raw sensor units
+  return {CalcMeters(),
           units::radian_t{ -1.0 * m_turningEncoder.GetPosition() } };
+}
+
+units::meter_t SwerveModule::CalcMeters()
+{
+   double ticks = m_driveMotor.GetSelectedSensorPosition();
+   return units::meter_t(kDriveEncoderMetersPerTick * ticks);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
