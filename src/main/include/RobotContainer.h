@@ -24,7 +24,7 @@ public:
   
   //frc2::CommandPtr GetAutonomousCommand();
   frc2::Command* GetAutonomousCommand();
-  void Periodic() { m_drive.Periodic(); m_vision.Periodic(); }
+  void Periodic();
 
 private:
   void SetDefaultCommands();
@@ -32,6 +32,7 @@ private:
   frc2::SequentialCommandGroup* GetParkCommand();
   frc2::ConditionalCommand* GetParkAndBalanceCommand();
   frc2::SwerveControllerCommand<4>* GetSwerveCommandPath(frc::Trajectory trajectory); 
+  void PrintTrajectory(frc::Trajectory& trajectory);
 
  private:
   // The robot's subsystems and commands are defined here...

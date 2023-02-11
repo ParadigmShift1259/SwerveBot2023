@@ -122,14 +122,17 @@ void SwerveModule::Periodic()
 void SwerveModule::ResyncAbsRelEnc()
 {
   auto time = m_timer.Get();
-  auto angle = fmod(1 + m_offset - m_absEnc.GetAbsolutePosition(), 1.0);
-  m_turningEncoder.SetPosition(angle * 2 * std::numbers::pi);
-  printf("%.3f abs enc set pos\n", angle);
-  printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rad]\n"
+  auto angleInRot = fmod(1 + m_offset - m_absEnc.GetAbsolutePosition(), 1.0); // Returns rotations between 0 and 1
+  auto angleInRad = angleInRot * 2 * std::numbers::pi;                        // Changes rotations to radians
+  if (angleInRad > std::numbers::pi)                                          // If angle is between pi and 2pi, put it between -pi and 0
+      angleInRad -= 2 * std::numbers::pi;
+
+  m_turningEncoder.SetPosition(angleInRad);
+  printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
         , m_id.c_str()
         , time.to<double>()
-        , angle
-        , angle * 2 * std::numbers::pi
+        , angleInRot
+        , angleInRad
         , -1.0 * m_turningEncoder.GetPosition()
         , -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }

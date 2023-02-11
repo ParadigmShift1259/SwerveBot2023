@@ -94,6 +94,19 @@ void DriveSubsystem::UpdateOdometry()
                     m_backLeft.GetPosition(),  m_backRight.GetPosition()});
 }
 
+void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
+{
+  SwerveModulePositions modulePositions = {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+                                           m_backLeft.GetPosition(), m_backRight.GetPosition()};
+
+  m_odometry.ResetPosition(m_gyro.GetRotation2d(), modulePositions, pose);
+}
+
+void DriveSubsystem::SetHeading(units::degree_t heading)
+{
+  m_gyro.Set(heading);
+}
+
 void DriveSubsystem::WheelsForward()
 {
   frc::SwerveModuleState sms;

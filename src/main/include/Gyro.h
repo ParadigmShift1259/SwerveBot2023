@@ -15,6 +15,7 @@ public:
     frc::Rotation2d GetRotation2d();
     double GetPitch() { return m_gyro.GetPitch(); }
     void Reset();
+    void Set(units::degree_t yaw);
          
 #ifdef USE_PIGEON_2
     Pigeon2 m_gyro;

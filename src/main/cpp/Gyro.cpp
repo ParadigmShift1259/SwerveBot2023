@@ -26,3 +26,8 @@ void Gyro::Reset()
     m_gyro.SetFusedHeading(0.0);
 #endif
 }
+
+void Gyro::Set(units::degree_t yaw)
+{
+    m_gyro.SetYaw(yaw.to<double>());
+}

@@ -37,11 +37,14 @@ public:
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
              bool fieldRelative);
   void UpdateOdometry();
+  void ResetOdometry(frc::Pose2d pose);
+  void SetHeading(units::degree_t heading);
   void Periodic() override;
   double GetPitch() { return m_gyro.GetPitch(); }
   frc::Pose2d GetPose();
   /// Readable alias for array of swerve modules
   using SwerveModuleStates = wpi::array<frc::SwerveModuleState, 4>;
+  using SwerveModulePositions = wpi::array<frc::SwerveModulePosition, 4>;
   void SetModuleStates(SwerveModuleStates desiredStates);
 
   void ResyncAbsRelEnc();
@@ -70,7 +73,7 @@ private:
   // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
 
   // Mk4 swerve modules with L3 gear set
-  static constexpr double kFLoffset = 0.982;    static constexpr double kFRoffset = 0.242;
+  static constexpr double kFLoffset = 0.002;    static constexpr double kFRoffset = 0.242;
   static constexpr double kBLoffset = 0.469;    static constexpr double kBRoffset = 0.762;
 
 //#define ZERO_OFFSETS
@@ -94,8 +97,7 @@ private:
       m_kinematics,
       m_gyro.GetRotation2d(),
       {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-       m_backLeft.GetPosition(), m_backRight.GetPosition()},
-      frc::Pose2d(3.95_m, 4.17_m, frc::Rotation2d())};
+       m_backLeft.GetPosition(), m_backRight.GetPosition()}};
 
   bool m_bOverrideXboxInput = false;
 
