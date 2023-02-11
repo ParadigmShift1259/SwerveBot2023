@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 
 #include <frc/MathUtil.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 
 #include <frc2/command/Commands.h>
@@ -17,6 +18,9 @@ RobotContainer::RobotContainer() : m_drive()
 {
   SetDefaultCommands();
   ConfigureBindings();
+
+  frc::SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
+  frc::SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
 }
 
 //frc2::CommandPtr RobotContainer::GetAutonomousCommand()
@@ -38,6 +42,13 @@ frc2::Command* RobotContainer::GetAutonomousCommand()
   //return (frc2::CommandPtr)GetSwerveCommandPath(trajectory);
   return GetSwerveCommandPath(trajectory);
   // return frc2::cmd::Print("No autonomous command configured");
+}
+
+void RobotContainer::Periodic() {
+  m_drive.Periodic();
+
+  m_pitchFactor = frc::SmartDashboard::GetNumber("PitchFactor", m_pitchFactor);
+  m_maxAutoBalanceSpeed = frc::SmartDashboard::GetNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
 }
 
 void RobotContainer::SetDefaultCommands()
@@ -117,7 +128,7 @@ frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
         frc2::RunCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
       , frc2::RunCommand([this]()                                                                            // Cmd if false
         { 
-          double driveSpeed = std::clamp(0.033 * m_drive.GetPitch(), -0.5, 0.5);
+          double driveSpeed = std::clamp(m_pitchFactor * m_drive.GetPitch(), -m_maxAutoBalanceSpeed, m_maxAutoBalanceSpeed);
           m_drive.Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false); 
         }
         , {&m_drive})
