@@ -14,6 +14,7 @@
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 
+
 RobotContainer::RobotContainer() : m_drive()
 {
   SetDefaultCommands();
@@ -23,6 +24,18 @@ RobotContainer::RobotContainer() : m_drive()
   frc::SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
 }
 
+#define USE_PATH_PLANNER_SWERVE_CMD
+#ifdef USE_PATH_PLANNER_SWERVE_CMD
+frc2::Command* RobotContainer::GetAutonomousCommand()
+{
+  auto pptraj = PathPlanner::loadPath("TestPath1", units::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
+  frc::Trajectory trajectory = convertPathToTrajectory(pptraj);
+  PrintTrajectory(trajectory);
+  
+  return GetSwerveCommandPath(trajectory);
+  //return GetPathPlannerSwervePath(trajectory);
+}
+#else
 //frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 frc2::Command* RobotContainer::GetAutonomousCommand()
 {
@@ -38,12 +51,10 @@ frc2::Command* RobotContainer::GetAutonomousCommand()
   auto config = frc::TrajectoryConfig(units::velocity::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
   config.SetKinematics(m_drive.m_kinematics);
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(waypoints[0], {}, waypoints[1], config);
-  
-  // GetSwerveCommandPath(trajectory);
+
   return GetSwerveCommandPath(trajectory);
-  // return frc2::cmd::Print("No autonomous command configured");
-  // return nullptr;
 }
+#endif
 
 void RobotContainer::Periodic() {
   m_drive.Periodic();
@@ -144,9 +155,9 @@ const frc::TrapezoidProfile<units::radians>::Constraints
 
 frc2::SwerveControllerCommand<4>* RobotContainer::GetSwerveCommandPath(frc::Trajectory trajectory)
 {
-  PrintTrajectory(trajectory);
+  //PrintTrajectory(trajectory);
 
-  frc::ProfiledPIDController<units::radians> thetaController{2.0, 0, 1.0, kThetaControllerConstraints};
+  frc::ProfiledPIDController<units::radians> thetaController{0.01, 0.0, 0.0, kThetaControllerConstraints};
 
   thetaController.EnableContinuousInput(units::radian_t(-std::numbers::pi), units::radian_t(std::numbers::pi));
 
@@ -167,6 +178,26 @@ frc2::SwerveControllerCommand<4>* RobotContainer::GetSwerveCommandPath(frc::Traj
     return swerveControllerCommand;
 }
 
+pathplanner::PPSwerveControllerCommand* RobotContainer::GetPathPlannerSwervePath(PathPlannerTrajectory trajectory)
+{
+  PPSwerveControllerCommand* ppSwerveControllerCommand = new PPSwerveControllerCommand(
+      trajectory,                                                             // frc::Trajectory
+      [this]() { return m_drive.GetPose(); },                                 // std::function<frc::Pose2d()>
+      m_drive.m_kinematics,                                                   // frc::SwerveDriveKinematics<NumModules>
+      frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
+      frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
+      frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
+      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
+      {&m_drive}                                                              // std::initializer_list<Subsystem*> requirements
+			//bool useAllianceColor = false);
+    );
+
+    m_drive.SetHeading(trajectory.getInitialHolonomicPose().Rotation().Degrees());
+    m_drive.ResetOdometry(trajectory.getInitialHolonomicPose());
+
+    return ppSwerveControllerCommand;
+}
+
 void RobotContainer::PrintTrajectory(frc::Trajectory& trajectory)
 {
     printf("Time,X,Y,HoloRot\n");
@@ -179,3 +210,25 @@ void RobotContainer::PrintTrajectory(frc::Trajectory& trajectory)
         printf("%.3f,%.3f,%.3f,%.3f\n", time, x, y, holoRot);
     }
 }
+
+frc::Trajectory RobotContainer::convertPathToTrajectory(PathPlannerTrajectory ppTrajectory)
+{
+    std::vector<frc::Trajectory::State> states;
+    for (double time = 0.0; time < ppTrajectory.getTotalTime().to<double>(); time += 0.02)
+    {
+        PathPlannerTrajectory::PathPlannerState state = ppTrajectory.sample(time * 1_s);
+        states.push_back({
+            time * 1_s,
+            state.velocity,
+            state.acceleration, 
+            frc::Pose2d(
+                state.pose.X(),
+                state.pose.Y(),
+                state.holonomicRotation
+            ),
+            units::curvature_t(0)
+        });
+    }
+    return frc::Trajectory(states);
+}
+

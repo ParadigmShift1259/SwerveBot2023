@@ -14,8 +14,13 @@
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SwerveControllerCommand.h>
 
-#include <DriveSubsystem.h>
-#include <Vision.h>
+#include <pathplanner/lib/PathPlanner.h>
+#include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
+
+#include "DriveSubsystem.h"
+#include "Vision.h"
+
+using namespace pathplanner;
 
 class RobotContainer
 {
@@ -32,7 +37,9 @@ private:
   frc2::SequentialCommandGroup* GetParkCommand();
   frc2::ConditionalCommand* GetParkAndBalanceCommand();
   frc2::SwerveControllerCommand<4>* GetSwerveCommandPath(frc::Trajectory trajectory); 
+  PPSwerveControllerCommand* GetPathPlannerSwervePath(PathPlannerTrajectory trajectory);
   void PrintTrajectory(frc::Trajectory& trajectory);
+  frc::Trajectory convertPathToTrajectory(PathPlannerTrajectory ppTrajectory);
 
  private:
   // The robot's subsystems and commands are defined here...
