@@ -1,6 +1,7 @@
 #include <vector>
 #include <wpi/DataLog.h>
 
+#include <frc2/command/SubsystemBase.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <frc/smartdashboard/Field2d.h>
@@ -10,7 +11,7 @@
 #include <units/length.h>
 #include <iostream>
 
-class Vision
+class Vision : public frc2::SubsystemBase
 {
     public:
     Vision(/* args */);
