@@ -11,10 +11,10 @@
 #include <units/length.h>
 #include <iostream>
 
-class Vision : public frc2::SubsystemBase
+class VisionSubsystem : public frc2::SubsystemBase
 {
     public:
-    Vision(/* args */);
+    VisionSubsystem(/* args */);
     void Periodic();
 
     std::vector<double> m_net_buffer{2};

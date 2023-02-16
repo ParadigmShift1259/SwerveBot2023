@@ -1,6 +1,6 @@
-#include "Vision.h"
+#include "VisionSubsystem.h"
 
-Vision::Vision()
+VisionSubsystem::VisionSubsystem()
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
@@ -9,7 +9,7 @@ Vision::Vision()
   m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/vision/robotPoseTheta");
 }
 
-void Vision::Periodic()
+void VisionSubsystem::Periodic()
 {
     if (m_net_table->GetNumber("tv", 0))
     {

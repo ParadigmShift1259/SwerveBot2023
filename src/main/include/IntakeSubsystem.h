@@ -1,15 +1,20 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
-#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
 #include <frc/Solenoid.h>
 #include <frc/Timer.h>
+#include <frc2/command/SubsystemBase.h>
 
-#include "Constants.h"
+#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
+
+#include "ConstantsDigitalOut.h"
+#include "ConstantsCANIDs.h"
 
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
+
+constexpr double kIngestSpeed = 1.0;
+constexpr double kReleaseSpeed = -0.80;
 
 class IntakeSubsystem : public frc2::SubsystemBase
 {

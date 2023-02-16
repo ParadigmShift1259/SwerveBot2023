@@ -3,26 +3,20 @@
 #include <frc2/command/SubsystemBase.h>
 
 #include <ctre/phoenix/motorcontrol/ControlMode.h>
-#include "ctre/phoenix/motorcontrol/can/TalonSRX.h"
-#include <frc/DigitalInput.h>
+#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wattributes"
-
-#include <rev/CANSparkMax.h>
-#include <rev/CANEncoder.h>
-#include <rev/CANPIDController.h>
-
-#pragma GCC diagnostic pop
+#include "ConstantsDigitalOut.h"
+#include "ConstantsCANIDs.h"
 
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
-#include "Constants.h"
-
 using namespace std;
 using namespace frc;
-using namespace rev;
+
+constexpr double kTurntableCWSpeed = 0.1;
+constexpr double kTurntableCCWSpeed = -0.1;
+constexpr units::second_t kTurntableCWRunTime = 10.0_s;
 
 class TurntableSubsystem : public frc2::SubsystemBase
 {

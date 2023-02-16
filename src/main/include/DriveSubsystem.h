@@ -18,6 +18,7 @@
 
 #include <ctre/phoenix.h>
 
+#include "ConstantsCANIDs.h"
 #include "SwerveModule.h"
 #include "Gyro.h"
 
@@ -65,9 +66,14 @@ private:
   static constexpr auto kWheelBase = 28_in;
   const frc::Translation2d m_frontLeftLocation{kWheelBase / 2, kTrackWidth / 2};
   const frc::Translation2d m_frontRightLocation{kWheelBase / 2, -kTrackWidth / 2};
-  const frc::Translation2d m_backLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
-  const frc::Translation2d m_backRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
+  const frc::Translation2d m_rearLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
+  const frc::Translation2d m_rearRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
+//#define ZERO_OFFSETS
+#ifdef ZERO_OFFSETS
+  static constexpr double kFLoffset = 0.0;    static constexpr double kFRoffset = 0.0;
+  static constexpr double kBLoffset = 0.0;    static constexpr double kBRoffset = 0.0;
+#else
   // Mk4 swerve modules with L1 gear set
   // static constexpr double kFLoffset = 0.440;   static constexpr double kFRoffset = 0.631;
   // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
@@ -75,29 +81,26 @@ private:
   // Mk4 swerve modules with L3 gear set
   static constexpr double kFLoffset = 0.002;    static constexpr double kFRoffset = 0.242;
   static constexpr double kBLoffset = 0.469;    static constexpr double kBRoffset = 0.762;
-
-//#define ZERO_OFFSETS
-#ifdef ZERO_OFFSETS
-  SwerveModule m_frontLeft { 1, 2, 0.000, false };  SwerveModule m_frontRight { 3, 4, 0.000, true };
-  SwerveModule m_backRight { 5, 6, 0.000, false };  SwerveModule m_backLeft   { 7, 8, 0.000, true };
-#else
-  SwerveModule m_frontLeft { 1, 2, kFLoffset, false };  SwerveModule m_frontRight { 3, 4, kFRoffset, true };
-  SwerveModule m_backLeft  { 7, 8, kBLoffset, false };  SwerveModule m_backRight  { 5, 6, kBRoffset, true };
 #endif
+
+  SwerveModule m_frontLeft  { kFrontLeftDriveCANID, kFrontLeftTurningCANID, kFLoffset, false };
+  SwerveModule m_frontRight { kFrontRightDriveCANID, kFrontRightTurningCANID, kFRoffset, true };
+  SwerveModule m_rearLeft   { kRearLeftDriveCANID, kRearLeftTurningCANID, kBLoffset, false };
+  SwerveModule m_rearRight  { kRearRightDriveCANID, kRearRightTurningCANID, kBRoffset, true };
 
   Gyro m_gyro;
 
 public:
   frc::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, 
-      m_backLeftLocation, m_backRightLocation};
+      m_rearLeftLocation, m_rearRightLocation};
 
 private:
   frc::SwerveDriveOdometry<4> m_odometry{
       m_kinematics,
       m_gyro.GetRotation2d(),
       {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-       m_backLeft.GetPosition(), m_backRight.GetPosition()}};
+       m_rearLeft.GetPosition(), m_rearRight.GetPosition()}};
 
   bool m_bOverrideXboxInput = false;
 

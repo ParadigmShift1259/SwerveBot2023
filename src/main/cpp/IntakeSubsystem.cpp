@@ -1,7 +1,6 @@
 
 #include "IntakeSubsystem.h"
 
-#include "Constants.h"
 #include <frc/SmartDashBoard/SmartDashboard.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 
@@ -10,8 +9,8 @@ using namespace std;
 using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem() 
-    : m_motor(0)//kMotorPort)
-    , m_solenoid(PneumaticsModuleType::REVPH, 0)//kSolenoidPort)
+    : m_motor(kIntakeCANID)
+    , m_solenoid(PneumaticsModuleType::REVPH, kIntakeSolenoid)
 {
     m_motor.SetNeutralMode(NeutralMode::Coast);
 }

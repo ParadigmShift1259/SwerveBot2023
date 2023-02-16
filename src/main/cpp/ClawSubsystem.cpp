@@ -4,7 +4,7 @@ using namespace std;
 using namespace frc;
 
 ClawSubsystem::ClawSubsystem()
-    : m_solenoid(PneumaticsModuleType::REVPH, 0)//kSolenoidPort)
+    : m_solenoid(PneumaticsModuleType::REVPH, kClawSolenoid)
 {
 
 }
@@ -12,4 +12,14 @@ ClawSubsystem::ClawSubsystem()
 void ClawSubsystem::Periodic()
 {
     
+}
+
+void ClawSubsystem::Open()
+{
+    m_solenoid.Set(false);
+}
+
+void ClawSubsystem::Close()
+{
+    m_solenoid.Set(true);
 }

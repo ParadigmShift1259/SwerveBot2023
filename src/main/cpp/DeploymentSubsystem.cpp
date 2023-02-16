@@ -3,8 +3,8 @@ using namespace std;
 using namespace frc;
 
 DeploymentSubsystem::DeploymentSubsystem()
-    : m_motor(0)//kMotorPort)
-    , m_solenoid(PneumaticsModuleType::REVPH, 0)//kSolenoidPort)
+    : m_motor(kDeploymentCANID)
+    , m_solenoid(PneumaticsModuleType::REVPH, kDeploymentSolenoid)
 {
 
 }

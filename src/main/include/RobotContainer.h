@@ -17,12 +17,11 @@
 #include <pathplanner/lib/PathPlanner.h>
 #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
 
-#include "DriveSubsystem.h"
-#include "Vision.h"
+#include "ISubsystemAccess.h"
 
 using namespace pathplanner;
 
-class RobotContainer
+class RobotContainer : public ISubsystemAccess
 {
 public:
   RobotContainer();
@@ -30,6 +29,14 @@ public:
   //frc2::CommandPtr GetAutonomousCommand();
   frc2::Command* GetAutonomousCommand();
   void Periodic();
+
+  // ISubsystemAcces Implementation
+  ClawSubsystem&          GetClaw() override { return m_claw; }
+  DeploymentSubsystem&    GetDeployment() override { return m_deployment; }
+  DriveSubsystem&         GetDrive() override { return m_drive; }
+  IntakeSubsystem&        GetIntake() override { return m_intake; }
+  TurntableSubsystem&     GetTurntable() override { return m_turntable; }
+  VisionSubsystem&        GetVision() override { return m_vision; }
 
 private:
   void SetDefaultCommands();
@@ -43,8 +50,12 @@ private:
 
  private:
   // The robot's subsystems and commands are defined here...
+  ClawSubsystem m_claw;
+  DeploymentSubsystem m_deployment;
   DriveSubsystem m_drive;
-  Vision m_vision;
+  IntakeSubsystem m_intake;
+  TurntableSubsystem m_turntable;
+  VisionSubsystem m_vision;
 
   frc::XboxController m_primaryController{0};
   frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};

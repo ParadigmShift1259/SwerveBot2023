@@ -39,8 +39,8 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
     m_frontLeft.SetDesiredState(fl);
     m_frontRight.SetDesiredState(fr);
-    m_backLeft.SetDesiredState(bl);
-    m_backRight.SetDesiredState(br);
+    m_rearLeft.SetDesiredState(bl);
+    m_rearRight.SetDesiredState(br);
   }
 }
 
@@ -49,8 +49,8 @@ void DriveSubsystem::Periodic()
   UpdateOdometry();
   m_frontLeft.Periodic();
   m_frontRight.Periodic();
-  m_backLeft.Periodic();
-  m_backRight.Periodic();
+  m_rearLeft.Periodic();
+  m_rearRight.Periodic();
 
   //Log Odometry Values
   frc::Pose2d pose = m_odometry.GetPose();
@@ -83,21 +83,21 @@ void DriveSubsystem::ResyncAbsRelEnc()
 {
   m_frontLeft.ResyncAbsRelEnc();
   m_frontRight.ResyncAbsRelEnc();
-  m_backLeft.ResyncAbsRelEnc();
-  m_backRight.ResyncAbsRelEnc();
+  m_rearLeft.ResyncAbsRelEnc();
+  m_rearRight.ResyncAbsRelEnc();
 }
 
 void DriveSubsystem::UpdateOdometry()
 {
   m_odometry.Update(m_gyro.GetRotation2d(),
                    {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-                    m_backLeft.GetPosition(),  m_backRight.GetPosition()});
+                    m_rearLeft.GetPosition(),  m_rearRight.GetPosition()});
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
 {
   SwerveModulePositions modulePositions = {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
-                                           m_backLeft.GetPosition(), m_backRight.GetPosition()};
+                                           m_rearLeft.GetPosition(), m_rearRight.GetPosition()};
 
   m_odometry.ResetPosition(m_gyro.GetRotation2d(), modulePositions, pose);
 }
@@ -143,8 +143,8 @@ void DriveSubsystem::SetAllDesiredState(const frc::SwerveModuleState& sms)
 {
   m_frontLeft.SetDesiredState(sms);
   m_frontRight.SetDesiredState(sms);
-  m_backLeft.SetDesiredState(sms);
-  m_backRight.SetDesiredState(sms);
+  m_rearLeft.SetDesiredState(sms);
+  m_rearRight.SetDesiredState(sms);
 }
 
 void DriveSubsystem::SetModuleStates(SwerveModuleStates desiredStates)
@@ -152,6 +152,6 @@ void DriveSubsystem::SetModuleStates(SwerveModuleStates desiredStates)
     m_kinematics.DesaturateWheelSpeeds(&desiredStates, kMaxSpeed);
     m_frontLeft.SetDesiredState(desiredStates[0]);
     m_frontRight.SetDesiredState(desiredStates[1]);
-    m_backRight.SetDesiredState(desiredStates[3]);
-    m_backLeft.SetDesiredState(desiredStates[2]);
+    m_rearRight.SetDesiredState(desiredStates[3]);
+    m_rearLeft.SetDesiredState(desiredStates[2]);
 }

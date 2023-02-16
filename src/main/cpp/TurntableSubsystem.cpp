@@ -5,7 +5,7 @@ using namespace std;
 using namespace frc;
 
 TurntableSubsystem::TurntableSubsystem()
-    : m_turntablemotor(0)//kTurnTablePort)
+    : m_turntablemotor(kTurntableCANID)
 {
     m_turntablemotor.SetNeutralMode(NeutralMode::Brake);
     m_turntablemotor.SetInverted(true);//kTurnTableInverted);

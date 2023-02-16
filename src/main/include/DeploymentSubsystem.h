@@ -1,10 +1,14 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
-#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
 #include <frc/Solenoid.h>
 #include <frc/Timer.h>
+#include <frc2/command/SubsystemBase.h>
+
+#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
+
+#include "ConstantsDigitalOut.h"
+#include "ConstantsCANIDs.h"
 
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
