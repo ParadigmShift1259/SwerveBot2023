@@ -4,10 +4,12 @@
 
 #pragma once
 
-#include <numbers>
+#ifndef __DRIVESUBSYSTEM_H__
+#define __DRIVESUBSYSTEM_H__
+
 #include <wpi/DataLog.h>
 
-#include <frc/AnalogGyro.h>
+//#include <frc/AnalogGyro.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
@@ -18,6 +20,7 @@
 
 #include <ctre/phoenix.h>
 
+#include "IDriveSubsystem.h"
 #include "ConstantsCANIDs.h"
 #include "SwerveModule.h"
 #include "Gyro.h"
@@ -29,31 +32,28 @@ static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{4 *
 /**
  * Represents a swerve drive style DriveSubsystem.
  */
-class DriveSubsystem : public frc2::SubsystemBase
+class DriveSubsystem : public frc2::SubsystemBase. public IDriveSubsystem
 {
 public:
   DriveSubsystem() { m_gyro.Reset(); }
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool fieldRelative);
-  void UpdateOdometry();
-  void ResetOdometry(frc::Pose2d pose);
-  void SetHeading(units::degree_t heading);
+             bool fieldRelative) override;
+  void UpdateOdometry() override;
+  void ResetOdometry(frc::Pose2d pose) override;
+  void SetHeading(units::degree_t heading) override;
   void Periodic() override;
-  double GetPitch() { return m_gyro.GetPitch(); }
-  frc::Pose2d GetPose();
-  /// Readable alias for array of swerve modules
-  using SwerveModuleStates = wpi::array<frc::SwerveModuleState, 4>;
-  using SwerveModulePositions = wpi::array<frc::SwerveModulePosition, 4>;
-  void SetModuleStates(SwerveModuleStates desiredStates);
+  double GetPitch() override { return m_gyro.GetPitch(); }
+  frc::Pose2d GetPose() override;
+  void SetModuleStates(SwerveModuleStates desiredStates) override;
 
-  void ResyncAbsRelEnc();
-  void SetOverrideXboxInput(bool bOverride) { m_bOverrideXboxInput = bOverride; }
-  void WheelsForward();
-  void WheelsLeft();
-  void WheelsBackward();
-  void WheelsRight();
+  void ResyncAbsRelEnc() override;
+  void SetOverrideXboxInput(bool bOverride) override { m_bOverrideXboxInput = bOverride; }
+  void WheelsForward() override;
+  void WheelsLeft() override;
+  void WheelsBackward() override;
+  void WheelsRight() override;
 
 // Safer sppeds for lab testing
   // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
@@ -117,3 +117,5 @@ private:
   wpi::log::DoubleLogEntry m_logRobotAccel;
   wpi::log::DoubleLogEntry m_logGyroPitch;
 };
+
+#endif  //ndef __DRIVESUBSYSTEM_H__
