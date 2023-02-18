@@ -63,10 +63,12 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         TalonSRX m_motor;
 
         
-        frc::Solenoid m_solenoid;
+        frc::Solenoid m_armSolenoid;
+        frc::Solenoid m_backPlateSolenoid;
         frc::Timer m_timer;
 
         // Empirically measured 9752 motor ticks for 120 degrees of turret swing
+        // TODO figure out arm encoder, currently from last year turret
         static constexpr double kTicksPerDegree = 9752.0 / 120.0;
 
 

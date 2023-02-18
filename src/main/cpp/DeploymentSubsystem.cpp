@@ -4,7 +4,8 @@ using namespace frc;
 
 DeploymentSubsystem::DeploymentSubsystem()
     : m_motor(kDeploymentCANID)
-    , m_solenoid(PneumaticsModuleType::REVPH, kDeploymentSolenoid)
+    , m_armSolenoid(PneumaticsModuleType::REVPH, kArmSolenoid)
+    , m_backPlateSolenoid(PneumaticsModuleType::REVPH, kBackPlateSolenoid)
 {
 
 }
@@ -26,12 +27,12 @@ void DeploymentSubsystem::RotateOutOfFrame(double speed)
 
 void DeploymentSubsystem::Extend()
 {
-    m_solenoid.Set(true);
+    m_armSolenoid.Set(true);
 }
 
 void DeploymentSubsystem::Retract()
 {
-    m_solenoid.Set(false);
+    m_armSolenoid.Set(false);
 }
 
 bool DeploymentSubsystem::IsForwardLimitSwitchClosed()

@@ -39,4 +39,6 @@ public:
   virtual void WheelsLeft() = 0;
   virtual void WheelsBackward() = 0;
   virtual void WheelsRight() = 0;
+
+  virtual void ToggleSlowSpeed() = 0;
 };

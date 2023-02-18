@@ -25,6 +25,7 @@
 #include "PigeonGyro.h"
 
 static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ratio Falcon Max Speed
+static constexpr units::meters_per_second_t kLowSpeed = 4.0_fps;  // L3 Gear Ratio Falcon Max Speed
 static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
 static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{4 * std::numbers::pi};  // 4 rotations per second squared
 
@@ -46,7 +47,6 @@ public:
   double GetPitch() override { return m_gyro.GetPitch(); }
   frc::Pose2d GetPose() override;
   void SetModuleStates(SwerveModuleStates desiredStates) override;
-  //frc::SwerveDriveKinematics<4> GetKinematics() override { return m_kinematics; }
 
   void ResyncAbsRelEnc() override;
   void SetOverrideXboxInput(bool bOverride) override { m_bOverrideXboxInput = bOverride; }
@@ -54,6 +54,8 @@ public:
   void WheelsLeft() override;
   void WheelsBackward() override;
   void WheelsRight() override;
+
+  void ToggleSlowSpeed() override { m_currentMaxSpeed = (m_currentMaxSpeed == kMaxSpeed ? kLowSpeed : kMaxSpeed); }
 
 // Safer sppeds for lab testing
   // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
@@ -68,6 +70,8 @@ private:
   const frc::Translation2d m_frontRightLocation{kWheelBase / 2, -kTrackWidth / 2};
   const frc::Translation2d m_rearLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   const frc::Translation2d m_rearRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
+
+  units::meters_per_second_t m_currentMaxSpeed = kMaxSpeed;
 
 //#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS

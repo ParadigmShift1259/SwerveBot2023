@@ -10,10 +10,9 @@ class IntakeDeploy : public frc2::CommandHelper<frc2::CommandBase, IntakeDeploy>
   explicit IntakeDeploy(ISubsystemAccess& subsystemAccess);
 
   void Execute() override;
+  bool IsFinished() override;
   void End(bool interrupted) override;
-  bool IsFinished();
   
  private:
   IntakeSubsystem& m_intake;
-  bool m_bRunning = false;
 };

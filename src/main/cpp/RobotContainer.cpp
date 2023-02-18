@@ -14,43 +14,59 @@
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 
+#include "ClawOpen.h"
+#include "ClawClose.h"
+
+#include "IntakeDeploy.h"
+#include "IntakeIngest.h"
+#include "IntakeRelease.h"
+#include "IntakeStop.h"
+
+#include "RotateTurntableCW.h"
+
+#include "RetrievePosition.h"
+#include "TravelPosition.h"
+
+#include "PlaceOnFloor.h"
+#include "PlaceLow.h"
+#include "PlaceHigh.h"
 
 RobotContainer::RobotContainer() : m_drive()
 {
   SetDefaultCommands();
   ConfigureBindings();
 
-  frc::SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
-  frc::SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
+  SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
+  SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
 }
 
 #define USE_PATH_PLANNER_SWERVE_CMD
 #ifdef USE_PATH_PLANNER_SWERVE_CMD
-frc2::Command* RobotContainer::GetAutonomousCommand()
+Command* RobotContainer::GetAutonomousCommand()
 {
   auto pptraj = PathPlanner::loadPath("TestPath1", units::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
-  frc::Trajectory trajectory = convertPathToTrajectory(pptraj);
+  Trajectory trajectory = convertPathToTrajectory(pptraj);
   PrintTrajectory(trajectory);
   
   return GetSwerveCommandPath(trajectory);
   //return GetPathPlannerSwervePath(trajectory);
 }
 #else
-//frc2::CommandPtr RobotContainer::GetAutonomousCommand()
-frc2::Command* RobotContainer::GetAutonomousCommand()
+//CommandPtr RobotContainer::GetAutonomousCommand()
+Command* RobotContainer::GetAutonomousCommand()
 {
-  std::vector<frc::Pose2d> waypoints
+  std::vector<Pose2d> waypoints
   {
-      frc::Pose2d(3.95_m, 4.17_m, -90_deg)
-    , frc::Pose2d(3.95_m, 2.17_m, -90_deg)
-    // , frc::Pose2d(2.95_m, 2.17_m, 180_deg)
-    // , frc::Pose2d(2.95_m, 4.17_m, 180_deg)
-    // , frc::Pose2d(3.95_m, 4.17_m, 180_deg)
+      Pose2d(3.95_m, 4.17_m, -90_deg)
+    , Pose2d(3.95_m, 2.17_m, -90_deg)
+    // , Pose2d(2.95_m, 2.17_m, 180_deg)
+    // , Pose2d(2.95_m, 4.17_m, 180_deg)
+    // , Pose2d(3.95_m, 4.17_m, 180_deg)
   };
 
-  auto config = frc::TrajectoryConfig(units::velocity::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
+  auto config = TrajectoryConfig(units::velocity::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
   config.SetKinematics(m_drive.m_kinematics);
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(waypoints[0], {}, waypoints[1], config);
+  Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(waypoints[0], {}, waypoints[1], config);
 
   return GetSwerveCommandPath(trajectory);
 }
@@ -60,20 +76,20 @@ void RobotContainer::Periodic() {
   m_drive.Periodic();
   m_vision.Periodic();
 
-  m_pitchFactor = frc::SmartDashboard::GetNumber("PitchFactor", m_pitchFactor);
-  m_maxAutoBalanceSpeed = frc::SmartDashboard::GetNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
+  m_pitchFactor = SmartDashboard::GetNumber("PitchFactor", m_pitchFactor);
+  m_maxAutoBalanceSpeed = SmartDashboard::GetNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
 }
 
 void RobotContainer::SetDefaultCommands()
 {
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+  m_drive.SetDefaultCommand(RunCommand(
     [this] 
     {
       //const double kDeadband = 0.02;
       const double kDeadband = 0.1;
-      const auto xInput = frc::ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
-      const auto yInput = frc::ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
-      const auto rotInput = frc::ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
+      const auto xInput = ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
+      const auto yInput = ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
+      const auto rotInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
 
       const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * kMaxSpeed;
       const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
@@ -87,59 +103,87 @@ void RobotContainer::SetDefaultCommands()
 
 void RobotContainer::ConfigureBindings()
 {
-    using namespace frc;
-    using namespace frc2;
-    using xbox = frc::XboxController::Button;
+    ConfigPrimaryButtonBindings();
+    ConfigSecondaryButtonBindings();
+}
+
+void RobotContainer::ConfigPrimaryButtonBindings()
+{
+    using xbox = XboxController::Button;
 
     auto& primary = m_primaryController;
 
     // Primary
     // Keep the bindings in this order
     // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
+#ifdef USE_TEST_BUTTONS
     JoystickButton(&primary, xbox::kA).WhileTrue(&m_wheelsBackward);
-    // JoystickButton(&primary, xbox::kB).WhileTrue(&m_wheelsLeft);
-    JoystickButton(&primary, xbox::kX).WhileTrue(&m_wheelsRight);
+    JoystickButton(&primary, xbox::kB).WhileTrue(&m_wheelsRight);
+    JoystickButton(&primary, xbox::kX).WhileTrue(&m_wheelsLeft);
     JoystickButton(&primary, xbox::kY).WhileTrue(&m_wheelsForward);
-
-    JoystickButton(&primary, xbox::kY).WhileTrue(GetParkAndBalanceCommand());
-    JoystickButton(&primary, xbox::kB).OnTrue(GetParkCommand());
-
     JoystickButton(&primary, xbox::kStart).WhileTrue(&m_OverrideOn);
     JoystickButton(&primary, xbox::kBack).WhileTrue(&m_OverrideOff);
-
-    //JoystickButton(&primary, xbox::kRightBumper).WhileTrue(&m_resyncAbsRelEnc);
+#else
+    JoystickButton(&primary, xbox::kA).OnTrue(ClawOpen(*this).ToPtr());
+    JoystickButton(&primary, xbox::kB).OnTrue(ClawClose(*this).ToPtr());
+    // JoystickButton(&primary, xbox::kX).OnTrue();
+    // JoystickButton(&primary, xbox::kY).WhileTrue();
+#endif
     // Triggers field relative driving
     // TODO If we set field relative as default, we also need to swap the 
     //      button bindings here (while button is true (pressed) it should clear field relative (be robo relative))
-    JoystickButton(&primary, xbox::kLeftBumper).WhileTrue(&m_setFieldRelative);
-    JoystickButton(&primary, xbox::kLeftBumper).WhileFalse(&m_clearFieldRelative);
+    JoystickButton(&primary, xbox::kLeftBumper).OnTrue(&m_toggleFieldRelative);
+    // JoystickButton(&primary, xbox::kLeftBumper).WhileFalse(&m_clearFieldRelative);
 
+    JoystickButton(&primary, xbox::kRightBumper).OnTrue(&m_toggleSlowSpeed);
 }
 
-frc2::SequentialCommandGroup* RobotContainer::GetParkCommand()
+void RobotContainer::ConfigSecondaryButtonBindings()
 {
-    return new frc2::SequentialCommandGroup
+    using xbox = XboxController::Button;
+
+    auto& secondary = m_secondaryController;
+
+    // Keep the bindings in this order
+    // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
+    JoystickButton(&secondary, xbox::kA).OnTrue(IntakeIngest(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kB).OnTrue(PlaceLow(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kX).OnTrue(PlaceHigh(*this).ToPtr());
+    
+    JoystickButton(&secondary, xbox::kY).WhileTrue(RetrievePosition(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kY).WhileFalse(TravelPosition(*this).ToPtr());
+
+    JoystickButton(&secondary, xbox::kLeftBumper).OnTrue(PlaceOnFloor(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kRightBumper).OnTrue(IntakeRelease(*this).ToPtr());
+    
+    JoystickButton(&secondary, xbox::kBack).OnTrue(RotateTurntableCW(*this).ToPtr());    
+    // JoystickButton(&secondary, xbox::kStart).OnTrue();
+}
+
+SequentialCommandGroup* RobotContainer::GetParkCommand()
+{
+    return new SequentialCommandGroup
     (
-        frc2::ParallelDeadlineGroup
+        ParallelDeadlineGroup
         (
-              frc2::WaitUntilCommand([this]() { return GetDrive().GetPitch() < -7.0; })
-            , frc2::RunCommand([this]() { GetDrive().Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+              WaitUntilCommand([this]() { return GetDrive().GetPitch() < -7.0; })
+            , RunCommand([this]() { GetDrive().Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
         )
-        , frc2::ParallelDeadlineGroup
+        , ParallelDeadlineGroup
         (
-            frc2::WaitCommand(1.600_s)
-          , frc2::RunCommand([this]() { GetDrive().Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+            WaitCommand(1.600_s)
+          , RunCommand([this]() { GetDrive().Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
         )
-        , frc2::InstantCommand([this]() { GetDrive().Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+        , InstantCommand([this]() { GetDrive().Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
     );
 }
 
-frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
+ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
 {
-    return new frc2::ConditionalCommand
+    return new ConditionalCommand
     (
-        frc2::RunCommand([this]() { GetDrive().Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
-      , frc2::RunCommand([this]()                                                                            // Cmd if false
+        RunCommand([this]() { GetDrive().Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
+      , RunCommand([this]()                                                                            // Cmd if false
         { 
           double driveSpeed = std::clamp(m_pitchFactor * GetDrive().GetPitch(), -m_maxAutoBalanceSpeed, m_maxAutoBalanceSpeed);
           GetDrive().Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false); 
@@ -149,24 +193,24 @@ frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
     );
 }
 
-const frc::TrapezoidProfile<units::radians>::Constraints
+const TrapezoidProfile<units::radians>::Constraints
     kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
 
 
-frc2::SwerveControllerCommand<4>* RobotContainer::GetSwerveCommandPath(frc::Trajectory trajectory)
+SwerveControllerCommand<4>* RobotContainer::GetSwerveCommandPath(Trajectory trajectory)
 {
   //PrintTrajectory(trajectory);
 
-  frc::ProfiledPIDController<units::radians> thetaController{0.01, 0.0, 0.0, kThetaControllerConstraints};
+  ProfiledPIDController<units::radians> thetaController{0.01, 0.0, 0.0, kThetaControllerConstraints};
 
   thetaController.EnableContinuousInput(units::radian_t(-std::numbers::pi), units::radian_t(std::numbers::pi));
 
-  frc2::SwerveControllerCommand<4>* swerveControllerCommand = new frc2::SwerveControllerCommand<4>(
+  SwerveControllerCommand<4>* swerveControllerCommand = new SwerveControllerCommand<4>(
       trajectory,                                                             // frc::Trajectory
       [this]() { return GetDrive().GetPose(); },                                 // std::function<frc::Pose2d()>
       m_drive.m_kinematics,                                               // frc::SwerveDriveKinematics<NumModules>
-      frc2::PIDController(1.0, 0, 0.0),                // frc2::PIDController
-      frc2::PIDController(1.0, 0, 0.0),                // frc2::PIDController
+      PIDController(1.0, 0, 0.0),                // frc2::PIDController
+      PIDController(1.0, 0, 0.0),                // frc2::PIDController
       thetaController,                                                        // frc::ProfiledPIDController<units::radians>
       [this](auto moduleStates) { GetDrive().SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
       {&m_drive}                                                              // std::initializer_list<Subsystem*> requirements
@@ -184,9 +228,9 @@ pathplanner::PPSwerveControllerCommand* RobotContainer::GetPathPlannerSwervePath
       trajectory,                                                             // frc::Trajectory
       [this]() { return GetDrive().GetPose(); },                                 // std::function<frc::Pose2d()>
       m_drive.m_kinematics,                                                   // frc::SwerveDriveKinematics<NumModules>
-      frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
-      frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
-      frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
+      PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
+      PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
+      PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
       [this](auto moduleStates) { GetDrive().SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
       {&m_drive}                                                              // std::initializer_list<Subsystem*> requirements
 			//bool useAllianceColor = false);
@@ -198,7 +242,7 @@ pathplanner::PPSwerveControllerCommand* RobotContainer::GetPathPlannerSwervePath
     return ppSwerveControllerCommand;
 }
 
-void RobotContainer::PrintTrajectory(frc::Trajectory& trajectory)
+void RobotContainer::PrintTrajectory(Trajectory& trajectory)
 {
     printf("Time,X,Y,HoloRot\n");
     for (auto &state:trajectory.States())
@@ -211,9 +255,9 @@ void RobotContainer::PrintTrajectory(frc::Trajectory& trajectory)
     }
 }
 
-frc::Trajectory RobotContainer::convertPathToTrajectory(PathPlannerTrajectory ppTrajectory)
+Trajectory RobotContainer::convertPathToTrajectory(PathPlannerTrajectory ppTrajectory)
 {
-    std::vector<frc::Trajectory::State> states;
+    std::vector<Trajectory::State> states;
     for (double time = 0.0; time < ppTrajectory.getTotalTime().to<double>(); time += 0.02)
     {
         PathPlannerTrajectory::PathPlannerState state = ppTrajectory.sample(time * 1_s);
@@ -221,7 +265,7 @@ frc::Trajectory RobotContainer::convertPathToTrajectory(PathPlannerTrajectory pp
             time * 1_s,
             state.velocity,
             state.acceleration, 
-            frc::Pose2d(
+            Pose2d(
                 state.pose.X(),
                 state.pose.Y(),
                 state.holonomicRotation
@@ -229,6 +273,6 @@ frc::Trajectory RobotContainer::convertPathToTrajectory(PathPlannerTrajectory pp
             units::curvature_t(0)
         });
     }
-    return frc::Trajectory(states);
+    return Trajectory(states);
 }
 

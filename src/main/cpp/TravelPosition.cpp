@@ -2,8 +2,9 @@
 
 TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
+  , m_intake(subsystemAccess.GetIntake())
 {
-  AddRequirements({&subsystemAccess.GetDeployment()});
+  AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
 }
 
 void TravelPosition::Execute()
@@ -27,4 +28,5 @@ bool TravelPosition::IsFinished()
 void TravelPosition::End(bool interrupted)
 {
     m_deployment.Stop();
+    m_intake.IntakeOut(false);
 }

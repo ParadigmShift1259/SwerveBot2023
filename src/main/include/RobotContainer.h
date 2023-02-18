@@ -20,6 +20,8 @@
 #include "ISubsystemAccess.h"
 #include "DriveSubsystem.h"
 
+using namespace frc;
+using namespace frc2;
 using namespace pathplanner;
 
 class RobotContainer : public ISubsystemAccess
@@ -42,12 +44,14 @@ public:
 private:
   void SetDefaultCommands();
   void ConfigureBindings();
-  frc2::SequentialCommandGroup* GetParkCommand();
-  frc2::ConditionalCommand* GetParkAndBalanceCommand();
-  frc2::SwerveControllerCommand<4>* GetSwerveCommandPath(frc::Trajectory trajectory); 
+  void ConfigPrimaryButtonBindings();
+  void ConfigSecondaryButtonBindings();
+  SequentialCommandGroup* GetParkCommand();
+  ConditionalCommand* GetParkAndBalanceCommand();
+  SwerveControllerCommand<4>* GetSwerveCommandPath(Trajectory trajectory); 
   PPSwerveControllerCommand* GetPathPlannerSwervePath(PathPlannerTrajectory trajectory);
-  void PrintTrajectory(frc::Trajectory& trajectory);
-  frc::Trajectory convertPathToTrajectory(PathPlannerTrajectory ppTrajectory);
+  void PrintTrajectory(Trajectory& trajectory);
+  Trajectory convertPathToTrajectory(PathPlannerTrajectory ppTrajectory);
 
  private:
   // The robot's subsystems and commands are defined here...
@@ -58,28 +62,28 @@ private:
   TurntableSubsystem m_turntable;
   VisionSubsystem m_vision;
 
-  frc::XboxController m_primaryController{0};
-  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+  XboxController m_primaryController{0};
+  XboxController m_secondaryController{1};
+  SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
+  SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
+  SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
 
   // TODO If we set field relative as default, we also need to swap the 
   //      button bindings here (while button is true (pressed) it should clear field relative (be robo relative))
   //      in ConfigureBindings()
   bool m_fieldRelative = false; //true;
   
-  frc2::InstantCommand m_setFieldRelative{[this] { m_fieldRelative = true; }, {}};
-  frc2::InstantCommand m_clearFieldRelative{[this] { m_fieldRelative = false; }, {}};
+  InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
+  InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
+  // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
 
-  frc2::InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
-  frc2::InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };
-  frc2::InstantCommand m_wheelsBackward{[this] { GetDrive().WheelsBackward(); }, {&m_drive} };
-  frc2::InstantCommand m_wheelsRight{[this] { GetDrive().WheelsRight(); }, {&m_drive} };
+  InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
+  InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };
+  InstantCommand m_wheelsBackward{[this] { GetDrive().WheelsBackward(); }, {&m_drive} };
+  InstantCommand m_wheelsRight{[this] { GetDrive().WheelsRight(); }, {&m_drive} };
 
-  frc2::InstantCommand m_OverrideOn{[this] { GetDrive().SetOverrideXboxInput(true); }, {&m_drive} };
-  frc2::InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
-
-  frc2::InstantCommand m_resyncAbsRelEnc{[this] { GetDrive().ResyncAbsRelEnc(); }, {&m_drive} };
+  InstantCommand m_OverrideOn{[this] { GetDrive().SetOverrideXboxInput(true); }, {&m_drive} };
+  InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
 
   double m_pitchFactor = 0.033;
   double m_maxAutoBalanceSpeed = 0.5;

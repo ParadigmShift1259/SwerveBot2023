@@ -1,5 +1,7 @@
 #include "IntakeIngest.h"
 
+#include <frc2/command/WaitCommand.h>
+
 IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess) 
   : m_intake(subsystemAccess.GetIntake())
   , m_turntable(subsystemAccess.GetTurntable())
@@ -9,6 +11,8 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
 
 void IntakeIngest::Execute()
 {
+  m_intake.IntakeOut(true);
+  // WaitCommand(0.5_s); Do we still need this? Rollers not touching
   m_intake.Set(kIngestSpeed);
   m_turntable.SetTurnTable(kTurntableCCWSpeed);
 }

@@ -6,16 +6,17 @@ IntakeDeploy::IntakeDeploy(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetIntake()});
 }
 
-void IntakeDeploy::Execute() {
+void IntakeDeploy::Execute() 
+{
     m_intake.IntakeOut(true);
-    m_bRunning = true;
 }
 
 bool IntakeDeploy::IsFinished()
 {
-  return m_bRunning;
+  return true;
 }
 
-void IntakeDeploy::End(bool interrupted) {
-    m_bRunning = false;
+void IntakeDeploy::End(bool interrupted) 
+{
+
 }

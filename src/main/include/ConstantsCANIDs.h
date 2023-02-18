@@ -13,6 +13,7 @@ constexpr int kRearLeftDriveCANID     = 7;       //!< Rear Left Drive CAN ID (Ta
 constexpr int kRearLeftTurningCANID   = 8;       //!< Rear Left Turn CAN ID (SparkMAX)
 
 // Subsystem TalonSRXs
+// TODO assign CANIDs for talons
 constexpr int kIntakeCANID     = 1;
 constexpr int kTurntableCANID  = 2;
 constexpr int kDeploymentCANID = 3;
