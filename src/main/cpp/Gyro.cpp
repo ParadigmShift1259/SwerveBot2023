@@ -1,12 +1,12 @@
 #include "Gyro.h"
 
-Gyro::Gyro() :
+PigeonGyro::PigeonGyro() :
     m_gyro(1)
 {
 
 }
 
-frc::Rotation2d Gyro::GetRotation2d()
+frc::Rotation2d PigeonGyro::GetRotation2d()
 {
 #ifdef USE_PIGEON_2
     auto retVal = std::remainder(m_gyro.GetYaw(), 360.0);
@@ -18,7 +18,7 @@ frc::Rotation2d Gyro::GetRotation2d()
     return frc::Rotation2d(units::degree_t(retVal));
 }
 
-void Gyro::Reset()
+void PigeonGyro::Reset()
 {
 #ifdef USE_PIGEON_2
     m_gyro.SetYaw(0.0);
@@ -27,7 +27,7 @@ void Gyro::Reset()
 #endif
 }
 
-void Gyro::Set(units::degree_t yaw)
+void PigeonGyro::Set(units::degree_t yaw)
 {
     m_gyro.SetYaw(yaw.to<double>());
 }

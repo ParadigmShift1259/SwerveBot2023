@@ -79,7 +79,7 @@ void RobotContainer::SetDefaultCommands()
       const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
       const auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;
       
-      m_drive.Drive(xSpeed, ySpeed, rot, m_fieldRelative);
+      GetDrive().Drive(xSpeed, ySpeed, rot, m_fieldRelative);
     },
     {&m_drive}
   ));
@@ -122,15 +122,15 @@ frc2::SequentialCommandGroup* RobotContainer::GetParkCommand()
     (
         frc2::ParallelDeadlineGroup
         (
-              frc2::WaitUntilCommand([this]() { return m_drive.GetPitch() < -7.0; })
-            , frc2::RunCommand([this]() { m_drive.Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+              frc2::WaitUntilCommand([this]() { return GetDrive().GetPitch() < -7.0; })
+            , frc2::RunCommand([this]() { GetDrive().Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
         )
         , frc2::ParallelDeadlineGroup
         (
             frc2::WaitCommand(1.600_s)
-          , frc2::RunCommand([this]() { m_drive.Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+          , frc2::RunCommand([this]() { GetDrive().Drive(-1.00_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
         )
-        , frc2::InstantCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
+        , frc2::InstantCommand([this]() { GetDrive().Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})
     );
 }
 
@@ -138,14 +138,14 @@ frc2::ConditionalCommand* RobotContainer::GetParkAndBalanceCommand()
 {
     return new frc2::ConditionalCommand
     (
-        frc2::RunCommand([this]() { m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
+        frc2::RunCommand([this]() { GetDrive().Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false); }, {&m_drive})    // Cmd if true
       , frc2::RunCommand([this]()                                                                            // Cmd if false
         { 
-          double driveSpeed = std::clamp(m_pitchFactor * m_drive.GetPitch(), -m_maxAutoBalanceSpeed, m_maxAutoBalanceSpeed);
-          m_drive.Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false); 
+          double driveSpeed = std::clamp(m_pitchFactor * GetDrive().GetPitch(), -m_maxAutoBalanceSpeed, m_maxAutoBalanceSpeed);
+          GetDrive().Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false); 
         }
         , {&m_drive})
-      , [this]() { return m_drive.GetPitch() > -1.0 && m_drive.GetPitch() < 1.0; }    // Condition
+      , [this]() { return GetDrive().GetPitch() > -1.0 && GetDrive().GetPitch() < 1.0; }    // Condition
     );
 }
 
@@ -163,12 +163,12 @@ frc2::SwerveControllerCommand<4>* RobotContainer::GetSwerveCommandPath(frc::Traj
 
   frc2::SwerveControllerCommand<4>* swerveControllerCommand = new frc2::SwerveControllerCommand<4>(
       trajectory,                                                             // frc::Trajectory
-      [this]() { return m_drive.GetPose(); },                                 // std::function<frc::Pose2d()>
+      [this]() { return GetDrive().GetPose(); },                                 // std::function<frc::Pose2d()>
       m_drive.m_kinematics,                                               // frc::SwerveDriveKinematics<NumModules>
       frc2::PIDController(1.0, 0, 0.0),                // frc2::PIDController
       frc2::PIDController(1.0, 0, 0.0),                // frc2::PIDController
       thetaController,                                                        // frc::ProfiledPIDController<units::radians>
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
+      [this](auto moduleStates) { GetDrive().SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
       {&m_drive}                                                              // std::initializer_list<Subsystem*> requirements
     );
 
@@ -182,12 +182,12 @@ pathplanner::PPSwerveControllerCommand* RobotContainer::GetPathPlannerSwervePath
 {
   PPSwerveControllerCommand* ppSwerveControllerCommand = new PPSwerveControllerCommand(
       trajectory,                                                             // frc::Trajectory
-      [this]() { return m_drive.GetPose(); },                                 // std::function<frc::Pose2d()>
+      [this]() { return GetDrive().GetPose(); },                                 // std::function<frc::Pose2d()>
       m_drive.m_kinematics,                                                   // frc::SwerveDriveKinematics<NumModules>
       frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
       frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
       frc2::PIDController(1.0, 0.0, 0.0),                                       // frc2::PIDController
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
+      [this](auto moduleStates) { GetDrive().SetModuleStates(moduleStates); },   // std::function< void(std::array<frc::SwerveModuleState, NumModules>)>
       {&m_drive}                                                              // std::initializer_list<Subsystem*> requirements
 			//bool useAllianceColor = false);
     );

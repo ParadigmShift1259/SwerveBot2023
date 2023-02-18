@@ -18,6 +18,7 @@
 #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
 
 #include "ISubsystemAccess.h"
+#include "DriveSubsystem.h"
 
 using namespace pathplanner;
 
@@ -33,7 +34,7 @@ public:
   // ISubsystemAcces Implementation
   ClawSubsystem&          GetClaw() override { return m_claw; }
   DeploymentSubsystem&    GetDeployment() override { return m_deployment; }
-  DriveSubsystem&         GetDrive() override { return m_drive; }
+  IDriveSubsystem&        GetDrive() override { return m_drive; }
   IntakeSubsystem&        GetIntake() override { return m_intake; }
   TurntableSubsystem&     GetTurntable() override { return m_turntable; }
   VisionSubsystem&        GetVision() override { return m_vision; }
@@ -70,15 +71,15 @@ private:
   frc2::InstantCommand m_setFieldRelative{[this] { m_fieldRelative = true; }, {}};
   frc2::InstantCommand m_clearFieldRelative{[this] { m_fieldRelative = false; }, {}};
 
-  frc2::InstantCommand m_wheelsForward{[this] { m_drive.WheelsForward(); }, {&m_drive} };
-  frc2::InstantCommand m_wheelsLeft{[this] { m_drive.WheelsLeft(); }, {&m_drive} };
-  frc2::InstantCommand m_wheelsBackward{[this] { m_drive.WheelsBackward(); }, {&m_drive} };
-  frc2::InstantCommand m_wheelsRight{[this] { m_drive.WheelsRight(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsBackward{[this] { GetDrive().WheelsBackward(); }, {&m_drive} };
+  frc2::InstantCommand m_wheelsRight{[this] { GetDrive().WheelsRight(); }, {&m_drive} };
 
-  frc2::InstantCommand m_OverrideOn{[this] { m_drive.SetOverrideXboxInput(true); }, {&m_drive} };
-  frc2::InstantCommand m_OverrideOff{[this] { m_drive.SetOverrideXboxInput(false); }, {&m_drive} };
+  frc2::InstantCommand m_OverrideOn{[this] { GetDrive().SetOverrideXboxInput(true); }, {&m_drive} };
+  frc2::InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
 
-  frc2::InstantCommand m_resyncAbsRelEnc{[this] { m_drive.ResyncAbsRelEnc(); }, {&m_drive} };
+  frc2::InstantCommand m_resyncAbsRelEnc{[this] { GetDrive().ResyncAbsRelEnc(); }, {&m_drive} };
 
   double m_pitchFactor = 0.033;
   double m_maxAutoBalanceSpeed = 0.5;

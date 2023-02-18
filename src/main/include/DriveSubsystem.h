@@ -32,7 +32,7 @@ static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{4 *
 /**
  * Represents a swerve drive style DriveSubsystem.
  */
-class DriveSubsystem : public frc2::SubsystemBase. public IDriveSubsystem
+class DriveSubsystem : public frc2::SubsystemBase, public IDriveSubsystem
 {
 public:
   DriveSubsystem() { m_gyro.Reset(); }
@@ -47,6 +47,7 @@ public:
   double GetPitch() override { return m_gyro.GetPitch(); }
   frc::Pose2d GetPose() override;
   void SetModuleStates(SwerveModuleStates desiredStates) override;
+  //frc::SwerveDriveKinematics<4> GetKinematics() override { return m_kinematics; }
 
   void ResyncAbsRelEnc() override;
   void SetOverrideXboxInput(bool bOverride) override { m_bOverrideXboxInput = bOverride; }
@@ -88,7 +89,7 @@ private:
   SwerveModule m_rearLeft   { kRearLeftDriveCANID, kRearLeftTurningCANID, kBLoffset, false };
   SwerveModule m_rearRight  { kRearRightDriveCANID, kRearRightTurningCANID, kBRoffset, true };
 
-  Gyro m_gyro;
+  PigeonGyro m_gyro;
 
 public:
   frc::SwerveDriveKinematics<4> m_kinematics{

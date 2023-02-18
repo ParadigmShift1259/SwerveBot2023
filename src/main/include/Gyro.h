@@ -7,10 +7,10 @@
 #include <ctre/phoenix/sensors/Pigeon2.h>
 #endif
 
-class Gyro
+class PigeonGyro
 {
 public:
-    Gyro();
+    PigeonGyro();
 
     frc::Rotation2d GetRotation2d();
     double GetPitch() { return m_gyro.GetPitch(); }
