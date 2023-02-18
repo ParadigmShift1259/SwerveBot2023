@@ -26,6 +26,13 @@ public:
              units::meters_per_second_t ySpeed,
              units::radians_per_second_t rot,
              bool fieldRelative) = 0;
+  
+  virtual void RotationDrive(units::meters_per_second_t xSpeed
+                           , units::meters_per_second_t ySpeed
+                           , double xRot
+                           , double yRot
+                           , bool fieldRelative) = 0;
+  
   virtual void UpdateOdometry() = 0;
   virtual void ResetOdometry(frc::Pose2d pose) = 0;
   virtual void SetHeading(units::degree_t heading) = 0;

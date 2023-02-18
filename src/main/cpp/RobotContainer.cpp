@@ -83,13 +83,24 @@ void RobotContainer::SetDefaultCommands()
       const double kDeadband = 0.1;
       const auto xInput = ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
       const auto yInput = ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
-      const auto rotInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
+      const auto rotInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);      
+      const auto rotXInput = ApplyDeadband(m_primaryController.GetRightY(), kDeadband);
+      const auto rotYInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
 
       const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * kMaxSpeed;
       const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
-      const auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;
+      const auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;      
+      const double rotX = m_rotLimiter.Calculate(rotXInput);
+      const double rotY = m_rotLimiter.Calculate(rotYInput);
       
-      GetDrive().Drive(xSpeed, ySpeed, rot, m_fieldRelative);
+      if (m_fieldRelative)
+      {
+        GetDrive().RotationDrive(xSpeed, ySpeed, rotX, rotY, m_fieldRelative);
+      }
+      else
+      {
+        GetDrive().Drive(xSpeed, ySpeed, rot, m_fieldRelative);
+      }
     },
     {&m_drive}
   ));

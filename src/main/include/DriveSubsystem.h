@@ -15,6 +15,7 @@
 #include <frc/DataLogManager.h>
 #include <frc/Timer.h>
 #include <frc/trajectory/Trajectory.h>
+#include <frc/controller/PIDController.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <ctre/phoenix.h>
@@ -28,6 +29,8 @@ static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ra
 static constexpr units::meters_per_second_t kLowSpeed = 4.0_fps;  // L3 Gear Ratio Falcon Max Speed
 static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
 static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{4 * std::numbers::pi};  // 4 rotations per second squared
+static constexpr units::radians_per_second_t kRotationDriveMaxSpeed = 3.5_rad_per_s;
+static constexpr units::radians_per_second_t kRotationDriveDirectionLimit = 3.0_rad_per_s;
 
 /**
  * Represents a swerve drive style DriveSubsystem.
@@ -37,9 +40,18 @@ class DriveSubsystem : public frc2::SubsystemBase, public IDriveSubsystem
 public:
   DriveSubsystem() { m_gyro.Reset(); }
 
-  void Drive(units::meters_per_second_t xSpeed,
-             units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool fieldRelative) override;
+  void Drive(units::meters_per_second_t xSpeed
+           , units::meters_per_second_t ySpeed
+           , units::radians_per_second_t rot
+           , bool fieldRelative) override;
+
+  void RotationDrive(units::meters_per_second_t xSpeed
+                   , units::meters_per_second_t ySpeed
+                   , double xRot
+                   , double yRot
+                   , bool fieldRelative) override; 
+
+  
   void UpdateOdometry() override;
   void ResetOdometry(frc::Pose2d pose) override;
   void SetHeading(units::degree_t heading) override;
@@ -62,6 +74,11 @@ public:
   // static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
 
 private:
+  void RotationDrive(units::meters_per_second_t xSpeed
+                   , units::meters_per_second_t ySpeed
+                   , units::radian_t rot
+                   , bool fieldRelative);
+
   void SetAllDesiredState(const frc::SwerveModuleState& sms);
 
   static constexpr auto kTrackWidth = 20_in;
@@ -105,6 +122,8 @@ private:
       m_gyro.GetRotation2d(),
       {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
        m_rearLeft.GetPosition(), m_rearRight.GetPosition()}};
+
+  frc2::PIDController m_rotationPIDController{1, 0, 0.025};
 
   bool m_bOverrideXboxInput = false;
 

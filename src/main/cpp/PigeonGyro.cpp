@@ -31,3 +31,10 @@ void PigeonGyro::Set(units::degree_t yaw)
 {
     m_gyro.SetYaw(yaw.to<double>());
 }
+
+units::degrees_per_second_t PigeonGyro::GetTurnRate()
+{
+    double turnRates [3] = {0, 0, 0};
+    m_gyro.GetRawGyro(turnRates);
+    return units::degrees_per_second_t(turnRates[2]); 
+}
