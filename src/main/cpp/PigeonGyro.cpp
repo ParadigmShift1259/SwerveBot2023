@@ -1,4 +1,4 @@
-#include "Gyro.h"
+#include "PigeonGyro.h"
 
 PigeonGyro::PigeonGyro() :
     m_gyro(1)

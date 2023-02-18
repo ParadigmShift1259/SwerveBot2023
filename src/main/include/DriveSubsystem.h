@@ -9,7 +9,6 @@
 
 #include <wpi/DataLog.h>
 
-//#include <frc/AnalogGyro.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
@@ -23,7 +22,7 @@
 #include "IDriveSubsystem.h"
 #include "ConstantsCANIDs.h"
 #include "SwerveModule.h"
-#include "Gyro.h"
+#include "PigeonGyro.h"
 
 static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ratio Falcon Max Speed
 static constexpr units::radians_per_second_t kMaxAngularSpeed{std::numbers::pi};  // 1/2 rotation per second
