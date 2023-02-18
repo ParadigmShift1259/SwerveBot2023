@@ -2,9 +2,10 @@
 #include "IntakeRelease.h"
 
 IntakeRelease::IntakeRelease(ISubsystemAccess& subsystemAccess)
- : m_intake(subsystemAccess.GetIntake())
+ : m_deployment(subsystemAccess.GetDeployment())
+ , m_intake(subsystemAccess.GetIntake())
 {
-  AddRequirements({&subsystemAccess.GetIntake()});
+  AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
 }
 
 void IntakeRelease::Execute() {
@@ -18,5 +19,6 @@ bool IntakeRelease::IsFinished()
 
 void IntakeRelease::End(bool interrupted) {
   m_intake.Set(0);
-  m_intake.IntakeOut(false);
+  // Only retract intake if deployment arm is out of the way
+  m_intake.IntakeOut(!m_deployment.IsOkayToRetractIntake());
 }

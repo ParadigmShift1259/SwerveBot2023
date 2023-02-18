@@ -17,5 +17,4 @@ class PlaceOnFloor : public frc2::CommandHelper<frc2::CommandBase, PlaceOnFloor>
      
     private:
      DeploymentSubsystem& m_deployment;
-     static constexpr degree_t kAcceptedPosition = 45_deg;
 };

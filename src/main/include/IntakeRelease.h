@@ -14,5 +14,6 @@ class IntakeRelease : public frc2::CommandHelper<frc2::CommandBase, IntakeReleas
   void End(bool interrupted) override;
 
  private:
+  DeploymentSubsystem& m_deployment;
   IntakeSubsystem& m_intake;
 };

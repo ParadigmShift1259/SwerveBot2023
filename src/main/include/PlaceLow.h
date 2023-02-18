@@ -17,5 +17,4 @@ class PlaceLow : public frc2::CommandHelper<frc2::CommandBase, PlaceLow>
      
     private:
      DeploymentSubsystem& m_deployment;
-     static constexpr degree_t kAcceptedPosition = 60_deg;
 };

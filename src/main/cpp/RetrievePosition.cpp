@@ -1,5 +1,7 @@
 #include "RetrievePosition.h"
 
+#include "ConstantsDeploymentAngles.h"
+
 RetrievePosition::RetrievePosition(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
 {
@@ -8,7 +10,7 @@ RetrievePosition::RetrievePosition(ISubsystemAccess& subsystemAccess)
 
 void RetrievePosition::Execute()
 {
-    m_deployment.Extend();
+    m_deployment.ExtendArm();
     m_deployment.RotateIntoFrame(0.2);
 }
 

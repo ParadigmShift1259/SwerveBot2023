@@ -1,4 +1,7 @@
 #include "DeploymentSubsystem.h"
+
+#include "ConstantsDeploymentAngles.h"
+
 using namespace std;
 using namespace frc;
 
@@ -17,22 +20,34 @@ void DeploymentSubsystem::Periodic()
 
 void DeploymentSubsystem::RotateIntoFrame(double speed)
 {
+    m_backPlateSolenoid.Set(false);
     m_motor.Set(ControlMode::PercentOutput, -speed);
 }
 
 void DeploymentSubsystem::RotateOutOfFrame(double speed)
 {
+    m_backPlateSolenoid.Set(false);
     m_motor.Set(ControlMode::PercentOutput, speed);
 }
 
-void DeploymentSubsystem::Extend()
+void DeploymentSubsystem::ExtendArm()
 {
     m_armSolenoid.Set(true);
 }
 
-void DeploymentSubsystem::Retract()
+void DeploymentSubsystem::RetractArm()
 {
     m_armSolenoid.Set(false);
+}
+
+void DeploymentSubsystem::ExtendBackPlate()
+{
+    m_backPlateSolenoid.Set(true);
+}
+
+void DeploymentSubsystem::RetractBackPlate()
+{
+    m_backPlateSolenoid.Set(false);
 }
 
 bool DeploymentSubsystem::IsForwardLimitSwitchClosed()
@@ -52,6 +67,7 @@ void DeploymentSubsystem::Stop()
 
 bool DeploymentSubsystem::IsAtDegreeSetpoint(degree_t setpoint)
 {
+    // TODO Figure out actual angle tolerance
     double currentAngle = m_motor.GetSelectedSensorPosition() * kTicksPerDegree;
     return (fabs(setpoint.to<double>() - currentAngle) < 0.1);
 }
@@ -59,4 +75,10 @@ bool DeploymentSubsystem::IsAtDegreeSetpoint(degree_t setpoint)
 degree_t DeploymentSubsystem::CurrentDegreePosition()
 {
     return degree_t(m_motor.GetSelectedSensorPosition() * kTicksPerDegree);
+}
+
+bool DeploymentSubsystem::IsOkayToRetractIntake()
+{
+    degree_t currentAngle(m_motor.GetSelectedSensorPosition() * kTicksPerDegree);
+    return currentAngle > kTravelAngle;
 }

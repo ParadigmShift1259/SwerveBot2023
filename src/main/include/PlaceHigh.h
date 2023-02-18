@@ -17,6 +17,4 @@ class PlaceHigh : public frc2::CommandHelper<frc2::CommandBase, PlaceHigh>
 
     private:
      DeploymentSubsystem& m_deployment;
-     static constexpr degree_t kAcceptedPosition = 90_deg;
-
 };

@@ -1,5 +1,7 @@
 #include "TravelPosition.h"
 
+#include "ConstantsDeploymentAngles.h"
+
 TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
   , m_intake(subsystemAccess.GetIntake())
@@ -9,8 +11,8 @@ TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess)
 
 void TravelPosition::Execute()
 {
-    m_deployment.Retract();
-    if (m_deployment.CurrentDegreePosition() < kAcceptedPosition)
+    m_deployment.RetractArm();
+    if (m_deployment.CurrentDegreePosition() < kTravelAngle)
     {
         m_deployment.RotateOutOfFrame(0.2);
     }
@@ -22,7 +24,7 @@ void TravelPosition::Execute()
 
 bool TravelPosition::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kAcceptedPosition);
+    return m_deployment.IsAtDegreeSetpoint(kTravelAngle);
 }
 
 void TravelPosition::End(bool interrupted)

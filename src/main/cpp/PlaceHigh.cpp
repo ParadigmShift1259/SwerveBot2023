@@ -1,5 +1,7 @@
 #include "PlaceHigh.h"
 
+#include "ConstantsDeploymentAngles.h"
+
 PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
 {
@@ -8,7 +10,7 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
 
 void PlaceHigh::Execute()
 {
-    m_deployment.Extend();
+    m_deployment.ExtendArm();
     m_deployment.RotateOutOfFrame(0.2);
 }
 

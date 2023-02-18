@@ -20,6 +20,12 @@
 #include "ISubsystemAccess.h"
 #include "DriveSubsystem.h"
 
+#include "ClawOpen.h"
+#include "ClawClose.h"
+
+#include "RetrievePosition.h"
+#include "TravelPosition.h"
+
 using namespace frc;
 using namespace frc2;
 using namespace pathplanner;
@@ -76,6 +82,7 @@ private:
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
+  SequentialCommandGroup m_retrieveGamePiece{ ClawOpen(*this), RetrievePosition(*this), ClawClose(*this), TravelPosition(*this) };
 
   InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
   InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };

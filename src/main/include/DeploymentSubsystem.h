@@ -34,10 +34,16 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         void RotateOutOfFrame(double speed);
 
         /// Extends the deployment arm
-        void Extend();
+        void ExtendArm();
 
         /// Retracts the deployment arm
-        void Retract();
+        void RetractArm();
+
+        /// Extends the back plate
+        void ExtendBackPlate();
+
+        /// Retracts the back plate
+        void RetractBackPlate();
 
         /// Returns if the forward limit switch is currently closed
         /// \returns true if the limit switch is closed, false if the limit switch is open
@@ -58,6 +64,10 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Retrieves current position of deployment arm  
         /// \returns position of deployment arm, in degrees 
         degree_t CurrentDegreePosition();
+
+        /// Checks for interefence of the claw
+        /// \returns true if ready to retracts
+        bool IsOkayToRetractIntake();
 
     private:
         TalonSRX m_motor;

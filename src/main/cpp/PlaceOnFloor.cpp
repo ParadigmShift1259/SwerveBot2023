@@ -1,5 +1,7 @@
 #include "PlaceOnFloor.h"
 
+#include "ConstantsDeploymentAngles.h"
+
 PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
 {
@@ -8,8 +10,8 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 
 void PlaceOnFloor::Execute()
 {
-    m_deployment.Extend();
-    if (m_deployment.CurrentDegreePosition() < kAcceptedPosition)
+    m_deployment.ExtendArm();
+    if (m_deployment.CurrentDegreePosition() < kPlaceOnFloorAngle)
     {
         m_deployment.RotateOutOfFrame(0.2);
     }
@@ -21,7 +23,7 @@ void PlaceOnFloor::Execute()
 
 bool PlaceOnFloor::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kAcceptedPosition);
+    return m_deployment.IsAtDegreeSetpoint(kPlaceOnFloorAngle);
 }
 
 void PlaceOnFloor::End(bool interrupted)

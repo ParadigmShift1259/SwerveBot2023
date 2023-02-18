@@ -1,5 +1,7 @@
 #include "PlaceLow.h"
 
+#include "ConstantsDeploymentAngles.h"
+
 PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
 {
@@ -8,8 +10,8 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
 
 void PlaceLow::Execute()
 {
-    m_deployment.Retract();
-    if (m_deployment.CurrentDegreePosition() < kAcceptedPosition)
+    m_deployment.RetractArm();
+    if (m_deployment.CurrentDegreePosition() < kPlaceLowAngle)
     {
         m_deployment.RotateOutOfFrame(0.2);
     }
@@ -21,7 +23,7 @@ void PlaceLow::Execute()
 
 bool PlaceLow::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kAcceptedPosition);
+    return m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
 }
 
 void PlaceLow::End(bool interrupted)

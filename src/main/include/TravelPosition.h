@@ -18,5 +18,4 @@ class TravelPosition : public frc2::CommandHelper<frc2::CommandBase, TravelPosit
     private:
      DeploymentSubsystem& m_deployment;
      IntakeSubsystem& m_intake;
-     static constexpr degree_t kAcceptedPosition = 30_deg;
 };

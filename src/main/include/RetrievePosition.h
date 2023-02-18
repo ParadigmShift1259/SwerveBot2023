@@ -15,5 +15,4 @@ class RetrievePosition : public frc2::CommandHelper<frc2::CommandBase, RetrieveP
      void End(bool interrupted) override;
     private:
      DeploymentSubsystem& m_deployment;
-     static constexpr degree_t kAcceptedPosition = 0_deg;
 };

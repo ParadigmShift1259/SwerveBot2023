@@ -13,6 +13,7 @@ class IntakeIngest : public frc2::CommandHelper<frc2::CommandBase, IntakeIngest>
   void End(bool interrupted) override;
   
  private:
+  DeploymentSubsystem& m_deployment;
   IntakeSubsystem& m_intake;
   TurntableSubsystem& m_turntable;
 };

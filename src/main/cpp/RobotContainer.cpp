@@ -14,18 +14,12 @@
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 
-#include "ClawOpen.h"
-#include "ClawClose.h"
-
 #include "IntakeDeploy.h"
 #include "IntakeIngest.h"
 #include "IntakeRelease.h"
 #include "IntakeStop.h"
 
 #include "RotateTurntableCW.h"
-
-#include "RetrievePosition.h"
-#include "TravelPosition.h"
 
 #include "PlaceOnFloor.h"
 #include "PlaceLow.h"
@@ -146,15 +140,13 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
     // Keep the bindings in this order
     // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-    JoystickButton(&secondary, xbox::kA).OnTrue(IntakeIngest(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kA).WhileTrue(IntakeIngest(*this).ToPtr());
     JoystickButton(&secondary, xbox::kB).OnTrue(PlaceLow(*this).ToPtr());
     JoystickButton(&secondary, xbox::kX).OnTrue(PlaceHigh(*this).ToPtr());
-    
-    JoystickButton(&secondary, xbox::kY).WhileTrue(RetrievePosition(*this).ToPtr());
-    JoystickButton(&secondary, xbox::kY).WhileFalse(TravelPosition(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kY).OnTrue(&m_retrieveGamePiece);
 
     JoystickButton(&secondary, xbox::kLeftBumper).OnTrue(PlaceOnFloor(*this).ToPtr());
-    JoystickButton(&secondary, xbox::kRightBumper).OnTrue(IntakeRelease(*this).ToPtr());
+    JoystickButton(&secondary, xbox::kRightBumper).WhileTrue(IntakeRelease(*this).ToPtr());
     
     JoystickButton(&secondary, xbox::kBack).OnTrue(RotateTurntableCW(*this).ToPtr());    
     // JoystickButton(&secondary, xbox::kStart).OnTrue();
