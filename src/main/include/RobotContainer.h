@@ -15,7 +15,9 @@
 #include <frc2/command/SwerveControllerCommand.h>
 
 #include <pathplanner/lib/PathPlanner.h>
+#include <pathplanner/lib/auto/SwerveAutoBuilder.h>
 #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
+#include <unordered_map>
 
 #include "ISubsystemAccess.h"
 #include "DriveSubsystem.h"
@@ -35,8 +37,7 @@ class RobotContainer : public ISubsystemAccess
 public:
   RobotContainer();
   
-  //frc2::CommandPtr GetAutonomousCommand();
-  frc2::Command* GetAutonomousCommand();
+  CommandPtr GetAutonomousCommand();
   void Periodic();
 
   // ISubsystemAcces Implementation
@@ -91,6 +92,9 @@ private:
 
   InstantCommand m_OverrideOn{[this] { GetDrive().SetOverrideXboxInput(true); }, {&m_drive} };
   InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
+
+  std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
+  SwerveAutoBuilder m_autoBuilder;
 
   double m_pitchFactor = 0.033;
   double m_maxAutoBalanceSpeed = 0.5;

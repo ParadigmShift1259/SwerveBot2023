@@ -25,16 +25,37 @@
 #include "PlaceLow.h"
 #include "PlaceHigh.h"
 
-RobotContainer::RobotContainer() : m_drive()
+#include <pathplanner/lib/auto/SwerveAutoBuilder.h>
+#include <pathplanner/lib/PathPlanner.h>
+
+using namespace pathplanner;
+
+
+RobotContainer::RobotContainer() 
+  : m_drive()
+  , m_autoBuilder(
+      [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
+      [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
+      PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+      PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+      [this](auto speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
+      m_eventMap, // Our event map
+      { &m_drive }, // Drive requirements, usually just a single drive subsystem
+      true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+  )
 {
   SetDefaultCommands();
   ConfigureBindings();
+
+  // This is the pathplanner event map
+  m_eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
+  m_eventMap.emplace("intakeDown", std::make_shared<IntakeIngest>(*this));
 
   SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
   SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
 }
 
-#define USE_PATH_PLANNER_SWERVE_CMD
+//#define USE_PATH_PLANNER_SWERVE_CMD
 #ifdef USE_PATH_PLANNER_SWERVE_CMD
 Command* RobotContainer::GetAutonomousCommand()
 {
@@ -46,23 +67,26 @@ Command* RobotContainer::GetAutonomousCommand()
   //return GetPathPlannerSwervePath(trajectory);
 }
 #else
-//CommandPtr RobotContainer::GetAutonomousCommand()
-Command* RobotContainer::GetAutonomousCommand()
+CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  std::vector<Pose2d> waypoints
-  {
-      Pose2d(3.95_m, 4.17_m, -90_deg)
-    , Pose2d(3.95_m, 2.17_m, -90_deg)
-    // , Pose2d(2.95_m, 2.17_m, 180_deg)
-    // , Pose2d(2.95_m, 4.17_m, 180_deg)
-    // , Pose2d(3.95_m, 4.17_m, 180_deg)
-  };
+  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("TestPath1", {PathConstraints(1_mps, 1_mps_sq)});
 
-  auto config = TrajectoryConfig(units::velocity::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
-  config.SetKinematics(m_drive.m_kinematics);
-  Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(waypoints[0], {}, waypoints[1], config);
+  return m_autoBuilder.fullAuto(pathGroup);
 
-  return GetSwerveCommandPath(trajectory);
+  // std::vector<Pose2d> waypoints
+  // {
+  //     Pose2d(3.95_m, 4.17_m, -90_deg)
+  //   , Pose2d(3.95_m, 2.17_m, -90_deg)
+  //   // , Pose2d(2.95_m, 2.17_m, 180_deg)
+  //   // , Pose2d(2.95_m, 4.17_m, 180_deg)
+  //   // , Pose2d(3.95_m, 4.17_m, 180_deg)
+  // };
+
+  // auto config = TrajectoryConfig(units::velocity::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
+  // config.SetKinematics(m_drive.m_kinematics);
+  // Trajectory trajectory = TrajectoryGenerator::GenerateTrajectory(waypoints[0], {}, waypoints[1], config);
+
+  // return GetSwerveCommandPath(trajectory);
 }
 #endif
 
@@ -244,6 +268,8 @@ pathplanner::PPSwerveControllerCommand* RobotContainer::GetPathPlannerSwervePath
 
     return ppSwerveControllerCommand;
 }
+
+
 
 void RobotContainer::PrintTrajectory(Trajectory& trajectory)
 {
