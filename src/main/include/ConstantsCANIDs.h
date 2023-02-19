@@ -14,6 +14,6 @@ constexpr int kRearLeftTurningCANID   = 8;       //!< Rear Left Turn CAN ID (Spa
 
 // Subsystem TalonSRXs
 // TODO assign CANIDs for talons
-constexpr int kIntakeCANID     = 1;
-constexpr int kTurntableCANID  = 2;
-constexpr int kDeploymentCANID = 3;
+constexpr int kIntakeCANID     = 11;
+constexpr int kTurntableCANID  = 22;
+constexpr int kDeploymentCANID = 33;

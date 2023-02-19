@@ -11,13 +11,15 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
 void PlaceLow::Execute()
 {
     m_deployment.RetractArm();
+    //m_deployment.RotateArmToAngle(kPlaceLowAngle);
+
     if (m_deployment.CurrentDegreePosition() < kPlaceLowAngle)
     {
-        m_deployment.RotateOutOfFrame(0.2);
+        m_deployment.RotateOutOfFrame(kRotateSpeed);
     }
     else
     {
-        m_deployment.RotateIntoFrame(0.2);
+        m_deployment.RotateIntoFrame(kRotateSpeed);
     }
 }
 
@@ -28,5 +30,5 @@ bool PlaceLow::IsFinished()
 
 void PlaceLow::End(bool interrupted)
 {
-    m_deployment.Stop();
+    //m_deployment.Stop();
 }

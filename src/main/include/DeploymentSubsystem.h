@@ -33,6 +33,11 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// \param speed         Desired motor speed to run, ranging from [0, 1]
         void RotateOutOfFrame(double speed);
 
+
+        /// Drives the deployment arm to a specific angle
+        /// \param angle  Desired angle to rotate to [0, 140]
+        void RotateArmToAngle(degree_t angle);
+
         /// Extends the deployment arm
         void ExtendArm();
 
@@ -69,17 +74,16 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// \returns true if ready to retracts
         bool IsOkayToRetractIntake();
 
+        /// Zero out the arm encoder count
+        void ResetEncoder() { m_motor.SetSelectedSensorPosition(0.0); }
+
     private:
         TalonSRX m_motor;
-
-        
         frc::Solenoid m_armSolenoid;
         frc::Solenoid m_backPlateSolenoid;
         frc::Timer m_timer;
 
-        // Empirically measured 9752 motor ticks for 120 degrees of turret swing
-        // TODO figure out arm encoder, currently from last year turret
-        static constexpr double kTicksPerDegree = 9752.0 / 120.0;
-
-
+        // Empirically measured 4657 motor ticks for 140 degrees of arm rotation
+        static constexpr double kDegreesPerTick = 140.0 / 4657.0;
+        static constexpr double kTicksPerDegree = 1.0 / kDegreesPerTick;
 };

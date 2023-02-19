@@ -21,5 +21,5 @@ bool RetrievePosition::IsFinished()
 
 void RetrievePosition::End(bool interrupted)
 {
-    m_deployment.Stop();
+    //m_deployment.Stop();
 }

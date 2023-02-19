@@ -29,6 +29,6 @@ bool TravelPosition::IsFinished()
 
 void TravelPosition::End(bool interrupted)
 {
-    m_deployment.Stop();
+    //m_deployment.Stop();
     m_intake.IntakeOut(false);
 }

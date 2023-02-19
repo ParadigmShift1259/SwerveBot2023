@@ -155,7 +155,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
     JoystickButton(&primary, xbox::kA).OnTrue(ClawOpen(*this).ToPtr());
     JoystickButton(&primary, xbox::kB).OnTrue(ClawClose(*this).ToPtr());
-    // JoystickButton(&primary, xbox::kX).OnTrue();
+    
+    JoystickButton(&primary, xbox::kX).OnTrue(&m_resetArmEncoder);
     // JoystickButton(&primary, xbox::kY).WhileTrue();
 #endif
     // Triggers field relative driving

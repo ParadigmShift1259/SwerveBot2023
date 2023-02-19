@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO assign ports for solenoids
-constexpr int kIntakeSolenoid     = 1;
-constexpr int kArmSolenoid        = 2;
-constexpr int kBackPlateSolenoid  = 3;
-constexpr int kClawSolenoid       = 4;
+constexpr int kArmSolenoid        = 0;
+constexpr int kClawSolenoid       = 1;
+constexpr int kBackPlateSolenoid  = 2;
+constexpr int kIntakeSolenoid     = 3;

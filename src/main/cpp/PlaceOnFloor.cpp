@@ -13,11 +13,11 @@ void PlaceOnFloor::Execute()
     m_deployment.ExtendArm();
     if (m_deployment.CurrentDegreePosition() < kPlaceOnFloorAngle)
     {
-        m_deployment.RotateOutOfFrame(0.2);
+        m_deployment.RotateOutOfFrame(kRotateSpeed);
     }
     else
     {
-        m_deployment.RotateIntoFrame(0.2);
+        m_deployment.RotateIntoFrame(kRotateSpeed);
     }
 }
 
@@ -28,5 +28,5 @@ bool PlaceOnFloor::IsFinished()
 
 void PlaceOnFloor::End(bool interrupted)
 {
-    m_deployment.Stop();
+    //m_deployment.Stop();
 }
