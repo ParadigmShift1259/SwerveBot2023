@@ -12,16 +12,16 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
 
 void PlaceHigh::Execute()
 {
-    SmartDashboard::PutBoolean("fwd limit", IsFinished());
     m_deployment.ExtendArm();
-    auto spd = SmartDashboard::GetNumber("rot speed", kRotateSpeed);
-    m_deployment.RotateOutOfFrame(spd);
+//    auto spd = SmartDashboard::GetNumber("rot speed", kRotateSpeed);
+//    m_deployment.RotateOutOfFrame(spd);
     //m_deployment.RotateOutOfFrame(kRotateSpeed);
+    m_deployment.RotateArmToAngle(kPlaceHighAngle);
 }
 
 bool PlaceHigh::IsFinished()
 {
-    return m_deployment.IsForwardLimitSwitchClosed();
+    return true; //m_deployment.IsForwardLimitSwitchClosed();
 }
 
 void PlaceHigh::End(bool interrupted)

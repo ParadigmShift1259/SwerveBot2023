@@ -4,8 +4,6 @@
 #include <frc/SmartDashBoard/SmartDashboard.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 
-// using namespace IntakeConstants;
-using namespace std;
 using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem() 

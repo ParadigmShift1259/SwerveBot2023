@@ -1,7 +1,6 @@
 #include "TurntableSubsystem.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
-using namespace std;
 using namespace frc;
 
 TurntableSubsystem::TurntableSubsystem()

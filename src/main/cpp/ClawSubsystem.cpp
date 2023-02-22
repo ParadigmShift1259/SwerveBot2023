@@ -1,6 +1,5 @@
 #include "ClawSubsystem.h"
 
-using namespace std;
 using namespace frc;
 
 ClawSubsystem::ClawSubsystem()

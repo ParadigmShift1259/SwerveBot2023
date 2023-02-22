@@ -37,6 +37,7 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Drives the deployment arm to a specific angle
         /// \param angle  Desired angle to rotate to [0, 140]
         void RotateArmToAngle(degree_t angle);
+        void RotateArmToAngleRel(degree_t angle);
 
         /// Extends the deployment arm
         void ExtendArm();
@@ -84,6 +85,8 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         frc::Timer m_timer;
 
         // Empirically measured 4657 motor ticks for 140 degrees of arm rotation
-        static constexpr double kDegreesPerTick = 140.0 / 4657.0;
+        //static constexpr double kDegreesPerTick = 140.0 / 4657.0;
+        // Empirically measured 5815 motor ticks for 180 degrees of arm rotation
+        static constexpr double kDegreesPerTick = 180.0 / 5815.0;
         static constexpr double kTicksPerDegree = 1.0 / kDegreesPerTick;
 };

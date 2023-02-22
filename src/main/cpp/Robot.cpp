@@ -22,7 +22,7 @@ void Robot::RobotPeriodic()
 
 void Robot::DisabledInit()
 {
-
+  m_container.GetDeployment().Stop();
 }
 
 void Robot::DisabledPeriodic()

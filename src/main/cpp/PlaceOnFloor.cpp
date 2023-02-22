@@ -11,19 +11,22 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 void PlaceOnFloor::Execute()
 {
     m_deployment.ExtendArm();
-    if (m_deployment.CurrentDegreePosition() < kPlaceOnFloorAngle)
-    {
-        m_deployment.RotateOutOfFrame(kRotateSpeed);
-    }
-    else
-    {
-        m_deployment.RotateIntoFrame(kRotateSpeed);
-    }
+//    m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);
+    m_deployment.RotateArmToAngle(120_deg);
+
+    // if (m_deployment.CurrentDegreePosition() < kPlaceOnFloorAngle)
+    // {
+    //     m_deployment.RotateOutOfFrame(kRotateSpeed);
+    // }
+    // else
+    // {
+    //     m_deployment.RotateIntoFrame(kRotateSpeed);
+    // }
 }
 
 bool PlaceOnFloor::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kPlaceOnFloorAngle);
+    return true;//m_deployment.IsAtDegreeSetpoint(kPlaceOnFloorAngle);
 }
 
 void PlaceOnFloor::End(bool interrupted)

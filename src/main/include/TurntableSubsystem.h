@@ -11,7 +11,6 @@
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
-using namespace std;
 using namespace frc;
 
 constexpr double kTurntableCWSpeed = 0.1;
