@@ -25,23 +25,29 @@ DeploymentSubsystem::DeploymentSubsystem()
     // m_motor.ConfigForwardSoftLimitEnable(true);
     // m_motor.ConfigReverseSoftLimitEnable(true);
 
-    m_motor.ConfigPeakOutputForward(0.4);
-    m_motor.ConfigPeakOutputReverse(-0.4);
-    m_motor.ConfigNominalOutputForward(0.1);
-    m_motor.ConfigNominalOutputReverse(-0.1);
+    m_motor.ConfigPeakOutputForward(1.0);
+    m_motor.ConfigPeakOutputReverse(-1.0);
+    m_motor.ConfigNominalOutputForward(0.0);
+    m_motor.ConfigNominalOutputReverse(0.0);
  	//m_motor.ConfigAllowableClosedloopError (int slotIdx, double allowableCloseLoopError, int timeoutMs=0)=0
   	//m_motor.ConfigMaxIntegralAccumulator (int slotIdx, double iaccum, int timeoutMs=0)=0
- 	m_motor.ConfigClosedLoopPeakOutput(0, 0.4);
+ 	m_motor.ConfigClosedLoopPeakOutput(0, 1.0);
+    m_motor.ConfigContinuousCurrentLimit(20);
+    m_motor.ConfigPeakCurrentLimit(0);
+    m_motor.EnableCurrentLimit(true);
  
-    m_motor.SetSelectedSensorPosition(-4000.0);  // TODO setting enc count to hanging pos for testing
+    m_motor.SetSelectedSensorPosition(0.0);  // TODO setting enc count to hanging pos for testing
+    //m_motor.SetSelectedSensorPosition(-4000.0);  // TODO setting enc count to hanging pos for testing
     //m_motor.SetSelectedSensorPosition(1501.0);  // TODO setting enc count to hanging pos for testing
 
     m_motor.SelectProfileSlot(0, 0);
-    m_motor.Config_kP(0, 0.5);
-    m_motor.Config_kI(0, 0.01);
-    m_motor.Config_kD(0, 0.1);
+    m_motor.Config_kP(0, 5.0);
+    m_motor.Config_kI(0, 0.001);
+    m_motor.Config_kD(0, 0.0);
     m_motor.Config_kF(0, 0.0);
     m_motor.SetIntegralAccumulator(0.0);
+
+    SmartDashboard::PutNumber("GotoAngle", 0.0);
 }
 
 void DeploymentSubsystem::Periodic() 
@@ -51,13 +57,16 @@ void DeploymentSubsystem::Periodic()
     double err = m_motor.GetClosedLoopError(0);
     double target = m_motor.GetClosedLoopTarget(0);
     double outputCurrent = m_motor.GetOutputCurrent();
+    double motorOutput = m_motor.GetMotorOutputPercent();
     SmartDashboard::PutNumber("Arm enc", pos);
     SmartDashboard::PutNumber("Arm angle", currentAngle);
     SmartDashboard::PutNumber("Arm error", err);
     SmartDashboard::PutNumber("Arm target", target);
+    SmartDashboard::PutNumber("output current", outputCurrent);
+    SmartDashboard::PutNumber("motor output", motorOutput);
+
     SmartDashboard::PutBoolean("fwd limit", IsForwardLimitSwitchClosed());
     SmartDashboard::PutBoolean("rev limit", IsReverseLimitSwitchClosed());
-    SmartDashboard::PutBoolean("output current", outputCurrent);
 }
 
 void DeploymentSubsystem::RotateIntoFrame(double speed)
@@ -82,7 +91,9 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     //auto newTickPos = copysign(1.0, (currentAngle - angle).to<double>()) * angle.to<double>() * kTicksPerDegree;  // Negate to indicate direction
     //auto newTickPos = copysign(1.0, (angle - currentAngle).to<double>()) * angle.to<double>() * kTicksPerDegree;  // Negate to indicate direction
     //auto newTickPos = -1.0 * angle.to<double>() * kTicksPerDegree;  // Negate to indicate direction
-    auto newTickPos = angle.to<double>() * kTicksPerDegree;  // Negate to indicate direction
+    //auto newTickPos = angle.to<double>() * kTicksPerDegree;  // Negate to indicate direction
+    angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
+    auto newTickPos = angle.to<double>() * kTicksPerDegree;
     printf("Rot angle %.3f currAngle %.3f delta %.3f ticks %.3f\n"
      , angle.to<double>()
      , currentAngle.to<double>()
@@ -90,9 +101,12 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
      , newTickPos);
     m_motor.Set(ControlMode::Position, newTickPos);
 
-    double err = m_motor.GetClosedLoopError(0);
-    double target = m_motor.GetClosedLoopTarget(0);
-    printf("Err %.3f target %.3f\n", err, target);
+    if (m_motor.GetControlMode() == ControlMode::Position)
+    {
+        double err = m_motor.GetClosedLoopError(0);
+        double target = m_motor.GetClosedLoopTarget(0);
+        printf("Err %.3f target %.3f\n", err, target);
+    }
 }
 
 void DeploymentSubsystem::RotateArmToAngleRel(degree_t angle)
