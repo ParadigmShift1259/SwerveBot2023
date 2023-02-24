@@ -29,7 +29,10 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_motor.ConfigPeakOutputReverse(-0.4);
     m_motor.ConfigNominalOutputForward(0.1);
     m_motor.ConfigNominalOutputReverse(-0.1);
-
+ 	//m_motor.ConfigAllowableClosedloopError (int slotIdx, double allowableCloseLoopError, int timeoutMs=0)=0
+  	//m_motor.ConfigMaxIntegralAccumulator (int slotIdx, double iaccum, int timeoutMs=0)=0
+ 	m_motor.ConfigClosedLoopPeakOutput(0, 0.4);
+ 
     m_motor.SetSelectedSensorPosition(-4000.0);  // TODO setting enc count to hanging pos for testing
     //m_motor.SetSelectedSensorPosition(1501.0);  // TODO setting enc count to hanging pos for testing
 
