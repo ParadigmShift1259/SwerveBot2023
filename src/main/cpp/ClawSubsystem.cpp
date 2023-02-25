@@ -3,7 +3,7 @@
 using namespace frc;
 
 ClawSubsystem::ClawSubsystem()
-    : m_solenoid(PneumaticsModuleType::REVPH, kClawSolenoid)
+    : m_solenoid(PneumaticsModuleType::CTREPCM, kClawSolenoid)
 {
 
 }

@@ -5,15 +5,14 @@
 #include <frc/Timer.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
+#include <rev/CANSparkMax.h>
 
 #include "ConstantsDigitalOut.h"
 #include "ConstantsCANIDs.h"
 
 #include <units/angle.h>
 
-using namespace ctre::phoenix::motorcontrol;
-using namespace ctre::phoenix::motorcontrol::can;
+using namespace rev;
 using namespace units;
 
 class DeploymentSubsystem : public frc2::SubsystemBase 
@@ -37,7 +36,7 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Drives the deployment arm to a specific angle
         /// \param angle  Desired angle to rotate to [0, 140]
         void RotateArmToAngle(degree_t angle);
-        void RotateArmToAngleRel(degree_t angle);
+        //void RotateArmToAngleRel(degree_t angle);
 
         /// Extends the deployment arm
         void ExtendArm();
@@ -76,10 +75,13 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         bool IsOkayToRetractIntake();
 
         /// Zero out the arm encoder count
-        void ResetEncoder() { m_motor.SetSelectedSensorPosition(0.0); }
+        void ResetEncoder() { m_enc.SetPosition(0.0); }
 
     private:
-        TalonSRX m_motor;
+        CANSparkMax m_motor;
+        SparkMaxRelativeEncoder m_enc{m_motor.GetEncoder()};
+        SparkMaxPIDController m_pid{m_motor.GetPIDController()};
+        double m_setpointTicks = 0.0;
         frc::Solenoid m_armSolenoid;
         frc::Solenoid m_backPlateSolenoid;
         frc::Timer m_timer;
@@ -87,6 +89,6 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         // Empirically measured 4657 motor ticks for 140 degrees of arm rotation
         //static constexpr double kDegreesPerTick = 140.0 / 4657.0;
         // Empirically measured 5815 motor ticks for 180 degrees of arm rotation
-        static constexpr double kDegreesPerTick = 180.0 / 5815.0;
+        static constexpr double kDegreesPerTick = 180.0 / 210.0;
         static constexpr double kTicksPerDegree = 1.0 / kDegreesPerTick;
 };
