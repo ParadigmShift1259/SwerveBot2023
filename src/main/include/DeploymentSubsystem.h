@@ -89,6 +89,6 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         // Empirically measured 4657 motor ticks for 140 degrees of arm rotation
         //static constexpr double kDegreesPerTick = 140.0 / 4657.0;
         // Empirically measured 5815 motor ticks for 180 degrees of arm rotation
-        static constexpr double kDegreesPerTick = 180.0 / 210.0;
+        static constexpr double kDegreesPerTick = 180.0 / (17.85 + 33.81);
         static constexpr double kTicksPerDegree = 1.0 / kDegreesPerTick;
 };
