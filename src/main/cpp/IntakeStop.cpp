@@ -6,6 +6,9 @@ IntakeStop::IntakeStop(ISubsystemAccess& subsystemAccess, bool retractIntake)
  , m_retractIntake(retractIntake)
 {
   AddRequirements({&subsystemAccess.GetIntake()});
+
+  wpi::log::DataLog& log = subsystemAccess.GetLogger();
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
 }
 
 void IntakeStop::Execute() {
@@ -19,4 +22,5 @@ bool IntakeStop::IsFinished()
 
 void IntakeStop::End(bool interrupted) {
   m_intake.IntakeOut(m_retractIntake);
+  m_logStartCommand.Append(false);
 }

@@ -8,8 +8,9 @@
 
 using namespace frc;
 
-class RotateTurntableCW : public frc2::CommandHelper<frc2::CommandBase, RotateTurntableCW> {
- public:
+class RotateTurntableCW : public frc2::CommandHelper<frc2::CommandBase, RotateTurntableCW>
+{
+public:
   explicit RotateTurntableCW(ISubsystemAccess& subsystemAccess);
 
   void Initialize() override;
@@ -17,7 +18,9 @@ class RotateTurntableCW : public frc2::CommandHelper<frc2::CommandBase, RotateTu
   bool IsFinished() override;
   void End(bool interrupted) override;
   
- private:
+private:
   TurntableSubsystem& m_turntable;
   Timer m_timer;
+
+  wpi::log::BooleanLogEntry m_logStartCommand;
 };

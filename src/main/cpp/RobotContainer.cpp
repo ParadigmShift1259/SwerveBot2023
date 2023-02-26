@@ -133,7 +133,8 @@ void RobotContainer::SetDefaultCommands()
 void RobotContainer::ConfigureBindings()
 {
     ConfigPrimaryButtonBindings();
-    ConfigSecondaryButtonBindings();
+    // ConfigSecondaryButtonBindings();
+    ConfigSecondaryButtonBindingsNewWay();
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
@@ -186,6 +187,39 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     
     JoystickButton(&secondary, xbox::kBack).OnTrue(RotateTurntableCW(*this).ToPtr());    
     // JoystickButton(&secondary, xbox::kStart).OnTrue();
+}
+
+void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
+{
+  using namespace frc;
+  using namespace frc2;
+
+  auto& secondary = m_secondaryController;
+  // Raspberry PI Pico with gp2040 firmware Button Box
+  //
+  // Row	Black			    Blue			    Green				      Yellow				      Red
+  // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
+  // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
+  // 3	  B				      A				      POV Left			    POV Right			      POV Up
+  secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
+  secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
+  secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
+
+  secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
+  secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
+  secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
+  secondary.Back().OnTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+
+  secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
+  secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
+  secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
+  secondary.RightTrigger().WhileTrue(RetrievePosition(*this).ToPtr());     // Black  row 2
+
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
+  secondary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
+  secondary.POVUp(loop).Rising().IfHigh([] { printf("POV Up button\n"); });      // Red    row 3
 }
 
 SequentialCommandGroup* RobotContainer::GetParkCommand()

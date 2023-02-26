@@ -7,19 +7,15 @@ TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess)
   , m_intake(subsystemAccess.GetIntake())
 {
   AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
+
+  wpi::log::DataLog& log = subsystemAccess.GetLogger();
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
 }
 
 void TravelPosition::Execute()
 {
-    m_deployment.RetractArm();
-    if (m_deployment.CurrentDegreePosition() < kTravelAngle)
-    {
-        m_deployment.RotateOutOfFrame(0.2);
-    }
-    else
-    {
-        m_deployment.RotateIntoFrame(0.2);
-    }
+    // m_deployment.RetractArm();
+    m_deployment.RotateArmToAngle(kTravelAngle);
 }
 
 bool TravelPosition::IsFinished()
@@ -29,6 +25,6 @@ bool TravelPosition::IsFinished()
 
 void TravelPosition::End(bool interrupted)
 {
-    //m_deployment.Stop();
     m_intake.IntakeOut(false);
+    m_logStartCommand.Append(false);
 }

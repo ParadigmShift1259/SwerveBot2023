@@ -8,6 +8,9 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
   , m_turntable(subsystemAccess.GetTurntable())
 {
   AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake(), &subsystemAccess.GetTurntable()});
+
+  wpi::log::DataLog& log = subsystemAccess.GetLogger();
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
 }
 
 void IntakeIngest::Execute()
@@ -23,4 +26,5 @@ void IntakeIngest::End(bool interrupted)
 {
   m_intake.Set(0.0);
   m_turntable.SetTurnTable(0.0);
+  m_logStartCommand.Append(false);
 }

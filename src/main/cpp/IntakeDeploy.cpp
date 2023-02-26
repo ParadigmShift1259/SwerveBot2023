@@ -4,6 +4,9 @@ IntakeDeploy::IntakeDeploy(ISubsystemAccess& subsystemAccess)
   : m_intake(subsystemAccess.GetIntake())
 {
   AddRequirements({&subsystemAccess.GetIntake()});
+
+  wpi::log::DataLog& log = subsystemAccess.GetLogger();
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
 }
 
 void IntakeDeploy::Execute() 
@@ -18,5 +21,5 @@ bool IntakeDeploy::IsFinished()
 
 void IntakeDeploy::End(bool interrupted) 
 {
-
+    m_logStartCommand.Append(false);
 }

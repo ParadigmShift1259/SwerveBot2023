@@ -4,6 +4,9 @@ RotateTurntableCW::RotateTurntableCW(ISubsystemAccess& subsystemAccess)
   : m_turntable(subsystemAccess.GetTurntable())
 {
   AddRequirements({&subsystemAccess.GetTurntable()});
+
+  wpi::log::DataLog& log = subsystemAccess.GetLogger();
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
 }
 
 void RotateTurntableCW::Initialize()
@@ -25,4 +28,5 @@ bool RotateTurntableCW::IsFinished()
 void RotateTurntableCW::End(bool interrupted) 
 {
     m_turntable.SetTurnTable(0.0);
+    m_logStartCommand.Append(false);
 }

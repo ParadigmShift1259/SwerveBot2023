@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include <frc/XboxController.h>
+//#include <frc/XboxController.h>
 #include <frc/filter/SlewRateLimiter.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
+#include <frc2/command/button/CommandXboxController.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/RunCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
@@ -48,11 +50,14 @@ public:
   TurntableSubsystem&     GetTurntable() override { return m_turntable; }
   VisionSubsystem&        GetVision() override { return m_vision; }
 
+  wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
+
 private:
   void SetDefaultCommands();
   void ConfigureBindings();
   void ConfigPrimaryButtonBindings();
   void ConfigSecondaryButtonBindings();
+  void ConfigSecondaryButtonBindingsNewWay();
   SequentialCommandGroup* GetParkCommand();
   ConditionalCommand* GetParkAndBalanceCommand();
   SwerveControllerCommand<4>* GetSwerveCommandPath(Trajectory trajectory); 
@@ -69,8 +74,8 @@ private:
   TurntableSubsystem m_turntable;
   VisionSubsystem m_vision;
 
-  XboxController m_primaryController{0};
-  XboxController m_secondaryController{1};
+  CommandXboxController m_primaryController{0};
+  CommandXboxController m_secondaryController{1};
   SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
   SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
@@ -84,6 +89,10 @@ private:
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
   SequentialCommandGroup m_retrieveGamePiece{ ClawOpen(*this), RetrievePosition(*this), ClawClose(*this), TravelPosition(*this) };
+
+  InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
+  InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };
+  InstantCommand m_rotateArm{[this] { m_deployment.RotateArmToAngle(degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0))); }, {&m_deployment} };
 
   InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
   InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };

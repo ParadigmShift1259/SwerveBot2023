@@ -5,7 +5,7 @@ using namespace frc;
 ClawSubsystem::ClawSubsystem()
     : m_solenoid(PneumaticsModuleType::CTREPCM, kClawSolenoid)
 {
-
+    m_solenoid.Set(false);
 }
 
 void ClawSubsystem::Periodic()
