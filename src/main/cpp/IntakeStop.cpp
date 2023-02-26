@@ -1,14 +1,13 @@
 
 #include "IntakeStop.h"
 
-IntakeStop::IntakeStop(ISubsystemAccess& subsystemAccess, bool retractIntake)
+IntakeStop::IntakeStop(ISubsystemAccess& subsystemAccess)
  : m_intake(subsystemAccess.GetIntake())
- , m_retractIntake(retractIntake)
 {
   AddRequirements({&subsystemAccess.GetIntake()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeStop/startCommand");
 }
 
 void IntakeStop::Execute() {
@@ -21,6 +20,6 @@ bool IntakeStop::IsFinished()
 }
 
 void IntakeStop::End(bool interrupted) {
-  m_intake.IntakeOut(m_retractIntake);
+  m_intake.RetractIntake();
   m_logStartCommand.Append(false);
 }

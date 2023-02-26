@@ -8,7 +8,7 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetDeployment()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeLow/startCommand");
 }
 
 void PlaceLow::Execute()

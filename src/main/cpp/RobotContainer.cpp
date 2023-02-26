@@ -24,6 +24,7 @@
 #include "PlaceOnFloor.h"
 #include "PlaceLow.h"
 #include "PlaceHigh.h"
+#include "PlaceHighCube.h"
 
 #include <pathplanner/lib/auto/SwerveAutoBuilder.h>
 #include <pathplanner/lib/PathPlanner.h>
@@ -202,6 +203,7 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
   secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
   secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
   secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
   secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
@@ -219,7 +221,7 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
   secondary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
-  secondary.POVUp(loop).Rising().IfHigh([] { printf("POV Up button\n"); });      // Red    row 3
+  secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
 }
 
 SequentialCommandGroup* RobotContainer::GetParkCommand()

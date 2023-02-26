@@ -24,7 +24,12 @@ void IntakeSubsystem::Set(double speed)
     m_motor.Set(ControlMode::PercentOutput, speed);//kMotorReverseConstant);
 }
 
-void IntakeSubsystem::IntakeOut(bool out)
+void IntakeSubsystem::ExtendIntake()
 {
-    m_solenoid.Set(out);
+    m_solenoid.Set(kIntakeExtend);
+}
+
+void IntakeSubsystem::RetractIntake()
+{
+    m_solenoid.Set(kIntakeRetract);
 }

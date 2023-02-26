@@ -10,12 +10,12 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake(), &subsystemAccess.GetTurntable()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeIngest/startCommand");
 }
 
 void IntakeIngest::Execute()
 {
-  m_intake.IntakeOut(true);
+  m_intake.ExtendIntake();
   m_deployment.ExtendBackPlate();
   // WaitCommand(0.5_s); Do we still need this? Rollers not touching
   m_intake.Set(kIngestSpeed);

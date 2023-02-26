@@ -26,7 +26,7 @@
 
 #include "ClawOpen.h"
 #include "ClawClose.h"
-
+#include "IntakeDeploy.h"
 #include "RetrievePosition.h"
 #include "TravelPosition.h"
 
@@ -88,7 +88,7 @@ private:
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
-  SequentialCommandGroup m_retrieveGamePiece{ ClawOpen(*this), RetrievePosition(*this), ClawClose(*this), TravelPosition(*this) };
+  SequentialCommandGroup m_retrieveGamePiece{ IntakeDeploy(*this), ClawOpen(*this), RetrievePosition(*this), ClawClose(*this), TravelPosition(*this) };
 
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };

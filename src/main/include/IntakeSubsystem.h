@@ -29,10 +29,18 @@ public:
     /// \param speed         Desired motor speed to run, ranging from [-1, 1]
     void Set(double speed);
 
-    void IntakeOut(bool out);
+    /// Extends the intake out of the robot
+    void ExtendIntake();
+
+    // Retracts the intake into the robot
+    void RetractIntake();
+
 private:
     /// 775 that runs intake
     TalonSRX m_motor;
     frc::Solenoid m_solenoid;
     frc::Timer m_timer;
+
+    static constexpr bool kIntakeExtend = true;
+    static constexpr bool kIntakeRetract = false;
 };

@@ -6,7 +6,7 @@ ClawOpen::ClawOpen(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetClaw()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/clawOpen/startCommand");
 }
 
 void ClawOpen::Execute()
