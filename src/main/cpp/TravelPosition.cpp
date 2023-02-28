@@ -13,16 +13,17 @@ TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess)
 
 void TravelPosition::Execute()
 {
-    m_deployment.RetractArm();
-    m_deployment.RotateArmToAngle(kTravelAngle);
+  m_deployment.RetractBackPlate();
+  m_deployment.RetractArm();
+  m_deployment.RotateArmToAngle(kTravelAngle);
 }
 
 bool TravelPosition::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kTravelAngle);
+  return m_deployment.IsAtDegreeSetpoint(kTravelAngle);
 }
 
 void TravelPosition::End(bool interrupted)
 {
-    m_logStartCommand.Append(false);
+  m_logStartCommand.Append(false);
 }

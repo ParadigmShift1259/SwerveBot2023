@@ -50,45 +50,45 @@ void DriveSubsystem::RotationDrive(units::meters_per_second_t xSpeed
                                  , units::radian_t rot
                                  , bool fieldRelative) 
 {  
-    auto error = rot - m_gyro.GetRotation2d().Radians();//m_gyro->GetHeadingAsRot2d().Radians().to<double>();
-    if (error.to<double>() > std::numbers::pi)
-    {
-      error -= units::radian_t(2 * std::numbers::pi);
-    }
-    else if (error.to<double>() < -1 * std::numbers::pi)
-    {
-      error += units::radian_t(2 * std::numbers::pi);
-    }
-    auto max = kRotationDriveMaxSpeed;
-    auto maxTurn = kRotationDriveDirectionLimit;
+  auto error = rot - m_gyro.GetRotation2d().Radians();//m_gyro->GetHeadingAsRot2d().Radians().to<double>();
+  if (error.to<double>() > std::numbers::pi)
+  {
+    error -= units::radian_t(2 * std::numbers::pi);
+  }
+  else if (error.to<double>() < -1 * std::numbers::pi)
+  {
+    error += units::radian_t(2 * std::numbers::pi);
+  }
+  auto max = kRotationDriveMaxSpeed;
+  auto maxTurn = kRotationDriveDirectionLimit;
 
-    #ifdef TUNE_ROTATION_DRIVE
-    double P = SmartDashboard::GetNumber("T_D_RP", 0);
-    double I = SmartDashboard::GetNumber("T_D_RI", 0);
-    double D = SmartDashboard::GetNumber("T_D_RD", 0);
-    double m = SmartDashboard::GetNumber("T_D_RMax", 0);
-    double mTurn = SmartDashboard::GetNumber("T_D_RTMax", 0);
+  #ifdef TUNE_ROTATION_DRIVE
+  double P = SmartDashboard::GetNumber("T_D_RP", 0);
+  double I = SmartDashboard::GetNumber("T_D_RI", 0);
+  double D = SmartDashboard::GetNumber("T_D_RD", 0);
+  double m = SmartDashboard::GetNumber("T_D_RMax", 0);
+  double mTurn = SmartDashboard::GetNumber("T_D_RTMax", 0);
 
-    m_rotationPIDController.SetP(P);
-    m_rotationPIDController.SetI(I);
-    m_rotationPIDController.SetD(D);
-    max = m;
-    maxTurn = mTurn;
-    #endif
+  m_rotationPIDController.SetP(P);
+  m_rotationPIDController.SetI(I);
+  m_rotationPIDController.SetD(D);
+  max = m;
+  maxTurn = mTurn;
+  #endif
 
-    units::radians_per_second_t desiredTurnRate(m_rotationPIDController.Calculate(0, error.to<double>()));
+  units::radians_per_second_t desiredTurnRate(m_rotationPIDController.Calculate(0, error.to<double>()));
 
-    units::radians_per_second_t currentTurnRate = m_gyro.GetTurnRate();
+  units::radians_per_second_t currentTurnRate = m_gyro.GetTurnRate();
 
-    // Prevent sharp turning if already fast going in the opposite direction
-    if ((units::math::abs(currentTurnRate) >= maxTurn) && (std::signbit(desiredTurnRate.to<double>()) != std::signbit(currentTurnRate.to<double>())))
-        desiredTurnRate *= -1.0;
+  // Prevent sharp turning if already fast going in the opposite direction
+  if ((units::math::abs(currentTurnRate) >= maxTurn) && (std::signbit(desiredTurnRate.to<double>()) != std::signbit(currentTurnRate.to<double>())))
+      desiredTurnRate *= -1.0;
 
-    // Power limiting
-    if (units::math::abs(desiredTurnRate) > max)
-        desiredTurnRate = std::signbit(desiredTurnRate.to<double>()) ? max * -1.0 : max;
+  // Power limiting
+  if (units::math::abs(desiredTurnRate) > max)
+      desiredTurnRate = std::signbit(desiredTurnRate.to<double>()) ? max * -1.0 : max;
 
-    Drive(xSpeed, ySpeed, desiredTurnRate, fieldRelative);
+  Drive(xSpeed, ySpeed, desiredTurnRate, fieldRelative);
 }
 
 void DriveSubsystem::RotationDrive(units::meters_per_second_t xSpeed
@@ -97,7 +97,7 @@ void DriveSubsystem::RotationDrive(units::meters_per_second_t xSpeed
                                  , double yRot
                                  , bool fieldRelative) 
 {
-    if (xRot != 0 || yRot != 0)
+  if (xRot != 0 || yRot != 0)
     {
       RotationDrive(xSpeed, ySpeed, units::radian_t(atan2f(yRot, xRot)), fieldRelative);
     }
@@ -140,6 +140,11 @@ void DriveSubsystem::Periodic()
 
 frc::Pose2d DriveSubsystem::GetPose()
 {
+  auto pose = m_odometry.GetPose();
+  frc::SmartDashboard::PutNumber("X", pose.X().to<double>());
+  frc::SmartDashboard::PutNumber("Y", pose.Y().to<double>());
+  frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Degrees().to<double>());
+
   return m_odometry.GetPose();
 }
 
@@ -160,6 +165,10 @@ void DriveSubsystem::UpdateOdometry()
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
 {
+  frc::SmartDashboard::PutNumber("ResetX", pose.X().to<double>());
+  frc::SmartDashboard::PutNumber("Resety", pose.Y().to<double>());
+  frc::SmartDashboard::PutNumber("ResetRot", pose.Rotation().Degrees().to<double>());
+
   SwerveModulePositions modulePositions = {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                                            m_rearLeft.GetPosition(), m_rearRight.GetPosition()};
 
@@ -213,9 +222,9 @@ void DriveSubsystem::SetAllDesiredState(const frc::SwerveModuleState& sms)
 
 void DriveSubsystem::SetModuleStates(SwerveModuleStates desiredStates)
 {
-    m_kinematics.DesaturateWheelSpeeds(&desiredStates, kMaxSpeed);
-    m_frontLeft.SetDesiredState(desiredStates[0]);
-    m_frontRight.SetDesiredState(desiredStates[1]);
-    m_rearRight.SetDesiredState(desiredStates[3]);
-    m_rearLeft.SetDesiredState(desiredStates[2]);
+  m_kinematics.DesaturateWheelSpeeds(&desiredStates, kMaxSpeed);
+  m_frontLeft.SetDesiredState(desiredStates[0]);
+  m_frontRight.SetDesiredState(desiredStates[1]);
+  m_rearRight.SetDesiredState(desiredStates[3]);
+  m_rearLeft.SetDesiredState(desiredStates[2]);
 }

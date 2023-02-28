@@ -11,11 +11,11 @@ ClawOpen::ClawOpen(ISubsystemAccess& subsystemAccess)
 
 void ClawOpen::Execute()
 {
-    m_claw.Open();
-    m_logStartCommand.Append(false);
+  m_claw.Open();
+  m_logStartCommand.Append(false);
 }
 
 bool ClawOpen::IsFinished()
 {
-    return true;
+  return true;
 }

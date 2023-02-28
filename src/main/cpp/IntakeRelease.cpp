@@ -11,7 +11,9 @@ IntakeRelease::IntakeRelease(ISubsystemAccess& subsystemAccess)
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeRelease/startCommand");
 }
 
-void IntakeRelease::Execute() {
+void IntakeRelease::Execute()
+{
+  m_intake.ExtendIntake();
   m_intake.Set(kReleaseSpeed);
 }
 
@@ -22,8 +24,5 @@ bool IntakeRelease::IsFinished()
 
 void IntakeRelease::End(bool interrupted) {
   m_intake.Set(0);
-  // Only retract intake if deployment arm is out of the way
-  // m_intake.IntakeOut(!m_deployment.IsOkayToRetractIntake());
-  //TODO replace with m_intake.RetractIntake();
   m_logStartCommand.Append(false);
 }

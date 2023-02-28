@@ -18,21 +18,21 @@ PlaceHighCube::PlaceHighCube(ISubsystemAccess& subsystemAccess)
 
 void PlaceHighCube::Execute()
 {
-    // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
+  // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
 
-    m_deployment.RetractArm();
-    m_deployment.RotateArmToAngle(kPlaceHighAngle);
-    // m_logAngle.Append(angle.to<double>());
-    // m_deployment.RotateArmToAngle(angle);
+  m_deployment.RetractArm();
+  m_deployment.RotateArmToAngle(kPlaceHighAngle);
+  // m_logAngle.Append(angle.to<double>());
+  // m_deployment.RotateArmToAngle(angle);
 }
 
 bool PlaceHighCube::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kPlaceHighCubeAngle);
+  return m_deployment.IsAtDegreeSetpoint(kPlaceHighCubeAngle);
 }
 
 void PlaceHighCube::End(bool interrupted)
 {
-    m_deployment.ExtendArm();
-    m_logStartCommand.Append(false);
+  m_deployment.ExtendArm();
+  m_logStartCommand.Append(false);
 }

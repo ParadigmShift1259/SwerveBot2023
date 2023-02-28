@@ -11,18 +11,18 @@ RotateTurntableCW::RotateTurntableCW(ISubsystemAccess& subsystemAccess)
 
 void RotateTurntableCW::Initialize()
 {
-    m_timer.Reset();
-    m_timer.Start();
+  m_timer.Reset();
+  m_timer.Start();
 }
 
 void RotateTurntableCW::Execute() 
 {
-    m_turntable.SetTurnTable(kTurntableCWSpeed);
+  m_turntable.SetTurnTable(kTurntableCWSpeed);
 }
 
 bool RotateTurntableCW::IsFinished()
 {
-    return m_timer.Get() > kTurntableCWRunTime;
+  return m_timer.Get() > kTurntableCWRunTime;
 }
 
 void RotateTurntableCW::End(bool interrupted) 

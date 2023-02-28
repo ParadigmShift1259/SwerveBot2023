@@ -41,6 +41,7 @@ public:
   
   CommandPtr GetAutonomousCommand();
   void Periodic();
+  void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }
 
   // ISubsystemAcces Implementation
   ClawSubsystem&          GetClaw() override { return m_claw; }
@@ -59,7 +60,8 @@ private:
   void ConfigSecondaryButtonBindings();
   void ConfigSecondaryButtonBindingsNewWay();
   SequentialCommandGroup* GetParkCommand();
-  ConditionalCommand* GetParkAndBalanceCommand();
+  std::shared_ptr<ConditionalCommand> GetParkAndBalanceCommand();
+  ConditionalCommand* GetParkAndBalanceCommand2();
   SwerveControllerCommand<4>* GetSwerveCommandPath(Trajectory trajectory); 
   PPSwerveControllerCommand* GetPathPlannerSwervePath(PathPlannerTrajectory trajectory);
   void PrintTrajectory(Trajectory& trajectory);
@@ -106,6 +108,5 @@ private:
   std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
   SwerveAutoBuilder m_autoBuilder;
 
-  double m_pitchFactor = 0.033;
-  double m_maxAutoBalanceSpeed = 0.5;
+  bool m_isAutoRunning = false;
 };

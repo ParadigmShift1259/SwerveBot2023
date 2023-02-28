@@ -73,6 +73,8 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         double TicksToDegreesDouble(double ticks) { return (ticks - kTickOffset) * kDegreesPerTick; }
 
         CANSparkMax m_motor;
+        SparkMaxLimitSwitch m_forwardLimitSwitch = m_motor.GetForwardLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
+        SparkMaxLimitSwitch m_reverseLimitSwitch = m_motor.GetReverseLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
         SparkMaxRelativeEncoder m_enc{m_motor.GetEncoder()};
         SparkMaxPIDController m_pid{m_motor.GetPIDController()};
         double m_setpointTicks = 0.0;

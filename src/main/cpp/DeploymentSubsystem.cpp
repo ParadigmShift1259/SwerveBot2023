@@ -39,6 +39,9 @@ DeploymentSubsystem::DeploymentSubsystem()
     SmartDashboard::PutNumber("P", kDefaultP);
     SmartDashboard::PutNumber("I", kDefaultI);
     SmartDashboard::PutNumber("D", kDefaultD);
+
+    m_forwardLimitSwitch.EnableLimitSwitch(true);
+    m_reverseLimitSwitch.EnableLimitSwitch(true);
 }
 
 void DeploymentSubsystem::Periodic() 
@@ -105,12 +108,12 @@ void DeploymentSubsystem::RetractBackPlate()
 
 bool DeploymentSubsystem::IsForwardLimitSwitchClosed()
 {
-    return false;//m_motor.GetForwardLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen).Get();
+    return m_forwardLimitSwitch.Get();
 }
 
 bool DeploymentSubsystem::IsReverseLimitSwitchClosed()
 {
-    return false; //m_motor.GetReverseLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen).Get();
+    return m_reverseLimitSwitch.Get();
 }
 
 void DeploymentSubsystem::Stop()

@@ -13,16 +13,16 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
 
 void PlaceLow::Execute()
 {
-    m_deployment.RetractArm();
-    m_deployment.RotateArmToAngle(kPlaceLowAngle);
+  m_deployment.RetractArm();
+  m_deployment.RotateArmToAngle(kPlaceLowAngle);
 }
 
 bool PlaceLow::IsFinished()
 {
-    return true;// m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
+  return true;// m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
 }
 
 void PlaceLow::End(bool interrupted)
 {
-    m_logStartCommand.Append(false);
+  m_logStartCommand.Append(false);
 }

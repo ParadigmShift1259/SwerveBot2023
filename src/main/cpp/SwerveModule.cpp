@@ -145,13 +145,13 @@ frc::SwerveModuleState SwerveModule::GetState()
 
 units::meters_per_second_t SwerveModule::CalcMetersPerSec()
 {
-   double ticksPer100ms = m_driveMotor.GetSelectedSensorVelocity();
-   return units::meters_per_second_t(kDriveEncoderMetersPerSec * ticksPer100ms);
+  double ticksPer100ms = m_driveMotor.GetSelectedSensorVelocity();
+  return units::meters_per_second_t(kDriveEncoderMetersPerSec * ticksPer100ms);
 }
 
 double SwerveModule::CalcTicksPer100Ms(units::meters_per_second_t speed)
 {
-   return speed.to<double>() / kDriveEncoderMetersPerSec;
+  return speed.to<double>() / kDriveEncoderMetersPerSec;
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition()
@@ -162,8 +162,8 @@ frc::SwerveModulePosition SwerveModule::GetPosition()
 
 units::meter_t SwerveModule::CalcMeters()
 {
-   double ticks = m_driveMotor.GetSelectedSensorPosition();
-   return units::meter_t(kDriveEncoderMetersPerTick * ticks);
+  double ticks = m_driveMotor.GetSelectedSensorPosition();
+  return units::meter_t(kDriveEncoderMetersPerTick * ticks);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
@@ -177,14 +177,14 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   if (state.speed != 0_mps)
   {
 #ifdef DISABLE_DRIVE
-      m_driveMotor.Set(TalonFXControlMode::Velocity, 0.0);
+    m_driveMotor.Set(TalonFXControlMode::Velocity, 0.0);
 #else
-      m_driveMotor.Set(TalonFXControlMode::Velocity, CalcTicksPer100Ms(state.speed));
+    m_driveMotor.Set(TalonFXControlMode::Velocity, CalcTicksPer100Ms(state.speed));
 #endif
   }
   else
   {
-      m_driveMotor.Set(TalonFXControlMode::PercentOutput, 0.0);
+    m_driveMotor.Set(TalonFXControlMode::PercentOutput, 0.0);
   }
 
   // Calculate the turning motor output from the turning PID controller.

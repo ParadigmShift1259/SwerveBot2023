@@ -18,21 +18,21 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
 
 void PlaceHigh::Execute()
 {
-    // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
+  // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
 
-    m_deployment.RetractArm();
-    m_deployment.RotateArmToAngle(kPlaceHighAngle);
-    // m_logAngle.Append(angle.to<double>());
-    // m_deployment.RotateArmToAngle(angle);
+  m_deployment.RetractArm();
+  m_deployment.RotateArmToAngle(kPlaceHighAngle);
+  // m_logAngle.Append(angle.to<double>());
+  // m_deployment.RotateArmToAngle(angle);
 }
 
 bool PlaceHigh::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kPlaceHighAngle);
+  return m_deployment.IsAtDegreeSetpoint(kPlaceHighAngle);
 }
 
 void PlaceHigh::End(bool interrupted)
 {
-    m_deployment.ExtendArm();
-    m_logStartCommand.Append(false);
+  m_deployment.ExtendArm();
+  m_logStartCommand.Append(false);
 }

@@ -11,11 +11,11 @@ ClawClose::ClawClose(ISubsystemAccess& subsystemAccess)
 
 void ClawClose::Execute()
 {
-    m_claw.Close();
-    m_logStartCommand.Append(false);
+  m_claw.Close();
+  m_logStartCommand.Append(false);
 }
 
 bool ClawClose::IsFinished()
 {
-    return true;
+  return true;
 }

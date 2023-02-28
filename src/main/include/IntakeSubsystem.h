@@ -13,8 +13,8 @@
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
-constexpr double kIngestSpeed = 0.8;
-constexpr double kReleaseSpeed = -0.80;
+constexpr double kIngestSpeed = 0.7;
+constexpr double kReleaseSpeed = -0.7;
 
 class IntakeSubsystem : public frc2::SubsystemBase
 {

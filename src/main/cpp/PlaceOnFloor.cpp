@@ -13,17 +13,17 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 
 void PlaceOnFloor::Execute()
 {
-    m_deployment.RetractArm();
-    m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);
+  m_deployment.RetractArm();
+  m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);
 }
 
 bool PlaceOnFloor::IsFinished()
 {
-    return m_deployment.IsAtDegreeSetpoint(kPlaceOnFloorAngle);
+  return m_deployment.IsAtDegreeSetpoint(kPlaceOnFloorAngle);
 }
 
 void PlaceOnFloor::End(bool interrupted)
 {
-    m_deployment.ExtendArm();
-    m_logStartCommand.Append(false);
+  m_deployment.ExtendArm();
+  m_logStartCommand.Append(false);
 }
