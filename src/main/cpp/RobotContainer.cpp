@@ -33,19 +33,27 @@
 
 using namespace pathplanner;
 
+// std::unordered_map<std::string, std::shared_ptr<frc2::Command>> g_eventMap = 
+// {
+//   {"Balance", std::make_shared<ClawOpen>(*this)}
+// };
 
 RobotContainer::RobotContainer() 
   : m_drive()
-  , m_autoBuilder(
-      [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
-      [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-      PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-      PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-      [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
-      m_eventMap, // Our event map
-      { &m_drive }, // Drive requirements, usually just a single drive subsystem
-      true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-  )
+  // , m_eventMap
+  // {
+  //   {"Balance", std::make_shared<ClawOpen>(*this)}
+  // }
+  // , m_autoBuilder(
+  //     [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
+  //     [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
+  //     PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+  //     PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+  //     [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
+  //     m_eventMap, // Our event map
+  //     { &m_drive }, // Drive requirements, usually just a single drive subsystem
+  //     true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+  // )
 {
   SetDefaultCommands();
   ConfigureBindings();
@@ -56,13 +64,14 @@ RobotContainer::RobotContainer()
   // m_eventMap.emplace("intakeDown", std::make_shared<IntakeIngest>(*this));
 
   // BalanceOnly
-  m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive));
-
+  // m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
+  // m_eventMap.emplace();
+  
   // PlaceAndBalance
   // m_eventMap.emplace("ExtendArm", std::make_shared<PlaceHigh>(*this));
   // m_eventMap.emplace("OpenClaw", std::make_shared<OpenClaw>(*this));
   // m_eventMap.emplace("RetractArm", std::make_shared<TravelPosition>(*this));
-  // m_eventMap.emplace("Balance", std::make_shared<Balance>(*this));
+  // m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
 
   // SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
   // SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
@@ -84,7 +93,25 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 {
   std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("BalanceOnly", {PathConstraints(4_mps, 3_mps_sq)});
 
-  return m_autoBuilder.fullAuto(pathGroup);
+  static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
+  eventMap.emplace("Balance", std::make_shared<ClawOpen>(*this));
+  eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
+
+  // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
+
+  static SwerveAutoBuilder autoBuilder(
+      [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
+      [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
+      PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+      PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+      [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
+      eventMap, // Our event map
+      { &m_drive }, // Drive requirements, usually just a single drive subsystem
+      true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+  );
+
+  return autoBuilder.fullAuto(pathGroup);
+  // return m_autoBuilder.fullAuto(pathGroup);
 }
 #endif
 
@@ -159,7 +186,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
   JoystickButton(&primary, xbox::kA).OnTrue(ClawOpen(*this).ToPtr());
   JoystickButton(&primary, xbox::kB).OnTrue(ClawClose(*this).ToPtr());
-  primary.Y().OnTrue(Balance(m_drive).ToPtr());
+  primary.Y().OnTrue(Balance(m_drive, *this).ToPtr());
   JoystickButton(&primary, xbox::kX).OnTrue(&m_resetArmEncoder);
   // JoystickButton(&primary, xbox::kY).WhileTrue();
 #endif

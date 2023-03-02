@@ -105,8 +105,8 @@ private:
   InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
   InstantCommand m_resetArmEncoder{[this] { m_deployment.ResetEncoder(); }, {}};
 
-  std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
-  SwerveAutoBuilder m_autoBuilder;
+  // std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
+  // SwerveAutoBuilder m_autoBuilder;
 
   bool m_isAutoRunning = false;
 };
