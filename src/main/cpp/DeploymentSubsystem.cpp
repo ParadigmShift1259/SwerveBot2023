@@ -125,7 +125,8 @@ bool DeploymentSubsystem::IsAtDegreeSetpoint(degree_t setpoint)
 {
     // TODO Figure out actual angle tolerance
     degree_t currentAngle = TicksToDegrees(m_enc.GetPosition());
-    return (units::math::fabs(setpoint - currentAngle) < 0.1_deg);
+    //return (units::math::fabs(setpoint - currentAngle) < 0.1_deg);
+    return (units::math::fabs(setpoint - currentAngle) < 0.5_deg);
 }
 
 degree_t DeploymentSubsystem::CurrentDegreePosition()

@@ -128,13 +128,13 @@ void SwerveModule::ResyncAbsRelEnc()
       angleInRad -= 2 * std::numbers::pi;
 
   m_turningEncoder.SetPosition(angleInRad);
-  printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
-        , m_id.c_str()
-        , time.to<double>()
-        , angleInRot
-        , angleInRad
-        , -1.0 * m_turningEncoder.GetPosition()
-        , -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
+  // printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
+  //       , m_id.c_str()
+  //       , time.to<double>()
+  //       , angleInRot
+  //       , angleInRad
+  //       , -1.0 * m_turningEncoder.GetPosition()
+  //       , -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }
 
 frc::SwerveModuleState SwerveModule::GetState()
