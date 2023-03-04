@@ -9,6 +9,7 @@ ClearancePosition::ClearancePosition(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/clearancePosition/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void ClearancePosition::Execute()

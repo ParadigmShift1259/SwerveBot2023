@@ -9,6 +9,7 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeOnFloor/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void PlaceOnFloor::Execute()

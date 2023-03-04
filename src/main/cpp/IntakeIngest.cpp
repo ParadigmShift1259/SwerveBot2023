@@ -11,6 +11,7 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeIngest/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void IntakeIngest::Execute()

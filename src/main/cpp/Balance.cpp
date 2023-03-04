@@ -11,12 +11,11 @@ Balance::Balance(DriveSubsystem& driveSubsystem, ISubsystemAccess& subsystemAcce
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/balance/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void Balance::Initialize()
 {
-  printf("Balance::Initialize\n");
-  m_logStartCommand.Append(true);
   m_speedTimer.Reset();
   m_speedTimer.Start();
 }

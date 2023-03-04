@@ -86,26 +86,14 @@ private:
   SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s, -3 / 3_s};
   SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
 
-  // TODO If we set field relative as default, we also need to swap the 
-  //      button bindings here (while button is true (pressed) it should clear field relative (be robo relative))
-  //      in ConfigureBindings()
+  // TODO Make sure field relative starts how the drive team wants
   bool m_fieldRelative = false; //true;
   
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
-  SequentialCommandGroup m_retrieveGamePiece
-  { 
-        IntakeDeploy(*this)
-      , RetrievePosition(*this)
-      , ClawOpen(*this)
-      , InstantCommand{[this] { m_deployment.ExtendArm(); }, {&m_deployment} }
-      , WaitCommand{1.2_s}
-      , ClawClose(*this)
-      , WaitCommand{0.5_s}
-      , ClearancePosition(*this)
-      , TravelPosition(*this) // Retracts BackPlate and arm
-  };
+
+  InstantCommand m_toggleDriveStraight{[this] { m_DriveStraightHook = !m_DriveStraightHook; printf("m_DriveStraightHook %s\n", m_DriveStraightHook ? "true" : "false");}, {} };
 
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };
@@ -138,4 +126,5 @@ private:
   // SwerveAutoBuilder m_autoBuilder;
 
   bool m_isAutoRunning = false;
+  bool m_DriveStraightHook = false;
 };

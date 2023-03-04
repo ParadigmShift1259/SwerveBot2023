@@ -91,7 +91,7 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         static constexpr double kTicksPerDegree = 1.01;
         static constexpr double kTickOffset = 0.0;
         // Initial tick position when the arm is in travel position
-        static constexpr double kInitialPosition = 4.8 * kTicksPerDegree;
+        static constexpr double kInitialPosition = 1.7 * kTicksPerDegree;
         static constexpr double kDegreesPerTick = 1.0 / kTicksPerDegree;
 
         static constexpr bool kArmSolenoidExtend = true;

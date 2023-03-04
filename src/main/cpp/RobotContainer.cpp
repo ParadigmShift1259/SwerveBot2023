@@ -22,6 +22,7 @@
 #include "IntakeStop.h"
 
 #include "RotateTurntableCW.h"
+#include "RotateTurntableCCW.h"
 
 #include "PlaceOnFloor.h"
 #include "PlaceLow.h"
@@ -95,6 +96,10 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
+  eventMap.emplace("TravelPosition", std::make_shared<TravelPosition>(*this));
+  //eventMap.emplace("RetrieveGamePiece", std::make_shared<&m_retrieveGamePiece>());
+  eventMap.emplace("PlaceHigh", std::make_shared<PlaceHigh>(*this));
+  eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
 
   // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
 
@@ -140,11 +145,17 @@ void RobotContainer::SetDefaultCommands()
         const auto rotYInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
 
         const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * kMaxSpeed;
-        const auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
-        const auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;      
+        auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
+        auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;      
         const double rotX = m_rotLimiter.Calculate(rotXInput);
         const double rotY = m_rotLimiter.Calculate(rotYInput);
-        
+
+        if (m_DriveStraightHook)
+        {
+          ySpeed = 0.0_mps;
+          rot = 0.0_rad_per_s;
+        }
+
         if (m_fieldRelative)
         {
           GetDrive().RotationDrive(xSpeed, ySpeed, rotX, rotY, m_fieldRelative);
@@ -162,40 +173,32 @@ void RobotContainer::SetDefaultCommands()
 void RobotContainer::ConfigureBindings()
 {
   ConfigPrimaryButtonBindings();
-  //ConfigSecondaryButtonBindings();
+  // ConfigSecondaryButtonBindings();
   ConfigSecondaryButtonBindingsNewWay();
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
 {
-  using xbox = XboxController::Button;
-
   auto& primary = m_primaryController;
 
   // Primary
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
 #ifdef USE_TEST_BUTTONS
-  JoystickButton(&primary, xbox::kA).WhileTrue(&m_wheelsBackward);
-  JoystickButton(&primary, xbox::kB).WhileTrue(&m_wheelsRight);
-  JoystickButton(&primary, xbox::kX).WhileTrue(&m_wheelsLeft);
-  JoystickButton(&primary, xbox::kY).WhileTrue(&m_wheelsForward);
-  JoystickButton(&primary, xbox::kStart).WhileTrue(&m_OverrideOn);
-  JoystickButton(&primary, xbox::kBack).WhileTrue(&m_OverrideOff);
+  primary.A().WhileTrue(&m_wheelsBackward);
+  primary.B().WhileTrue(&m_wheelsRight);
+  primary.X().WhileTrue(&m_wheelsLeft);
+  primary.Y().WhileTrue(&m_wheelsForward);
+  primary.Start().WhileTrue(&m_OverrideOn);
+  primary.Back().WhileTrue(&m_OverrideOff);
 #else
-  JoystickButton(&primary, xbox::kA).OnTrue(ClawOpen(*this).ToPtr());
-  JoystickButton(&primary, xbox::kB).OnTrue(ClawClose(*this).ToPtr());
-  //primary.Y().OnTrue(Balance(m_drive, *this).ToPtr());
-  //JoystickButton(&primary, xbox::kX).OnTrue(&m_resetArmEncoder);
-  // JoystickButton(&primary, xbox::kY).WhileTrue();
+  primary.A().OnTrue(ClawOpen(*this).ToPtr());
+  primary.B().OnTrue(ClawClose(*this).ToPtr());
+  // primary.X().OnTrue(&m_retrieveGamePiece);
+  primary.Y().OnTrue(&m_toggleDriveStraight);
 #endif
-  // Triggers field relative driving
-  // TODO If we set field relative as default, we also need to swap the 
-  //      button bindings here (while button is true (pressed) it should clear field relative (be robo relative))
-  JoystickButton(&primary, xbox::kLeftBumper).OnTrue(&m_toggleFieldRelative);
-  // JoystickButton(&primary, xbox::kLeftBumper).WhileFalse(&m_clearFieldRelative);
-
-  JoystickButton(&primary, xbox::kRightBumper).OnTrue(&m_toggleSlowSpeed);
+  primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
+  primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 }
 
 void RobotContainer::ConfigSecondaryButtonBindings()
@@ -204,20 +207,23 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-  secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
-  secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
-  secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
-  secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
-  //secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
+  secondary.A().OnTrue(PlaceOnFloor(*this).ToPtr());                          
+  secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 
+  secondary.X().OnTrue(TravelPosition(*this).ToPtr());                                
+  secondary.Y().OnTrue(PlaceHigh(*this).ToPtr());                                    
 
-  secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
-  secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
-  //secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-  secondary.Back().OnTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+  secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
+  secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());
+  secondary.Start().WhileTrue(RotateTurntableCCW(*this).ToPtr());
+  secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());
   
-  // secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
-  // secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
-  secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
+  // secondary.LeftStick().OnTrue();                            
+  // secondary.RightStick().OnTrue();                           
+  // secondary.LeftTrigger().WhileTrue();
+  // secondary.RightTrigger().WhileTrue();
+
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });
 }
 
 void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
@@ -233,12 +239,12 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
   secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
   secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
-  secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
+  // secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
 
   secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
   secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
   secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-  secondary.Back().OnTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+  secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
 
   secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
   secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1

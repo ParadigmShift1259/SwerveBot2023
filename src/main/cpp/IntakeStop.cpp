@@ -8,6 +8,7 @@ IntakeStop::IntakeStop(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeStop/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void IntakeStop::Execute() {

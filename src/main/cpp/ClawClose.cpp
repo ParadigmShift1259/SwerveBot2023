@@ -7,15 +7,20 @@ ClawClose::ClawClose(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/clawClose/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void ClawClose::Execute()
 {
   m_claw.Close();
-  m_logStartCommand.Append(false);
 }
 
 bool ClawClose::IsFinished()
 {
   return true;
+}
+
+void ClawClose::End(bool interrupted)
+{
+  m_logStartCommand.Append(false);
 }

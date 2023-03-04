@@ -5,6 +5,7 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
+#include <cameraserver/CameraServer.h>
 
 wpi::log::DoubleLogEntry logMatchTime;
 
@@ -12,6 +13,7 @@ void Robot::RobotInit()
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
   logMatchTime = wpi::log::DoubleLogEntry(log, "/robot/matchTime");
+  frc::CameraServer::StartAutomaticCapture();
 }
 
 void Robot::RobotPeriodic()

@@ -9,6 +9,7 @@ TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/travelPosition/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void TravelPosition::Execute()

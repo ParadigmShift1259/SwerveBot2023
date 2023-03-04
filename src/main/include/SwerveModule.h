@@ -95,4 +95,8 @@ private:
     wpi::log::DoubleLogEntry m_logTurningEncoderPosition;
     wpi::log::DoubleLogEntry m_logAbsoluteEncoderPosition;
     wpi::log::DoubleLogEntry m_logAbsoluteEncoderPositionWithOffset;
+    wpi::log::DoubleLogEntry m_logTurningRefSpeed;
+    wpi::log::DoubleLogEntry m_logTurningRefAngle;
+    wpi::log::DoubleLogEntry m_logTurningNewSpeed;
+    wpi::log::DoubleLogEntry m_logTurningNewAngle;
 };

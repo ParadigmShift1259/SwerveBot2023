@@ -7,6 +7,7 @@ RotateTurntableCW::RotateTurntableCW(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/rotateTurntableCW/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void RotateTurntableCW::Initialize()
@@ -22,7 +23,7 @@ void RotateTurntableCW::Execute()
 
 bool RotateTurntableCW::IsFinished()
 {
-  return m_timer.Get() > kTurntableCWRunTime;
+  return true;
 }
 
 void RotateTurntableCW::End(bool interrupted) 

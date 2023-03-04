@@ -5,17 +5,21 @@
 
 #include "ISubsystemAccess.h"
 
-class TravelPosition : public frc2::CommandHelper<frc2::CommandBase, TravelPosition>
+class RetrieveGamePiece : public frc2::CommandHelper<frc2::CommandBase, RetrieveGamePiece>
 {
 public:
-    explicit TravelPosition(ISubsystemAccess& subsystemAccess);
+    explicit RetrieveGamePiece(ISubsystemAccess& subsystemAccess);
 
     void Execute() override;
     bool IsFinished() override;
     void End(bool interrupted) override;
-     
+
 private:
+    ClawSubsystem& m_claw;
     DeploymentSubsystem& m_deployment;
+    IntakeSubsystem& m_intake;
+
+    ISubsystemAccess& m_subsystemAccess;
 
     wpi::log::BooleanLogEntry m_logStartCommand;
 };

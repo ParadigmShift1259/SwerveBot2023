@@ -7,6 +7,7 @@ IntakeDeploy::IntakeDeploy(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeDeploy/startCommand");
+  m_logStartCommand.Append(true);
 }
 
 void IntakeDeploy::Execute() 
