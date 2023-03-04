@@ -90,7 +90,7 @@ private:
 
   units::meters_per_second_t m_currentMaxSpeed = kMaxSpeed;
 
-//#define ZERO_OFFSETS
+// #define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
   static constexpr double kFLoffset = 0.0;    static constexpr double kFRoffset = 0.0;
   static constexpr double kBLoffset = 0.0;    static constexpr double kBRoffset = 0.0;
@@ -100,8 +100,8 @@ private:
   // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
 
   // Mk4 swerve modules with L3 gear set
-  static constexpr double kFLoffset = 0.002;    static constexpr double kFRoffset = 0.242;
-  static constexpr double kBLoffset = 0.469;    static constexpr double kBRoffset = 0.762;
+  static constexpr double kFLoffset = 0.002;/*0.002;*/    static constexpr double kFRoffset = 0.248;/*0.242;*/
+  static constexpr double kBLoffset = 0.482;/*0.469;*/    static constexpr double kBRoffset = 0.759;/*0.762;*/
 #endif
 
   SwerveModule m_frontLeft  { kFrontLeftDriveCANID, kFrontLeftTurningCANID, kFLoffset, false };

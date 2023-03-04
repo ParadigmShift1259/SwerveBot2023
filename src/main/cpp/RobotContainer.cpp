@@ -105,7 +105,7 @@ void RobotContainer::SetDefaultCommands()
       // Don't send any input if autonomous is running
       if (m_isAutoRunning == false)
       {
-        //const double kDeadband = 0.02;
+        // const double kDeadband = 0.02;
         const double kDeadband = 0.1;
         const auto xInput = ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
         const auto yInput = ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
