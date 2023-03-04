@@ -20,9 +20,10 @@ public:
   
 private:
   DriveSubsystem& m_drive;
-  frc::Timer m_timer;
+  frc::Timer m_speedTimer;
+  frc::Timer m_endTimer;
   wpi::log::BooleanLogEntry m_logStartCommand;
 
-  static constexpr double kMaxAutoBalanceSpeed = 1.0;
+  static constexpr double kMaxAutoBalanceSpeed = 1.5;
   static constexpr double kMaxPitch = 15.0;
 };

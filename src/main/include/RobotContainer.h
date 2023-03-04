@@ -80,8 +80,10 @@ private:
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};
-  SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
-  SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
+  // SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
+  // SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
+  SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s, -3 / 2_s};
+  SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s, -3 / 3_s};
   SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
 
   // TODO If we set field relative as default, we also need to swap the 
@@ -100,6 +102,7 @@ private:
       , InstantCommand{[this] { m_deployment.ExtendArm(); }, {&m_deployment} }
       , WaitCommand{1.2_s}
       , ClawClose(*this)
+      , WaitCommand{0.5_s}
       , ClearancePosition(*this)
       , TravelPosition(*this) // Retracts BackPlate and arm
   };
@@ -107,6 +110,20 @@ private:
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };
   InstantCommand m_rotateArm{[this] { m_deployment.RotateArmToAngle(degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0))); }, {&m_deployment} };
+
+  void ToggleClaw()
+  {
+      if (m_claw.IsOpen())
+      {
+          m_claw.Close();
+      }
+      else
+      {
+          m_claw.Open();
+      }
+  }
+
+  InstantCommand m_toggleClaw{[this] { ToggleClaw(); }, { &m_claw } };
 
   InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
   InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };

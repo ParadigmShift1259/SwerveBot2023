@@ -91,11 +91,10 @@ Command* RobotContainer::GetAutonomousCommand()
 #else
 CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("BalanceOnly", {PathConstraints(4_mps, 3_mps_sq)});
+  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("BalanceOnly", {PathConstraints(2_mps, 2_mps_sq)});
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
-  eventMap.emplace("Balance", std::make_shared<ClawOpen>(*this));
-  eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
+  eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
 
   // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
 
@@ -201,8 +200,6 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 
 void RobotContainer::ConfigSecondaryButtonBindings()
 {
-  using xbox = XboxController::Button;
-
   auto& secondary = m_secondaryController;
 
   // Keep the bindings in this order
@@ -225,9 +222,6 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
 void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
 {
-  using namespace frc;
-  using namespace frc2;
-
   auto& secondary = m_secondaryController;
   // Raspberry PI Pico with gp2040 firmware Button Box
   //
@@ -249,12 +243,13 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
   secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
   secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
-  // on Y secondary.RightTrigger().WhileTrue(RetrievePosition(*this).ToPtr());     // Black  row 2
+  secondary.RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
   secondary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
-  secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
+  //secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
+  //secondary.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
 }
 
 SequentialCommandGroup* RobotContainer::GetParkCommand()
