@@ -15,6 +15,7 @@
 #include <frc2/command/ConditionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SwerveControllerCommand.h>
+#include <frc2/command/WaitCommand.h>
 
 #include <pathplanner/lib/PathPlanner.h>
 #include <pathplanner/lib/auto/SwerveAutoBuilder.h>
@@ -26,6 +27,7 @@
 
 #include "ClawOpen.h"
 #include "ClawClose.h"
+#include "ClearancePosition.h"
 #include "IntakeDeploy.h"
 #include "RetrievePosition.h"
 #include "TravelPosition.h"
@@ -90,7 +92,17 @@ private:
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
-  SequentialCommandGroup m_retrieveGamePiece{ IntakeDeploy(*this), ClawOpen(*this), RetrievePosition(*this), ClawClose(*this), TravelPosition(*this) };
+  SequentialCommandGroup m_retrieveGamePiece
+  { 
+        IntakeDeploy(*this)
+      , RetrievePosition(*this)
+      , ClawOpen(*this)
+      , InstantCommand{[this] { m_deployment.ExtendArm(); }, {&m_deployment} }
+      , WaitCommand{1.2_s}
+      , ClawClose(*this)
+      , ClearancePosition(*this)
+      , TravelPosition(*this) // Retracts BackPlate and arm
+  };
 
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };
@@ -105,8 +117,8 @@ private:
   InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
   InstantCommand m_resetArmEncoder{[this] { m_deployment.ResetEncoder(); }, {}};
 
-  std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
-  SwerveAutoBuilder m_autoBuilder;
+  // std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
+  // SwerveAutoBuilder m_autoBuilder;
 
   bool m_isAutoRunning = false;
 };

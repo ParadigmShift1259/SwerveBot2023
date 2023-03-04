@@ -33,19 +33,27 @@
 
 using namespace pathplanner;
 
+// std::unordered_map<std::string, std::shared_ptr<frc2::Command>> g_eventMap = 
+// {
+//   {"Balance", std::make_shared<ClawOpen>(*this)}
+// };
 
 RobotContainer::RobotContainer() 
   : m_drive()
-  , m_autoBuilder(
-      [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
-      [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-      PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-      PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-      [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
-      m_eventMap, // Our event map
-      { &m_drive }, // Drive requirements, usually just a single drive subsystem
-      true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-  )
+  // , m_eventMap
+  // {
+  //   {"Balance", std::make_shared<ClawOpen>(*this)}
+  // }
+  // , m_autoBuilder(
+  //     [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
+  //     [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
+  //     PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+  //     PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+  //     [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
+  //     m_eventMap, // Our event map
+  //     { &m_drive }, // Drive requirements, usually just a single drive subsystem
+  //     true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+  // )
 {
   SetDefaultCommands();
   ConfigureBindings();
@@ -56,13 +64,14 @@ RobotContainer::RobotContainer()
   // m_eventMap.emplace("intakeDown", std::make_shared<IntakeIngest>(*this));
 
   // BalanceOnly
-  m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive));
-
+  // m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
+  // m_eventMap.emplace();
+  
   // PlaceAndBalance
   // m_eventMap.emplace("ExtendArm", std::make_shared<PlaceHigh>(*this));
   // m_eventMap.emplace("OpenClaw", std::make_shared<OpenClaw>(*this));
   // m_eventMap.emplace("RetractArm", std::make_shared<TravelPosition>(*this));
-  // m_eventMap.emplace("Balance", std::make_shared<Balance>(*this));
+  // m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
 
   // SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
   // SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
@@ -84,7 +93,25 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 {
   std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("BalanceOnly", {PathConstraints(4_mps, 3_mps_sq)});
 
-  return m_autoBuilder.fullAuto(pathGroup);
+  static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
+  eventMap.emplace("Balance", std::make_shared<ClawOpen>(*this));
+  eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
+
+  // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
+
+  static SwerveAutoBuilder autoBuilder(
+      [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
+      [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
+      PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+      PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+      [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
+      eventMap, // Our event map
+      { &m_drive }, // Drive requirements, usually just a single drive subsystem
+      true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+  );
+
+  return autoBuilder.fullAuto(pathGroup);
+  // return m_autoBuilder.fullAuto(pathGroup);
 }
 #endif
 
@@ -136,7 +163,7 @@ void RobotContainer::SetDefaultCommands()
 void RobotContainer::ConfigureBindings()
 {
   ConfigPrimaryButtonBindings();
-  // ConfigSecondaryButtonBindings();
+  //ConfigSecondaryButtonBindings();
   ConfigSecondaryButtonBindingsNewWay();
 }
 
@@ -159,8 +186,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
   JoystickButton(&primary, xbox::kA).OnTrue(ClawOpen(*this).ToPtr());
   JoystickButton(&primary, xbox::kB).OnTrue(ClawClose(*this).ToPtr());
-  primary.Y().OnTrue(Balance(m_drive).ToPtr());
-  JoystickButton(&primary, xbox::kX).OnTrue(&m_resetArmEncoder);
+  //primary.Y().OnTrue(Balance(m_drive, *this).ToPtr());
+  //JoystickButton(&primary, xbox::kX).OnTrue(&m_resetArmEncoder);
   // JoystickButton(&primary, xbox::kY).WhileTrue();
 #endif
   // Triggers field relative driving
@@ -180,16 +207,20 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-  JoystickButton(&secondary, xbox::kA).WhileTrue(IntakeIngest(*this).ToPtr());
-  JoystickButton(&secondary, xbox::kB).OnTrue(PlaceLow(*this).ToPtr());
-  JoystickButton(&secondary, xbox::kX).OnTrue(PlaceHigh(*this).ToPtr());
-  JoystickButton(&secondary, xbox::kY).OnTrue(&m_retrieveGamePiece);
+  secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
+  secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
+  secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
+  //secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
 
-  JoystickButton(&secondary, xbox::kLeftBumper).OnTrue(PlaceOnFloor(*this).ToPtr());
-  JoystickButton(&secondary, xbox::kRightBumper).WhileTrue(IntakeRelease(*this).ToPtr());
+  secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
+  secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
+  //secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
+  secondary.Back().OnTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
   
-  JoystickButton(&secondary, xbox::kBack).OnTrue(RotateTurntableCW(*this).ToPtr());    
-  // JoystickButton(&secondary, xbox::kStart).OnTrue();
+  // secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
+  // secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
+  secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
 }
 
 void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
@@ -218,7 +249,7 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
   secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
   secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
-  secondary.RightTrigger().WhileTrue(RetrievePosition(*this).ToPtr());     // Black  row 2
+  // on Y secondary.RightTrigger().WhileTrue(RetrievePosition(*this).ToPtr());     // Black  row 2
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3

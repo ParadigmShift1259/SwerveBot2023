@@ -10,15 +10,15 @@ ClawSubsystem::ClawSubsystem()
 
 void ClawSubsystem::Periodic()
 {
-    
 }
 
 void ClawSubsystem::Open()
 {
-    m_solenoid.Set(false);
+  printf("ClawSubsystem::Open() m_solenoid.Get() %d\n", m_solenoid.Get());
+    m_solenoid.Set(true);
 }
 
 void ClawSubsystem::Close()
 {
-    m_solenoid.Set(true);
+    m_solenoid.Set(false);
 }

@@ -28,6 +28,6 @@ bool RetrievePosition::IsFinished()
 
 void RetrievePosition::End(bool interrupted)
 {
-  m_deployment.ExtendArm();
+  //m_deployment.ExtendArm();
   m_logStartCommand.Append(false);
 }
