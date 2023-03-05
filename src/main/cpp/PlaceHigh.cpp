@@ -11,19 +11,15 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
-  m_logAngle = wpi::log::DoubleLogEntry(log, "/placeHigh/angle");
   
   m_logStartCommand.Append(true);
 }
 
 void PlaceHigh::Initialize()
 {
-  // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
-
+  m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceHighAngle);
-  // m_logAngle.Append(angle.to<double>());
-  // m_deployment.RotateArmToAngle(angle);
 }
 
 void PlaceHigh::Execute()

@@ -14,6 +14,7 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
 
 void PlaceLow::Initialize()
 {
+  m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceLowAngle);
 }

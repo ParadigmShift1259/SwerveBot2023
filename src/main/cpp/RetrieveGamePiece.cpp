@@ -16,10 +16,6 @@
 #include <frc2/command/InstantCommand.h>
 
 RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess) 
-  // : m_claw(subsystemAccess.GetClaw())
-  // , m_deployment(subsystemAccess.GetDeployment())
-  // , m_intake(subsystemAccess.GetIntake())
-  //, m_subsystemAccess(subsystemAccess)
   : m_retrieveGamePiece(
         IntakeDeploy(subsystemAccess)
       , RetrievePosition(subsystemAccess)
@@ -30,9 +26,7 @@ RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess)
       , WaitCommand{0.5_s}
       , ClearancePosition(subsystemAccess)
       , TravelPosition(subsystemAccess) // Retracts BackPlate and arm
-      , WaitCommand{2.0_s}
-      , PlaceHigh(subsystemAccess)
-      // , InstantCommand([this] { m_isFinished = true;}, {})
+      , WaitCommand{1.2_s}
       )
 {
   AddRequirements({&subsystemAccess.GetClaw(), &subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
@@ -53,13 +47,10 @@ void RetrieveGamePiece::Execute()
 
 bool RetrieveGamePiece::IsFinished()
 {
-  //return m_isFinished;
-  // return m_deployment.IsAtDegreeSetpoint(kPlaceHighAngle);
   return m_retrieveGamePiece.IsFinished();
 }
 
 void RetrieveGamePiece::End(bool interrupted)
 {
-  printf("RetrieveGamePiece Interrupted %s", interrupted ? "true" : "false");
   m_logStartCommand.Append(false);
 }

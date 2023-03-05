@@ -1,5 +1,7 @@
 #include "TravelPosition.h"
 
+#include <frc2/command/WaitCommand.h>
+
 #include "ConstantsDeploymentAngles.h"
 
 TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess) 
@@ -16,6 +18,7 @@ void TravelPosition::Initialize()
 {
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
+  frc2::WaitCommand(0.5_s);
   m_deployment.RotateArmToAngle(kTravelAngle);
 }
 

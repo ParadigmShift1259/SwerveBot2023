@@ -18,7 +18,7 @@ void IntakeIngest::Execute()
 {
   m_intake.ExtendIntake();
   m_deployment.ExtendBackPlate();
-  // WaitCommand(0.5_s); Do we still need this? Rollers not touching
+  frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
   m_intake.Set(kIngestSpeed);
   m_turntable.SetTurnTable(kTurntableCCWSpeed);
 }

@@ -14,6 +14,7 @@ ClearancePosition::ClearancePosition(ISubsystemAccess& subsystemAccess)
 
 void ClearancePosition::Execute()
 {
+  m_deployment.RetractBackPlate();
   m_deployment.RotateArmToAngle(kClearanceAngle);
 }
 

@@ -31,7 +31,7 @@
 #include "PlaceHigh.h"
 #include "PlaceHighCube.h"
 
-#include "ReleaseHigh.h"
+#include "ReleaseCone.h"
 
 #include "ExtendArm.h"
 #include "RetractArm.h"
@@ -43,48 +43,15 @@
 
 using namespace pathplanner;
 
-// std::unordered_map<std::string, std::shared_ptr<frc2::Command>> g_eventMap = 
-// {
-//   {"Balance", std::make_shared<ClawOpen>(*this)}
-// };
-
 RobotContainer::RobotContainer() 
   : m_drive()
-  // , m_eventMap
-  // {
-  //   {"Balance", std::make_shared<ClawOpen>(*this)}
-  // }
-  // , m_autoBuilder(
-  //     [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
-  //     [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-  //     PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-  //     PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-  //     [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
-  //     m_eventMap, // Our event map
-  //     { &m_drive }, // Drive requirements, usually just a single drive subsystem
-  //     true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-  // )
 {
   SetDefaultCommands();
   ConfigureBindings();
 
-  // This is the pathplanner event map
-  // TestPath1
-  // m_eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
-  // m_eventMap.emplace("intakeDown", std::make_shared<IntakeIngest>(*this));
-
-  // BalanceOnly
-  // m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
-  // m_eventMap.emplace();
-  
-  // PlaceAndBalance
-  // m_eventMap.emplace("ExtendArm", std::make_shared<PlaceHigh>(*this));
-  // m_eventMap.emplace("OpenClaw", std::make_shared<OpenClaw>(*this));
-  // m_eventMap.emplace("RetractArm", std::make_shared<TravelPosition>(*this));
-  // m_eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
-
-  // SmartDashboard::PutNumber("PitchFactor", m_pitchFactor);
-  // SmartDashboard::PutNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
+  SmartDashboard::PutNumber("MaxAutoBalanceSpeed", 0.9);
+  frc::SmartDashboard::PutNumber("Balance Tolerance", 7.0);
+  frc::SmartDashboard::PutNumber("BalanceEndTime", 1.0);
 }
 
 //#define USE_PATH_PLANNER_SWERVE_CMD
@@ -101,7 +68,8 @@ Command* RobotContainer::GetAutonomousCommand()
 #else
 CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("PlaceOnly", {PathConstraints(2_mps, 2_mps_sq)});
+  // TODO Add dashboard selector for auto path
+  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("PlaceAndBalance", {PathConstraints(2_mps, 2_mps_sq)});
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
@@ -110,7 +78,7 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
   eventMap.emplace("ClawClose", std::make_shared<ClawClose>(*this));
   eventMap.emplace("IntakeDeploy", std::make_shared<IntakeDeploy>(*this));
-  eventMap.emplace("ReleaseHigh", std::make_shared<ReleaseHigh>(*this));
+  eventMap.emplace("ReleaseCone", std::make_shared<ReleaseCone>(*this));
   eventMap.emplace("RetrievePosition", std::make_shared<RetrievePosition>(*this));
   eventMap.emplace("ExtendArm", std::make_shared<ExtendArm>(*this));
   eventMap.emplace("WaitLong", std::make_shared<WaitCommand>(1.2_s));
@@ -187,8 +155,8 @@ void RobotContainer::SetDefaultCommands()
 void RobotContainer::ConfigureBindings()
 {
   ConfigPrimaryButtonBindings();
-  // ConfigSecondaryButtonBindings();
-  ConfigSecondaryButtonBindingsNewWay();
+  ConfigSecondaryButtonBindings();
+  // ConfigSecondaryButtonBindingsNewWay();
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
@@ -203,13 +171,14 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   primary.B().WhileTrue(&m_wheelsRight);
   primary.X().WhileTrue(&m_wheelsLeft);
   primary.Y().WhileTrue(&m_wheelsForward);
+  primary.Y().OnTrue(&m_toggleDriveStraight);
   primary.Start().WhileTrue(&m_OverrideOn);
   primary.Back().WhileTrue(&m_OverrideOff);
 #else
   primary.A().OnTrue(ClawOpen(*this).ToPtr());
   primary.B().OnTrue(ClawClose(*this).ToPtr());
   primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
-  primary.Y().OnTrue(&m_toggleDriveStraight);
+  primary.Y().OnTrue(ReleaseCone(*this).ToPtr());
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);

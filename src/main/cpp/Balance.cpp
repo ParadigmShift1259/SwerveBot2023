@@ -1,6 +1,7 @@
 #include "Balance.h"
 
 #include <cmath> // For sqrt function
+#include <frc/smartdashboard/SmartDashboard.h>
 
 Balance::Balance(DriveSubsystem& driveSubsystem, ISubsystemAccess& subsystemAccess) 
   : m_drive(driveSubsystem)
@@ -11,36 +12,41 @@ Balance::Balance(DriveSubsystem& driveSubsystem, ISubsystemAccess& subsystemAcce
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/balance/startCommand");
-  m_logStartCommand.Append(true);
 }
 
 void Balance::Initialize()
 {
+  m_logStartCommand.Append(true);
+
   m_speedTimer.Reset();
   m_speedTimer.Start();
 }
 
 void Balance::Execute()
 {
-  double driveSpeed = std::clamp(kMaxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch * m_speedTimer.Get().to<double>()), -kMaxAutoBalanceSpeed, kMaxAutoBalanceSpeed);
-  printf("Balance::Execute, Pitch %.3f, Speed %.3f, SpeedTime %.3f, EndTime %.3f\n", m_drive.GetPitch(), driveSpeed, m_speedTimer.Get().to<double>(), m_endTimer.Get().to<double>());
-  m_drive.Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false);
+  // double balanceTolerance = frc::SmartDashboard::GetNumber("Balance Tolerance", kBalanceTolerance);
+  // double maxAutoBalanceSpeed = frc::SmartDashboard::GetNumber("MaxAutoBalanceSpeed", kMaxAutoBalanceSpeed);
+  double driveSpeed = std::clamp(kMaxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch), -kMaxAutoBalanceSpeed, kMaxAutoBalanceSpeed);
 
-  if (abs(m_drive.GetPitch()) < 5.0)
+  if (abs(m_drive.GetPitch()) < kBalanceTolerance)
   {
+    driveSpeed = std::clamp(kMaxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch * m_speedTimer.Get().to<double>()), -kMaxAutoBalanceSpeed, kMaxAutoBalanceSpeed);
     m_endTimer.Start();
-    m_speedTimer.Reset();
   }
   else
   {
     m_endTimer.Reset();
     m_endTimer.Stop();
   }
+
+  m_drive.Drive(units::velocity::meters_per_second_t(driveSpeed), 0.0_mps, 0.0_rad_per_s, false);
 }
 
 bool Balance::IsFinished()
 {
-  return m_endTimer.Get() > 5.0_s;
+  // double endTime = frc::SmartDashboard::GetNumber("BalanceEndTime", kBalanceEndTime.to<double>());
+  // return m_endTimer.Get() > second_t(endTime);
+  return m_endTimer.Get() > kBalanceEndTime;
 }
 
 void Balance::End(bool interrupted)

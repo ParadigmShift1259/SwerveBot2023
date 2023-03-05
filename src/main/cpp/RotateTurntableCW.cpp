@@ -1,9 +1,12 @@
 #include "RotateTurntableCW.h"
 
+#include <frc2/command/WaitCommand.h>
+
 RotateTurntableCW::RotateTurntableCW(ISubsystemAccess& subsystemAccess) 
-  : m_turntable(subsystemAccess.GetTurntable())
+  : m_deployment(subsystemAccess.GetDeployment())
+  , m_turntable(subsystemAccess.GetTurntable())
 {
-  AddRequirements({&subsystemAccess.GetTurntable()});
+  AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetTurntable()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/rotateTurntableCW/startCommand");
@@ -12,13 +15,13 @@ RotateTurntableCW::RotateTurntableCW(ISubsystemAccess& subsystemAccess)
 
 void RotateTurntableCW::Initialize()
 {
-  m_timer.Reset();
-  m_timer.Start();
+  m_deployment.ExtendBackPlate();
+  frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
+  m_turntable.SetTurnTable(kTurntableCWSpeed);
 }
 
 void RotateTurntableCW::Execute() 
 {
-  m_turntable.SetTurnTable(kTurntableCWSpeed);
 }
 
 bool RotateTurntableCW::IsFinished()

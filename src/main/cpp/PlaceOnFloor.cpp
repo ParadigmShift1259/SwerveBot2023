@@ -14,6 +14,7 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 
 void PlaceOnFloor::Initialize()
 {
+  m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);
 }

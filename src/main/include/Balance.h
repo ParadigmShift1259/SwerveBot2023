@@ -24,6 +24,8 @@ private:
   frc::Timer m_endTimer;
   wpi::log::BooleanLogEntry m_logStartCommand;
 
-  static constexpr double kMaxAutoBalanceSpeed = 1.5;
-  static constexpr double kMaxPitch = 15.0;
+  static constexpr double kMaxAutoBalanceSpeed = 0.9;
+  static constexpr double kMaxPitch = 20.0;
+  static constexpr double kBalanceTolerance = 7.0;
+  second_t kBalanceEndTime = 1.0_s;
 };

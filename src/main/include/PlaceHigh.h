@@ -20,5 +20,4 @@ private:
     DeploymentSubsystem& m_deployment;
 
     wpi::log::BooleanLogEntry m_logStartCommand;
-    wpi::log::DoubleLogEntry m_logAngle;
 };

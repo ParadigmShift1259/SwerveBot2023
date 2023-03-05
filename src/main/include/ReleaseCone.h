@@ -5,10 +5,10 @@
 
 #include "ISubsystemAccess.h"
 
-class ReleaseHigh : public frc2::CommandHelper<frc2::CommandBase, ReleaseHigh>
+class ReleaseCone : public frc2::CommandHelper<frc2::CommandBase, ReleaseCone>
 {
 public:
-    explicit ReleaseHigh(ISubsystemAccess& subsystemAccess);
+    explicit ReleaseCone(ISubsystemAccess& subsystemAccess);
 
     void Initialize() override;
     void Execute() override;
@@ -19,6 +19,8 @@ public:
 private:
     ClawSubsystem& m_claw;
     DeploymentSubsystem& m_deployment;
+
+    degree_t m_releaseAngle;
 
     wpi::log::BooleanLogEntry m_logStartCommand;
     wpi::log::DoubleLogEntry m_logAngle;
