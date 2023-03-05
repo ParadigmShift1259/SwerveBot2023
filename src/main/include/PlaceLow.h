@@ -10,6 +10,7 @@ class PlaceLow : public frc2::CommandHelper<frc2::CommandBase, PlaceLow>
 public:
     explicit PlaceLow(ISubsystemAccess& subsystemAccess);
 
+    void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
 

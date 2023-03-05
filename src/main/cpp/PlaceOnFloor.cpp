@@ -12,10 +12,15 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
   m_logStartCommand.Append(true);
 }
 
-void PlaceOnFloor::Execute()
+void PlaceOnFloor::Initialize()
 {
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);
+}
+
+void PlaceOnFloor::Execute()
+{
+
 }
 
 bool PlaceOnFloor::IsFinished()

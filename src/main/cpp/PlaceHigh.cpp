@@ -16,7 +16,7 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
   m_logStartCommand.Append(true);
 }
 
-void PlaceHigh::Execute()
+void PlaceHigh::Initialize()
 {
   // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
 
@@ -24,6 +24,11 @@ void PlaceHigh::Execute()
   m_deployment.RotateArmToAngle(kPlaceHighAngle);
   // m_logAngle.Append(angle.to<double>());
   // m_deployment.RotateArmToAngle(angle);
+}
+
+void PlaceHigh::Execute()
+{
+
 }
 
 bool PlaceHigh::IsFinished()

@@ -10,6 +10,7 @@ class PlaceHighCube : public frc2::CommandHelper<frc2::CommandBase, PlaceHighCub
 public:
     explicit PlaceHighCube(ISubsystemAccess& subsystemAccess);
 
+    void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
 

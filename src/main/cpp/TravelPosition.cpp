@@ -5,18 +5,23 @@
 TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
 {
-  AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
+  AddRequirements({&subsystemAccess.GetDeployment()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/travelPosition/startCommand");
   m_logStartCommand.Append(true);
 }
 
-void TravelPosition::Execute()
+void TravelPosition::Initialize()
 {
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kTravelAngle);
+}
+
+void TravelPosition::Execute()
+{
+
 }
 
 bool TravelPosition::IsFinished()

@@ -5,19 +5,21 @@
 
 #include "ISubsystemAccess.h"
 
-class PlaceOnFloor : public frc2::CommandHelper<frc2::CommandBase, PlaceOnFloor>
+class ReleaseHigh : public frc2::CommandHelper<frc2::CommandBase, ReleaseHigh>
 {
 public:
-    explicit PlaceOnFloor(ISubsystemAccess& subsystemAccess);
+    explicit ReleaseHigh(ISubsystemAccess& subsystemAccess);
 
     void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
 
     void End(bool interrupted) override;
-     
+
 private:
+    ClawSubsystem& m_claw;
     DeploymentSubsystem& m_deployment;
 
     wpi::log::BooleanLogEntry m_logStartCommand;
+    wpi::log::DoubleLogEntry m_logAngle;
 };

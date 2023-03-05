@@ -16,14 +16,19 @@ PlaceHighCube::PlaceHighCube(ISubsystemAccess& subsystemAccess)
   m_logStartCommand.Append(true);
 }
 
-void PlaceHighCube::Execute()
+void PlaceHighCube::Initialize()
 {
   // degree_t angle = degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0));
 
   m_deployment.RetractArm();
-  m_deployment.RotateArmToAngle(kPlaceHighAngle);
+  m_deployment.RotateArmToAngle(kPlaceHighCubeAngle);
   // m_logAngle.Append(angle.to<double>());
   // m_deployment.RotateArmToAngle(angle);
+}
+
+void PlaceHighCube::Execute()
+{
+
 }
 
 bool PlaceHighCube::IsFinished()

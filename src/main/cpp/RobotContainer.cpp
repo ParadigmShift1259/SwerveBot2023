@@ -24,12 +24,21 @@
 #include "RotateTurntableCW.h"
 #include "RotateTurntableCCW.h"
 
+#include "RetrieveGamePiece.h"
+
 #include "PlaceOnFloor.h"
 #include "PlaceLow.h"
 #include "PlaceHigh.h"
 #include "PlaceHighCube.h"
 
+#include "ReleaseHigh.h"
+
+#include "ExtendArm.h"
+#include "RetractArm.h"
+
+#include <pathplanner/lib/PathPlannerTrajectory.h>
 #include <pathplanner/lib/auto/SwerveAutoBuilder.h>
+#include <pathplanner/lib/PathPoint.h>
 #include <pathplanner/lib/PathPlanner.h>
 
 using namespace pathplanner;
@@ -92,17 +101,23 @@ Command* RobotContainer::GetAutonomousCommand()
 #else
 CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("BalanceOnly", {PathConstraints(2_mps, 2_mps_sq)});
+  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("PlaceOnly", {PathConstraints(2_mps, 2_mps_sq)});
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
   eventMap.emplace("TravelPosition", std::make_shared<TravelPosition>(*this));
-  //eventMap.emplace("RetrieveGamePiece", std::make_shared<&m_retrieveGamePiece>());
   eventMap.emplace("PlaceHigh", std::make_shared<PlaceHigh>(*this));
   eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
+  eventMap.emplace("ClawClose", std::make_shared<ClawClose>(*this));
+  eventMap.emplace("IntakeDeploy", std::make_shared<IntakeDeploy>(*this));
+  eventMap.emplace("ReleaseHigh", std::make_shared<ReleaseHigh>(*this));
+  eventMap.emplace("RetrievePosition", std::make_shared<RetrievePosition>(*this));
+  eventMap.emplace("ExtendArm", std::make_shared<ExtendArm>(*this));
+  eventMap.emplace("WaitLong", std::make_shared<WaitCommand>(1.2_s));
+  eventMap.emplace("WaitShort", std::make_shared<WaitCommand>(0.5_s));
+  eventMap.emplace("ClearancePosition", std::make_shared<ClearancePosition>(*this));
 
   // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
-
   static SwerveAutoBuilder autoBuilder(
       [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
       [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
@@ -115,7 +130,6 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   );
 
   return autoBuilder.fullAuto(pathGroup);
-  // return m_autoBuilder.fullAuto(pathGroup);
 }
 #endif
 
@@ -194,7 +208,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
   primary.A().OnTrue(ClawOpen(*this).ToPtr());
   primary.B().OnTrue(ClawClose(*this).ToPtr());
-  // primary.X().OnTrue(&m_retrieveGamePiece);
+  primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
   primary.Y().OnTrue(&m_toggleDriveStraight);
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
@@ -239,7 +253,7 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
   secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
   secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
-  // secondary.Y().OnTrue(&m_retrieveGamePiece);                                    // Yellow row 2
+  secondary.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
 
   secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
   secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2

@@ -2,15 +2,38 @@
 
 #include "ConstantsDeploymentAngles.h"
 
+#include "ClawClose.h"
+#include "ClawOpen.h"
+#include "ClearancePosition.h"
+#include "ExtendArm.h"
 #include "IntakeDeploy.h"
+#include "PlaceHigh.h"
+#include "RetrievePosition.h"
+#include "TravelPosition.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/WaitCommand.h>
+#include <frc2/command/InstantCommand.h>
 
 RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess) 
-  : m_claw(subsystemAccess.GetClaw())
-  , m_deployment(subsystemAccess.GetDeployment())
-  , m_intake(subsystemAccess.GetIntake())
-  , m_subsystemAccess(subsystemAccess)
+  // : m_claw(subsystemAccess.GetClaw())
+  // , m_deployment(subsystemAccess.GetDeployment())
+  // , m_intake(subsystemAccess.GetIntake())
+  //, m_subsystemAccess(subsystemAccess)
+  : m_retrieveGamePiece(
+        IntakeDeploy(subsystemAccess)
+      , RetrievePosition(subsystemAccess)
+      , ClawOpen(subsystemAccess)
+      , ExtendArm(subsystemAccess)
+      , WaitCommand{1.2_s}
+      , ClawClose(subsystemAccess)
+      , WaitCommand{0.5_s}
+      , ClearancePosition(subsystemAccess)
+      , TravelPosition(subsystemAccess) // Retracts BackPlate and arm
+      , WaitCommand{2.0_s}
+      , PlaceHigh(subsystemAccess)
+      // , InstantCommand([this] { m_isFinished = true;}, {})
+      )
 {
   AddRequirements({&subsystemAccess.GetClaw(), &subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
 
@@ -19,52 +42,24 @@ RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess)
   m_logStartCommand.Append(true);
 }
 
+void RetrieveGamePiece::Initialize()
+{
+  m_retrieveGamePiece.Schedule();
+}
+
 void RetrieveGamePiece::Execute()
 {
-  IntakeDeploy(m_subsystemAccess).Schedule();
-  // RetrievePosition(*this)
-  // ClawOpen(*this)
-  // InstantCommand{[this] { m_deployment.ExtendArm(); }, {&m_deployment} }
-  // WaitCommand{1.2_s}
-  // ClawClose(*this)
-  // WaitCommand{0.5_s}
-  // ClearancePosition(*this)
-  // TravelPosition(*this) // Retracts BackPlate and arm
-
-
-  // m_intake.ExtendIntake();
-  // m_deployment.RotateArmToAngle(kRetrieveAngle);
-  // m_claw.Open();
-  // m_deployment.ExtendArm();
-  // // wait 1.2
-  // m_claw.Close();
-  // // wait 0.5
-  // m_deployment.RotateArmToAngle(kClearanceAngle);
-  // m_deployment.RetractBackPlate();
-  // m_deployment.RetractArm();
-  // m_deployment.RotateArmToAngle(kTravelAngle);
-  
-
-  // SequentialCommandGroup m_retrieveGamePiece
-  // { 
-  //       IntakeDeploy(*this)
-  //     , RetrievePosition(*this)
-  //     , ClawOpen(*this)
-  //     , InstantCommand{[this] { m_deployment.ExtendArm(); }, {&m_deployment} }
-  //     , WaitCommand{1.2_s}
-  //     , ClawClose(*this)
-  //     , WaitCommand{0.5_s}
-  //     , ClearancePosition(*this)
-  //     , TravelPosition(*this) // Retracts BackPlate and arm
-  // };
 }
 
 bool RetrieveGamePiece::IsFinished()
 {
-  return m_deployment.IsAtDegreeSetpoint(kRetrieveAngle);
+  //return m_isFinished;
+  // return m_deployment.IsAtDegreeSetpoint(kPlaceHighAngle);
+  return m_retrieveGamePiece.IsFinished();
 }
 
 void RetrieveGamePiece::End(bool interrupted)
 {
+  printf("RetrieveGamePiece Interrupted %s", interrupted ? "true" : "false");
   m_logStartCommand.Append(false);
 }

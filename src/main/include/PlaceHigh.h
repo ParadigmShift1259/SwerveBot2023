@@ -10,6 +10,7 @@ class PlaceHigh : public frc2::CommandHelper<frc2::CommandBase, PlaceHigh>
 public:
     explicit PlaceHigh(ISubsystemAccess& subsystemAccess);
 
+    void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
 

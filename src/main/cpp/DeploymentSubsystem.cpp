@@ -78,11 +78,11 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     auto currentPos = m_enc.GetPosition();
     degree_t currentAngle = TicksToDegrees(currentPos);
     m_setpointTicks = DegreesToTicks(angle);
-    printf("Rot angle %.3f currAngle %.3f delta %.3f ticks %.3f\n"
-     , angle.to<double>()
-     , currentAngle.to<double>()
-     , (angle - currentAngle).to<double>()
-     , m_setpointTicks);
+    // printf("Rot angle %.3f currAngle %.3f delta %.3f ticks %.3f\n"
+    //  , angle.to<double>()
+    //  , currentAngle.to<double>()
+    //  , (angle - currentAngle).to<double>()
+    //  , m_setpointTicks);
     m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
 }
 
