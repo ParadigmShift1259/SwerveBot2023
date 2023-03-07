@@ -126,8 +126,8 @@ void RobotContainer::SetDefaultCommands()
         const auto rotXInput = ApplyDeadband(m_primaryController.GetRightY(), kDeadband);
         const auto rotYInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
 
-        const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * kMaxSpeed;
-        auto ySpeed = m_yspeedLimiter.Calculate(yInput) * kMaxSpeed;
+        const auto xSpeed = m_xspeedLimiter.Calculate(xInput) * m_drive.m_currentMaxSpeed; //kMaxSpeed;
+        auto ySpeed = m_yspeedLimiter.Calculate(yInput) * m_drive.m_currentMaxSpeed; //kMaxSpeed;
         auto rot = m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;      
         const double rotX = m_rotLimiter.Calculate(rotXInput);
         const double rotY = m_rotLimiter.Calculate(rotYInput);
@@ -196,10 +196,12 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.Y().OnTrue(PlaceHigh(*this).ToPtr());                                    
 
   secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
-  secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());
+  // secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());
+  secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
   secondary.Start().WhileTrue(RotateTurntableCCW(*this).ToPtr());
   secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());
-  
+  secondary.RightTrigger().WhileTrue(RetrieveGamePiece(*this).ToPtr());
+
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           
   // secondary.LeftTrigger().WhileTrue();

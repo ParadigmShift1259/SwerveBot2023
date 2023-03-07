@@ -13,6 +13,7 @@ RotateTurntableCCW::RotateTurntableCCW(ISubsystemAccess& subsystemAccess)
   m_logStartCommand.Append(true);
 }
 
+
 void RotateTurntableCCW::Initialize()
 {
   m_deployment.ExtendBackPlate();

@@ -17,8 +17,8 @@
 
 RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess) 
   : m_retrieveGamePiece(
-        IntakeDeploy(subsystemAccess)
-      , RetrievePosition(subsystemAccess)
+        /*IntakeDeploy(subsystemAccess)
+      , */RetrievePosition(subsystemAccess)
       , ClawOpen(subsystemAccess)
       , ExtendArm(subsystemAccess)
       , WaitCommand{1.2_s}

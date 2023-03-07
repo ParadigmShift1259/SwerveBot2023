@@ -34,7 +34,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
        : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
     // Renormalizes the wheel speeds if any individual speed is above the specified maximum
-    m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
+    m_kinematics.DesaturateWheelSpeeds(&states, m_currentMaxSpeed);//kMaxSpeed);
 
     auto [fl, fr, bl, br] = states;
 
@@ -222,7 +222,7 @@ void DriveSubsystem::SetAllDesiredState(const frc::SwerveModuleState& sms)
 
 void DriveSubsystem::SetModuleStates(SwerveModuleStates desiredStates)
 {
-  m_kinematics.DesaturateWheelSpeeds(&desiredStates, kMaxSpeed);
+  m_kinematics.DesaturateWheelSpeeds(&desiredStates, m_currentMaxSpeed);//kMaxSpeed);
   m_frontLeft.SetDesiredState(desiredStates[0]);
   m_frontRight.SetDesiredState(desiredStates[1]);
   m_rearRight.SetDesiredState(desiredStates[3]);

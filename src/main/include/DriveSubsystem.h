@@ -69,6 +69,10 @@ public:
 
   void ToggleSlowSpeed() override { m_currentMaxSpeed = (m_currentMaxSpeed == kMaxSpeed ? kLowSpeed : kMaxSpeed); }
 
+  units::meters_per_second_t m_currentMaxSpeed = kMaxSpeed;
+
+
+
 // Safer sppeds for lab testing
   // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
   // static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
@@ -88,8 +92,7 @@ private:
   const frc::Translation2d m_rearLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   const frc::Translation2d m_rearRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-  units::meters_per_second_t m_currentMaxSpeed = kMaxSpeed;
-
+  
 // #define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
   static constexpr double kFLoffset = 0.0;    static constexpr double kFRoffset = 0.0;
