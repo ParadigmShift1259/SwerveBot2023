@@ -5,6 +5,7 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
+#include <cameraserver/CameraServer.h>
 
 wpi::log::DoubleLogEntry logMatchTime;
 
@@ -12,6 +13,7 @@ void Robot::RobotInit()
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
   logMatchTime = wpi::log::DoubleLogEntry(log, "/robot/matchTime");
+  frc::CameraServer::StartAutomaticCapture();
 }
 
 void Robot::RobotPeriodic()
@@ -27,12 +29,10 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
-
 }
 
 void Robot::DisabledExit()
 {
-
 }
 
 void Robot::AutonomousInit()
@@ -42,6 +42,7 @@ void Robot::AutonomousInit()
   // Record both DS control and joystick data
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 
+  m_container.SetIsAutoRunning(true);
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
@@ -51,16 +52,16 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-
 }
 
 void Robot::AutonomousExit()
 {
-
+  m_container.SetIsAutoRunning(false);
 }
 
 void Robot::TeleopInit()
 {
+  m_container.SetIsAutoRunning(false);
   if (m_hasAutoRun == false)
   {
     frc::DataLogManager::Start();

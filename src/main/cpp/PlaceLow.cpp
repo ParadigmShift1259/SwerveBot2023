@@ -6,29 +6,30 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
   : m_deployment(subsystemAccess.GetDeployment())
 {
   AddRequirements({&subsystemAccess.GetDeployment()});
+
+  wpi::log::DataLog& log = subsystemAccess.GetLogger();
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeLow/startCommand");
+}
+
+void PlaceLow::Initialize()
+{
+  m_logStartCommand.Append(true);
+  m_deployment.RetractBackPlate(); 
+  m_deployment.RetractArm();
+  m_deployment.RotateArmToAngle(kPlaceLowAngle);
 }
 
 void PlaceLow::Execute()
 {
-    m_deployment.RetractArm();
-    m_deployment.RotateArmToAngle(kPlaceLowAngle);
 
-    // if (m_deployment.CurrentDegreePosition() < kPlaceLowAngle)
-    // {
-    //     m_deployment.RotateOutOfFrame(kRotateSpeed);
-    // }
-    // else
-    // {
-    //     m_deployment.RotateIntoFrame(kRotateSpeed);
-    // }
 }
 
 bool PlaceLow::IsFinished()
 {
-    return true;// m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
+  return true;// m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
 }
 
 void PlaceLow::End(bool interrupted)
 {
-    //m_deployment.Stop();
+  m_logStartCommand.Append(false);
 }

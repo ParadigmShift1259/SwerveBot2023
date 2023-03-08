@@ -7,12 +7,16 @@
 
 class ClawOpen : public frc2::CommandHelper<frc2::CommandBase, ClawOpen>
 {
- public:
+public:
   explicit ClawOpen(ISubsystemAccess& subsystemAccess);
 
+  void Initialize() override;
   void Execute() override;
   bool IsFinished() override;
+  void End(bool interrupted) override;
   
- private:
+private:
   ClawSubsystem& m_claw;
+
+  wpi::log::BooleanLogEntry m_logStartCommand;
 };

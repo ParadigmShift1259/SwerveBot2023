@@ -23,6 +23,10 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   m_logTurningEncoderPosition = wpi::log::DoubleLogEntry(log, logHeader + "turningEncoderPosition");
   m_logAbsoluteEncoderPosition = wpi::log::DoubleLogEntry(log, logHeader + "absoluteEncoderPosition");
   m_logAbsoluteEncoderPositionWithOffset = wpi::log::DoubleLogEntry(log, logHeader + "absoluteEncoderPositionWithOffset");
+  m_logTurningRefSpeed = wpi::log::DoubleLogEntry(log, logHeader + "refSpeed");
+  m_logTurningRefAngle = wpi::log::DoubleLogEntry(log, logHeader + "refAngle");
+  m_logTurningNewSpeed = wpi::log::DoubleLogEntry(log, logHeader + "newSpeed");
+  m_logTurningNewAngle = wpi::log::DoubleLogEntry(log, logHeader + "newAngle");
 
   m_turningEncoder.SetInverted(true);               // SDS Mk4i motors are mounted upside down compared to the Mk4
   m_turningEncoder.SetPositionConversionFactor(2.0 * std::numbers::pi); //<! Converts from wheel rotations to radians
@@ -59,7 +63,8 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   // to be continuous.
   m_turningPIDController.SetOutputRange(-1.0, 1.0);
   constexpr double kTurnP = 1.0;
-  constexpr double kTurnI = 0.000001;
+  //constexpr double kTurnI = 0.000001;
+  constexpr double kTurnI = 0.0;
   constexpr double kTurnD = 0.0;
   m_turningPIDController.SetP(kTurnP);
   m_turningPIDController.SetI(kTurnI);
@@ -121,20 +126,20 @@ void SwerveModule::Periodic()
 
 void SwerveModule::ResyncAbsRelEnc()
 {
-  auto time = m_timer.Get();
   auto angleInRot = fmod(1 + m_offset - m_absEnc.GetAbsolutePosition(), 1.0); // Returns rotations between 0 and 1
   auto angleInRad = angleInRot * 2 * std::numbers::pi;                        // Changes rotations to radians
   if (angleInRad > std::numbers::pi)                                          // If angle is between pi and 2pi, put it between -pi and 0
       angleInRad -= 2 * std::numbers::pi;
 
   m_turningEncoder.SetPosition(angleInRad);
-  printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
-        , m_id.c_str()
-        , time.to<double>()
-        , angleInRot
-        , angleInRad
-        , -1.0 * m_turningEncoder.GetPosition()
-        , -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
+  // auto time = m_timer.Get()
+  // printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
+  //       , m_id.c_str()
+  //       , time.to<double>()
+  //       , angleInRot
+  //       , angleInRad
+  //       , -1.0 * m_turningEncoder.GetPosition()
+  //       , -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }
 
 frc::SwerveModuleState SwerveModule::GetState()
@@ -145,13 +150,13 @@ frc::SwerveModuleState SwerveModule::GetState()
 
 units::meters_per_second_t SwerveModule::CalcMetersPerSec()
 {
-   double ticksPer100ms = m_driveMotor.GetSelectedSensorVelocity();
-   return units::meters_per_second_t(kDriveEncoderMetersPerSec * ticksPer100ms);
+  double ticksPer100ms = m_driveMotor.GetSelectedSensorVelocity();
+  return units::meters_per_second_t(kDriveEncoderMetersPerSec * ticksPer100ms);
 }
 
 double SwerveModule::CalcTicksPer100Ms(units::meters_per_second_t speed)
 {
-   return speed.to<double>() / kDriveEncoderMetersPerSec;
+  return speed.to<double>() / kDriveEncoderMetersPerSec;
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition()
@@ -162,8 +167,8 @@ frc::SwerveModulePosition SwerveModule::GetPosition()
 
 units::meter_t SwerveModule::CalcMeters()
 {
-   double ticks = m_driveMotor.GetSelectedSensorPosition();
-   return units::meter_t(kDriveEncoderMetersPerTick * ticks);
+  double ticks = m_driveMotor.GetSelectedSensorPosition();
+  return units::meter_t(kDriveEncoderMetersPerTick * ticks);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
@@ -171,26 +176,32 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   // Optimize the reference state to avoid spinning further than 90 degrees
   double currPosition = -1.0 * m_turningEncoder.GetPosition();
   const auto state = frc::SwerveModuleState::Optimize(referenceState, frc::Rotation2d{ units::radian_t(currPosition) });
-  frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, currPosition);
-  frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, currPosition * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
+  //frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, currPosition);
+  //frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, currPosition * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 
   if (state.speed != 0_mps)
   {
 #ifdef DISABLE_DRIVE
-      m_driveMotor.Set(TalonFXControlMode::Velocity, 0.0);
+    m_driveMotor.Set(TalonFXControlMode::Velocity, 0.0);
 #else
-      m_driveMotor.Set(TalonFXControlMode::Velocity, CalcTicksPer100Ms(state.speed));
+    m_driveMotor.Set(TalonFXControlMode::Velocity, CalcTicksPer100Ms(state.speed));
 #endif
   }
   else
   {
-      m_driveMotor.Set(TalonFXControlMode::PercentOutput, 0.0);
+    m_driveMotor.Set(TalonFXControlMode::PercentOutput, 0.0);
   }
 
   // Calculate the turning motor output from the turning PID controller.
-  frc::SmartDashboard::PutNumber("Turn Ref Opt" + m_id, state.angle.Radians().to<double>());
-  frc::SmartDashboard::PutNumber("Turn Ref" + m_id, referenceState.angle.Radians().to<double>());
+  //frc::SmartDashboard::PutNumber("Turn Ref Opt" + m_id, state.angle.Radians().to<double>());
+  //frc::SmartDashboard::PutNumber("Turn Ref" + m_id, referenceState.angle.Radians().to<double>());
   double newRef = state.angle.Radians().to<double>();
-  frc::SmartDashboard::PutNumber("Turn Ref Motor" + m_id, newRef);
+ 
+  m_logTurningRefSpeed.Append(referenceState.speed.to<double>());
+  m_logTurningRefAngle.Append(referenceState.angle.Degrees().to<double>());
+  m_logTurningNewSpeed.Append(state.speed.to<double>());
+  m_logTurningNewAngle.Append(state.angle.Degrees().to<double>());
+
+  //frc::SmartDashboard::PutNumber("Turn Ref Motor" + m_id, newRef);
   m_turningPIDController.SetReference(-1.0 * newRef, CANSparkMax::ControlType::kPosition);
 }

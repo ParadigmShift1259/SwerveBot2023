@@ -7,14 +7,17 @@
 
 class PlaceOnFloor : public frc2::CommandHelper<frc2::CommandBase, PlaceOnFloor>
 {
-    public:
-     explicit PlaceOnFloor(ISubsystemAccess& subsystemAccess);
+public:
+    explicit PlaceOnFloor(ISubsystemAccess& subsystemAccess);
 
-     void Execute() override;
-     bool IsFinished() override;
+    void Initialize() override;
+    void Execute() override;
+    bool IsFinished() override;
 
-     void End(bool interrupted) override;
+    void End(bool interrupted) override;
      
-    private:
-     DeploymentSubsystem& m_deployment;
+private:
+    DeploymentSubsystem& m_deployment;
+
+    wpi::log::BooleanLogEntry m_logStartCommand;
 };

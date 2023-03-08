@@ -5,15 +5,18 @@
 
 #include "ISubsystemAccess.h"
 
-class IntakeStop : public frc2::CommandHelper<frc2::CommandBase, IntakeStop> {
- public:
-  explicit IntakeStop(ISubsystemAccess& subsystemAccess, bool retractIntake);
+class IntakeStop : public frc2::CommandHelper<frc2::CommandBase, IntakeStop>
+{
+public:
+  explicit IntakeStop(ISubsystemAccess& subsystemAccess);
 
+  void Initialize() override;
   void Execute() override;
   bool IsFinished() override;
   void End(bool interrupted) override;
 
- private:
+private:
   IntakeSubsystem& m_intake;
-  bool m_retractIntake;
+
+  wpi::log::BooleanLogEntry m_logStartCommand;
 };

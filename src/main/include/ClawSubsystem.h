@@ -18,6 +18,8 @@ public:
     void Periodic();
     void Open();
     void Close();
+
+    bool IsOpen() const { return m_solenoid.Get(); }
         
 private:
     frc::Solenoid m_solenoid;

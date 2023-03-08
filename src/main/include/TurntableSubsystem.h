@@ -13,8 +13,8 @@ using namespace ctre::phoenix::motorcontrol::can;
 
 using namespace frc;
 
-constexpr double kTurntableCWSpeed = 0.1;
-constexpr double kTurntableCCWSpeed = -0.1;
+constexpr double kTurntableCWSpeed = 0.75;
+constexpr double kTurntableCCWSpeed = -0.75;
 constexpr units::second_t kTurntableCWRunTime = 10.0_s;
 
 class TurntableSubsystem : public frc2::SubsystemBase

@@ -5,15 +5,14 @@
 #include <frc/Timer.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
+#include <rev/CANSparkMax.h>
 
 #include "ConstantsDigitalOut.h"
 #include "ConstantsCANIDs.h"
 
 #include <units/angle.h>
 
-using namespace ctre::phoenix::motorcontrol;
-using namespace ctre::phoenix::motorcontrol::can;
+using namespace rev;
 using namespace units;
 
 class DeploymentSubsystem : public frc2::SubsystemBase 
@@ -25,19 +24,9 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Will be called periodically whenever the CommandScheduler runs.
         void Periodic() override;
 
-        /// Drives the deployment mechanism at a given speed CCW into the robot frame
-        /// \param speed         Desired motor speed to run, ranging from [0, 1]
-        void RotateIntoFrame(double speed);
-
-        /// Drives the deployment mechanism at a given speed CW out of the robot frame
-        /// \param speed         Desired motor speed to run, ranging from [0, 1]
-        void RotateOutOfFrame(double speed);
-
-
         /// Drives the deployment arm to a specific angle
-        /// \param angle  Desired angle to rotate to [0, 140]
+        /// \param angle  Desired angle to rotate to; see ConstantsDeploymentAngles.h
         void RotateArmToAngle(degree_t angle);
-        void RotateArmToAngleRel(degree_t angle);
 
         /// Extends the deployment arm
         void ExtendArm();
@@ -76,10 +65,19 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         bool IsOkayToRetractIntake();
 
         /// Zero out the arm encoder count
-        void ResetEncoder() { m_motor.SetSelectedSensorPosition(0.0); }
+        void ResetEncoder() { m_enc.SetPosition(0.0); }
 
     private:
-        TalonSRX m_motor;
+        double DegreesToTicks(degree_t degrees) { return degrees.to<double>() * kTicksPerDegree + kTickOffset; }
+        degree_t TicksToDegrees(double ticks) { return degree_t{(ticks - kTickOffset) * kDegreesPerTick}; }
+        double TicksToDegreesDouble(double ticks) { return (ticks - kTickOffset) * kDegreesPerTick; }
+
+        CANSparkMax m_motor;
+        SparkMaxLimitSwitch m_forwardLimitSwitch = m_motor.GetForwardLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
+        SparkMaxLimitSwitch m_reverseLimitSwitch = m_motor.GetReverseLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
+        SparkMaxRelativeEncoder m_enc{m_motor.GetEncoder()};
+        SparkMaxPIDController m_pid{m_motor.GetPIDController()};
+        double m_setpointTicks = 0.0;
         frc::Solenoid m_armSolenoid;
         frc::Solenoid m_backPlateSolenoid;
         frc::Timer m_timer;
@@ -87,6 +85,17 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         // Empirically measured 4657 motor ticks for 140 degrees of arm rotation
         //static constexpr double kDegreesPerTick = 140.0 / 4657.0;
         // Empirically measured 5815 motor ticks for 180 degrees of arm rotation
-        static constexpr double kDegreesPerTick = 180.0 / 5815.0;
-        static constexpr double kTicksPerDegree = 1.0 / kDegreesPerTick;
+        // static constexpr double kDegreesPerTick = 180.0 / (17.85 + 33.81);
+        // Empirically measured multiple data points and made linear regression
+        // Linear Regression Slope
+        static constexpr double kTicksPerDegree = 1.01;
+        static constexpr double kTickOffset = 0.0;
+        // Initial tick position when the arm is in travel position
+        static constexpr double kInitialPosition = 2.9 * kTicksPerDegree;
+        static constexpr double kDegreesPerTick = 1.0 / kTicksPerDegree;
+
+        static constexpr bool kArmSolenoidExtend = true;
+        static constexpr bool kArmSolenoidRetract = false;
+        static constexpr bool kBackPlateSolenoidExtend = true;
+        static constexpr bool kBackPlateSolenoidRetract = false;
 };
