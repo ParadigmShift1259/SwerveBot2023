@@ -2,12 +2,12 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 2.5484395861903377,
+        "x": 2.41,
         "y": 5.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.03937073935362,
+        "x": 1.9009311531632824,
         "y": 5.0
       },
       "holonomicAngle": 180.0,
@@ -45,7 +45,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "ReleaseHigh"
+          "ReleaseCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "before",

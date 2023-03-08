@@ -202,7 +202,6 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.Y().OnTrue(PlaceHigh(*this).ToPtr());                                    
 
   secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
-  // secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
   secondary.Start().WhileTrue(RotateTurntableCCW(*this).ToPtr());
   secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());
@@ -215,6 +214,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });
+  secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 
 void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
