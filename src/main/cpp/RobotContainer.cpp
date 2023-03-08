@@ -49,6 +49,11 @@ RobotContainer::RobotContainer()
   SetDefaultCommands();
   ConfigureBindings();
 
+  m_chooser.SetDefaultOption("Place and Balance", EAutoPath::kAutoPathPlaceAndBalance);
+  m_chooser.AddOption("Place and Exit Tag 1 or 8", EAutoPath::kAutoPathPlaceAndExitTags1Or8);
+  m_chooser.AddOption("Place and Exit Tag 3 or 6", EAutoPath::kAutoPathPlaceAndExitTags3Or6);
+  frc::SmartDashboard::PutData("Auto Path", &m_chooser);
+
   SmartDashboard::PutNumber("MaxAutoBalanceSpeed", 0.9);
   frc::SmartDashboard::PutNumber("Balance Tolerance", 7.0);
   frc::SmartDashboard::PutNumber("BalanceEndTime", 1.0);
@@ -68,8 +73,9 @@ Command* RobotContainer::GetAutonomousCommand()
 #else
 CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  // TODO Add dashboard selector for auto path
-  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("PlaceAndBalance", {PathConstraints(2_mps, 2_mps_sq)});
+  auto autoPath = m_chooser.GetSelected();
+  auto pathFile = m_pathPlannerLUT[autoPath];
+  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup(pathFile, {PathConstraints(2_mps, 2_mps_sq)});
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));

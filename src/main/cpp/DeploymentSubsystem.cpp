@@ -35,10 +35,13 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_pid.SetFeedbackDevice(m_enc);
 
     SmartDashboard::PutNumber("GotoAngle", 0.0);
-    SmartDashboard::PutNumber("MaxOutput", 2.0);
+    //SmartDashboard::PutNumber("MaxOutput", 2.0);
+//#define DEPLOY_PID_TUNING
+#ifdef DEPLOY_PID_TUNING
     SmartDashboard::PutNumber("P", kDefaultP);
     SmartDashboard::PutNumber("I", kDefaultI);
     SmartDashboard::PutNumber("D", kDefaultD);
+#endif
 
     m_forwardLimitSwitch.EnableLimitSwitch(true);
     m_reverseLimitSwitch.EnableLimitSwitch(true);
@@ -69,15 +72,18 @@ void DeploymentSubsystem::Periodic()
 
 void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
 {
+#ifdef DEPLOY_PID_TUNING
     m_pid.SetP(SmartDashboard::GetNumber("P", kDefaultP));
     m_pid.SetI(SmartDashboard::GetNumber("I", kDefaultI));
     m_pid.SetD(SmartDashboard::GetNumber("D", kDefaultD));
+#endif
 
     //m_motor.NeutralOutput();
     m_backPlateSolenoid.Set(false);
-    auto currentPos = m_enc.GetPosition();
-    degree_t currentAngle = TicksToDegrees(currentPos);
     m_setpointTicks = DegreesToTicks(angle);
+
+    //auto currentPos = m_enc.GetPosition();
+    //degree_t currentAngle = TicksToDegrees(currentPos);
     // printf("Rot angle %.3f currAngle %.3f delta %.3f ticks %.3f\n"
     //  , angle.to<double>()
     //  , currentAngle.to<double>()

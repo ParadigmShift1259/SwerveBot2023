@@ -7,6 +7,7 @@
 //#include <frc/XboxController.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 #include <frc2/command/button/CommandXboxController.h>
 #include <frc2/command/CommandPtr.h>
@@ -42,8 +43,24 @@ public:
   RobotContainer();
   
   CommandPtr GetAutonomousCommand();
-  void Periodic();
+  enum EAutoPath
+  {
+      kAutoPathPlaceAndBalance
+    , kAutoPathPlaceAndExitTags1Or8
+    , kAutoPathPlaceAndExitTags3Or6
+    //, kAutoPath
+    // Keep the emun in sync with the LUT
+  };
+  std::vector<std::string> m_pathPlannerLUT
+  { 
+      "PlaceAndBalance"       // These strings are the names of the PathPlanner .path files
+    , "PlaceAndExitTags1Or8" 
+    , "PlaceAndExitTags3Or6"
+  };
+  frc::SendableChooser<EAutoPath> m_chooser;
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }
+
+  void Periodic();
 
   // ISubsystemAcces Implementation
   ClawSubsystem&          GetClaw() override { return m_claw; }
@@ -93,7 +110,13 @@ private:
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
 
-  InstantCommand m_toggleDriveStraight{[this] { m_DriveStraightHook = !m_DriveStraightHook; printf("m_DriveStraightHook %s\n", m_DriveStraightHook ? "true" : "false");}, {} };
+#ifdef USE_TEST_BUTTONS
+  InstantCommand m_toggleDriveStraight{[this] 
+  { 
+    m_DriveStraightHook = !m_DriveStraightHook;
+    printf("m_DriveStraightHook %s\n", m_DriveStraightHook ? "true" : "false");
+  }, {} };
+#endif
 
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };

@@ -22,10 +22,9 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_logRobotAccel = wpi::log::DoubleLogEntry(log, "/odometry/robotAccel");
   m_logGyroPitch = wpi::log::DoubleLogEntry(log, "/gyro/pitch");
 
-
-  frc::SmartDashboard::PutNumber("Input x speed", xSpeed.to<double>());
-  frc::SmartDashboard::PutNumber("Input y speed", ySpeed.to<double>());
-  frc::SmartDashboard::PutNumber("Input rot", rot.to<double>());
+  // frc::SmartDashboard::PutNumber("Input x speed", xSpeed.to<double>());
+  // frc::SmartDashboard::PutNumber("Input y speed", ySpeed.to<double>());
+  // frc::SmartDashboard::PutNumber("Input rot", rot.to<double>());
 
   if (m_bOverrideXboxInput == false)
   {
