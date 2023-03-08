@@ -15,12 +15,12 @@ ReleaseCone::ReleaseCone(ISubsystemAccess& subsystemAccess)
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/ReleaseCone/startCommand");
   m_logAngle = wpi::log::DoubleLogEntry(log, "/ReleaseCone/angle");
-  
-  m_logStartCommand.Append(true);
 }
 
 void ReleaseCone::Initialize()
 {
+  m_logStartCommand.Append(true);
+
   if (m_deployment.IsAtDegreeSetpoint(kPlaceHighAngle))
   {
     m_releaseAngle = kReleaseHighAngle;

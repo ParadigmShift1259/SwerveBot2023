@@ -11,12 +11,11 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
-  
-  m_logStartCommand.Append(true);
 }
 
 void PlaceHigh::Initialize()
 {
+  m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceHighAngle);

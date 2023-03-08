@@ -10,12 +10,11 @@ RotateTurntableCCW::RotateTurntableCCW(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/RotateTurntableCCW/startCommand");
-  m_logStartCommand.Append(true);
 }
-
 
 void RotateTurntableCCW::Initialize()
 {
+  m_logStartCommand.Append(true);
   m_deployment.ExtendBackPlate();
   frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
   m_turntable.SetTurnTable(kTurntableCCWSpeed);

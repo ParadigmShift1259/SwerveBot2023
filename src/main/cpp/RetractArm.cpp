@@ -6,6 +6,10 @@ RetractArm::RetractArm(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetDeployment()});
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/RetractArm/startCommand");
+}
+
+void RetractArm::Initialize()
+{
   m_logStartCommand.Append(true);
 }
 

@@ -9,6 +9,7 @@ class IntakeDeploy : public frc2::CommandHelper<frc2::CommandBase, IntakeDeploy>
 public:
   explicit IntakeDeploy(ISubsystemAccess& subsystemAccess);
 
+  void Initialize() override;
   void Execute() override;
   bool IsFinished() override;
   void End(bool interrupted) override;

@@ -9,11 +9,11 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeOnFloor/startCommand");
-  m_logStartCommand.Append(true);
 }
 
 void PlaceOnFloor::Initialize()
 {
+  m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);

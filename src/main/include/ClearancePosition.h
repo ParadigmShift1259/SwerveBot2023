@@ -10,6 +10,7 @@ class ClearancePosition : public frc2::CommandHelper<frc2::CommandBase, Clearanc
 public:
     explicit ClearancePosition(ISubsystemAccess& subsystemAccess);
 
+    void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
     void End(bool interrupted) override;

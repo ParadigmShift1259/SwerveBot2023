@@ -11,11 +11,11 @@ TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/travelPosition/startCommand");
-  m_logStartCommand.Append(true);
 }
 
 void TravelPosition::Initialize()
 {
+  m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   frc2::WaitCommand(0.5_s);

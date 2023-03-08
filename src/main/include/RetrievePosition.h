@@ -10,6 +10,7 @@ class RetrievePosition : public frc2::CommandHelper<frc2::CommandBase, RetrieveP
 public:
     explicit RetrievePosition(ISubsystemAccess& subsystemAccess);
 
+    void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
     void End(bool interrupted) override;

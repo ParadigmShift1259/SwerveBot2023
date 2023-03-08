@@ -9,11 +9,11 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeLow/startCommand");
-  m_logStartCommand.Append(true);
 }
 
 void PlaceLow::Initialize()
 {
+  m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
   m_deployment.RotateArmToAngle(kPlaceLowAngle);

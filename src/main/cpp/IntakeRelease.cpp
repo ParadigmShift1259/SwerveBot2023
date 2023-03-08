@@ -9,6 +9,10 @@ IntakeRelease::IntakeRelease(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeRelease/startCommand");
+}
+
+void IntakeRelease::Initialize()
+{
   m_logStartCommand.Append(true);
 }
 

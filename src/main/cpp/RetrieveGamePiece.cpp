@@ -33,11 +33,11 @@ RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/RetrieveGamePiece/startCommand");
-  m_logStartCommand.Append(true);
 }
 
 void RetrieveGamePiece::Initialize()
 {
+  m_logStartCommand.Append(true);
   m_retrieveGamePiece.Schedule();
 }
 

@@ -10,6 +10,7 @@ class ExtendArm : public frc2::CommandHelper<frc2::CommandBase, ExtendArm>
 public:
   explicit ExtendArm(ISubsystemAccess& subsystemAccess);
 
+  void Initialize() override;
   void Execute() override;
   bool IsFinished() override;
   void End(bool interrupted) override;

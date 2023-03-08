@@ -6,6 +6,10 @@ ExtendArm::ExtendArm(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetDeployment()});
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/ExtendArm/startCommand");
+}
+
+void ExtendArm::Initialize()
+{
   m_logStartCommand.Append(true);
 }
 

@@ -11,6 +11,10 @@ RetrievePosition::RetrievePosition(ISubsystemAccess& subsystemAccess)
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/retrievePosition/startCommand");
+}
+
+void RetrievePosition::Initialize()
+{
   m_logStartCommand.Append(true);
 }
 
