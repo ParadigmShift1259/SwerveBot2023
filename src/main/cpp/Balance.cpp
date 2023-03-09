@@ -24,13 +24,26 @@ void Balance::Initialize()
 
 void Balance::Execute()
 {
+// #define TESTING_BALANCE
+#ifdef TESTING_BALANCE
   // double balanceTolerance = frc::SmartDashboard::GetNumber("Balance Tolerance", kBalanceTolerance);
   // double maxAutoBalanceSpeed = frc::SmartDashboard::GetNumber("MaxAutoBalanceSpeed", kMaxAutoBalanceSpeed);
+  // double driveSpeed = std::clamp(maxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch), -maxAutoBalanceSpeed, maxAutoBalanceSpeed);
+#else
   double driveSpeed = std::clamp(kMaxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch), -kMaxAutoBalanceSpeed, kMaxAutoBalanceSpeed);
+#endif
 
+#ifdef TESTING_BALANCE
+  // if (abs(m_drive.GetPitch()) < balanceTolerance)
+#else
   if (abs(m_drive.GetPitch()) < kBalanceTolerance)
+#endif
   {
+#ifdef TESTING_BALANCE
+    driveSpeed = std::clamp(maxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch * m_speedTimer.Get().to<double>()), -maxAutoBalanceSpeed, maxAutoBalanceSpeed);
+#else
     driveSpeed = std::clamp(kMaxAutoBalanceSpeed * m_drive.GetPitch() / (kMaxPitch * m_speedTimer.Get().to<double>()), -kMaxAutoBalanceSpeed, kMaxAutoBalanceSpeed);
+#endif
     m_endTimer.Start();
   }
   else
@@ -44,9 +57,12 @@ void Balance::Execute()
 
 bool Balance::IsFinished()
 {
+#ifdef TESTING_BALANCE
   // double endTime = frc::SmartDashboard::GetNumber("BalanceEndTime", kBalanceEndTime.to<double>());
   // return m_endTimer.Get() > second_t(endTime);
+#else
   return m_endTimer.Get() > kBalanceEndTime;
+#endif
 }
 
 void Balance::End(bool interrupted)
