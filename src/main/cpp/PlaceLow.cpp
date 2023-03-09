@@ -26,7 +26,7 @@ void PlaceLow::Execute()
 
 bool PlaceLow::IsFinished()
 {
-  return true;// m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
+  return m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
 }
 
 void PlaceLow::End(bool interrupted)
