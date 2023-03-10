@@ -4,7 +4,6 @@
 
 #pragma once
 
-//#include <frc/XboxController.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/SendableChooser.h>
@@ -21,6 +20,7 @@
 #include <pathplanner/lib/PathPlanner.h>
 #include <pathplanner/lib/auto/SwerveAutoBuilder.h>
 #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
+
 #include <unordered_map>
 
 #include "ISubsystemAccess.h"
@@ -32,6 +32,8 @@
 #include "IntakeDeploy.h"
 #include "RetrievePosition.h"
 #include "TravelPosition.h"
+
+#include "DebugFlag.h"
 
 using namespace frc;
 using namespace frc2;
@@ -165,4 +167,6 @@ private:
 
   bool m_isAutoRunning = false;
   bool m_DriveStraightHook = false;
+
+  DebugFlag m_dbgFlagDrvrCtrlrPitOverride{"DrvCtrlrPitOvrd", false};
 };

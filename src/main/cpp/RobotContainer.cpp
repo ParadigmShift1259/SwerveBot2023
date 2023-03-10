@@ -193,7 +193,11 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 
-  primary.Start().WhileTrue(&m_rotateArm);
+  if (m_dbgFlagDrvrCtrlrPitOverride)
+  {
+    primary.Start().WhileTrue(&m_rotateArm);
+    // link to enable pit box primary.Back().WhileTrue(&);
+  }
 
 #ifdef USE_PIT_BUTTON_BOX  
   // Initialize button box bindingd
