@@ -15,6 +15,7 @@
 #include "ConstantsCANIDs.h"
 
 #include <units/angle.h>
+#include <units/angular_velocity.h>
 
 using namespace rev;
 using namespace units;
@@ -31,6 +32,10 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Drives the deployment arm to a specific angle
         /// \param angle  Desired angle to rotate to; see ConstantsDeploymentAngles.h
         void RotateArmToAngle(degree_t angle);
+
+        /// Drives the deployment arm to an angle relative to the current angle
+        /// \param rotation  Percentage of max roation to apply [0, 1]
+        void RotateArmRelative(double rotation);
 
         /// Extends the deployment arm
         void ExtendArm();
@@ -97,6 +102,7 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         // Initial tick position when the arm is in travel position
         static constexpr double kInitialPosition = 4.8 * kTicksPerDegree;
         static constexpr double kDegreesPerTick = 1.0 / kTicksPerDegree;
+        static constexpr double kMaxOperatorDeg = 5.0;
 
         static constexpr bool kArmSolenoidExtend = true;
         static constexpr bool kArmSolenoidRetract = false;

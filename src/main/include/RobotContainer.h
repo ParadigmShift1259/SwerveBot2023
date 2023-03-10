@@ -111,11 +111,10 @@ private:
 #ifdef USE_PIT_BUTTON_BOX  
   std::unique_ptr<CommandXboxController> m_pitButtonBox;
 #endif
-  // SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
-  // SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s, -3 / 2_s};
   SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s, -3 / 3_s};
   SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+  SlewRateLimiter<units::scalar> m_armRotLimiter{3 / 1_s};
 
   // TODO Make sure field relative starts how the drive team wants
   bool m_fieldRelative = false; //true;

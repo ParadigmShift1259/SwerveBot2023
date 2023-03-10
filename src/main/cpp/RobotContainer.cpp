@@ -124,7 +124,6 @@ void RobotContainer::SetDefaultCommands()
       // Don't send any input if autonomous is running
       if (m_isAutoRunning == false)
       {
-        // const double kDeadband = 0.02;
         const double kDeadband = 0.1;
         const auto xInput = ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
         const auto yInput = ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
@@ -155,6 +154,21 @@ void RobotContainer::SetDefaultCommands()
       }
     },
     {&m_drive}
+  ));
+
+  m_deployment.SetDefaultCommand(RunCommand
+  (
+    [this] 
+    {
+      // Don't send any input if autonomous is running
+      if (m_isAutoRunning == false)
+      {
+        const double kDeadband = 0.1;
+        const auto input = ApplyDeadband(m_secondaryController.GetLeftY(), kDeadband);
+        m_deployment.RotateArmRelative(m_armRotLimiter.Calculate(input));
+      }
+    },
+    {&m_deployment}
   ));
 }
 
@@ -196,13 +210,12 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   if (m_dbgFlagDrvrCtrlrPitOverride)
   {
     primary.Start().WhileTrue(&m_rotateArm);
-    // link to enable pit box primary.Back().WhileTrue(&);
-  }
-
 #ifdef USE_PIT_BUTTON_BOX  
   // Initialize button box bindingd
   primary.Back().OnTrue(&m_CfgPitButtonBoxCmd); // Calls ConfigPitButtonBoxBindings()
 #endif
+  }
+
 }
 
 void RobotContainer::ConfigSecondaryButtonBindings()

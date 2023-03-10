@@ -105,6 +105,14 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
 }
 
+void DeploymentSubsystem::RotateArmRelative(double rotation)
+{
+    auto currentPos = m_enc.GetPosition();
+    degree_t currentAngle = TicksToDegrees(currentPos);
+    m_setpointTicks = DegreesToTicks(currentAngle + degree_t(rotation * kMaxOperatorDeg));
+    m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
+}
+
 void DeploymentSubsystem::ExtendArm()
 {
     m_armSolenoid.Set(kArmSolenoidExtend);
