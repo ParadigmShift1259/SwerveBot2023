@@ -9,7 +9,7 @@ RotateTurntableCCW::RotateTurntableCCW(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetTurntable()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/RotateTurntableCCW/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/rotateTurntableCCW/startCommand");
 }
 
 void RotateTurntableCCW::Initialize()

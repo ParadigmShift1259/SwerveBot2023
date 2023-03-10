@@ -34,7 +34,8 @@ DeploymentSubsystem::DeploymentSubsystem()
     // not available in brushless m_enc.SetInverted(true);
     m_enc.SetPosition(kInitialPosition);
 
-    m_pid.SetOutputRange(-8.0, 8.0);
+    // m_pid.SetOutputRange(-8.0, 8.0);
+    m_pid.SetOutputRange(-6.0, 6.0);
     m_pid.SetP(kDefaultP);
     m_pid.SetI(kDefaultI);
     m_pid.SetD(kDefaultD);
@@ -81,6 +82,16 @@ void DeploymentSubsystem::Periodic()
 
     // double maxOutput = SmartDashboard::GetNumber("MaxOutput", 2.0);
     // m_pid.SetOutputRange(-maxOutput, maxOutput);
+
+    // Move arm to safer position if limit switch is hit
+    if (IsForwardLimitSwitchClosed())
+    {
+        RotateArmToAngle(kHighestAngle);
+    }
+    else if (IsReverseLimitSwitchClosed())
+    {
+        RotateArmToAngle(kLowestAngle);
+    }
 }
 
 void DeploymentSubsystem::RotateArmToAngle(degree_t angle)

@@ -24,9 +24,9 @@ RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess)
       , WaitCommand{1.2_s}
       , ClawClose(subsystemAccess)
       , WaitCommand{0.5_s}
-      , ClearancePosition(subsystemAccess)
+      // , ClearancePosition(subsystemAccess)
       , TravelPosition(subsystemAccess) // Retracts BackPlate and arm
-      , WaitCommand{1.2_s}
+      // , WaitCommand{1.2_s}
       )
 {
   AddRequirements({&subsystemAccess.GetClaw(), &subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});

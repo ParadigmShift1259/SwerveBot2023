@@ -76,6 +76,7 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   auto autoPath = m_chooser.GetSelected();
   auto pathFile = m_pathPlannerLUT[autoPath];
   std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup(pathFile, {PathConstraints(2_mps, 2_mps_sq)});
+//  std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("ExitTags1Or8", {PathConstraints(2_mps, 2_mps_sq)});
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
@@ -163,9 +164,12 @@ void RobotContainer::SetDefaultCommands()
       // Don't send any input if autonomous is running
       if (m_isAutoRunning == false)
       {
-        const double kDeadband = 0.1;
+        const double kDeadband = 0.25;
         const auto input = ApplyDeadband(m_secondaryController.GetLeftY(), kDeadband);
-        m_deployment.RotateArmRelative(m_armRotLimiter.Calculate(input));
+        if (fabs(input) > kDeadband)
+        {
+          m_deployment.RotateArmRelative(m_armRotLimiter.Calculate(input));
+        }
       }
     },
     {&m_deployment}
@@ -207,12 +211,12 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 
-  if (m_dbgFlagDrvrCtrlrPitOverride)
+//  if (m_dbgFlagDrvrCtrlrPitOverride)
   {
     primary.Start().WhileTrue(&m_rotateArm);
 #ifdef USE_PIT_BUTTON_BOX  
-  // Initialize button box bindingd
-  primary.Back().OnTrue(&m_CfgPitButtonBoxCmd); // Calls ConfigPitButtonBoxBindings()
+    // Initialize button box bindingd
+    primary.Back().OnTrue(&m_CfgPitButtonBoxCmd); // Calls ConfigPitButtonBoxBindings()
 #endif
   }
 
