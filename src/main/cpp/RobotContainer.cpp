@@ -161,8 +161,12 @@ void RobotContainer::SetDefaultCommands()
 void RobotContainer::ConfigureBindings()
 {
   ConfigPrimaryButtonBindings();
+
+#ifdef BUTTON_BOX_DEVELOPMENT
+  ConfigSecondaryButtonBindingsNewWay();
+#else
   ConfigSecondaryButtonBindings();
-  // ConfigSecondaryButtonBindingsNewWay();
+#endif
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
@@ -188,6 +192,13 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
+
+  primary.Start().WhileTrue(&m_rotateArm);
+
+#ifdef USE_PIT_BUTTON_BOX  
+  // Initialize button box bindingd
+  primary.Back().OnTrue(&m_CfgPitButtonBoxCmd); // Calls ConfigPitButtonBoxBindings()
+#endif
 }
 
 void RobotContainer::ConfigSecondaryButtonBindings()
@@ -217,6 +228,51 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 
+#ifdef USE_PIT_BUTTON_BOX  
+void RobotContainer::ConfigPitButtonBoxBindings()
+{
+  printf("ConfigPitButtonBoxBindings called\n");
+  if (!m_pitButtonBox)
+  {
+    printf("Creating m_pitButtonBox\n");
+    m_pitButtonBox = std::make_unique<CommandXboxController>(3);
+
+    if (m_pitButtonBox)
+    {
+      printf("Configuring m_pitButtonBox bindings\n");
+      // Raspberry PI Pico with gp2040 firmware Button Box
+      //
+      // Row	Black			    Blue			    Green				      Yellow				      Red
+      // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
+      // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
+      // 3	  B				      A				      POV Left			    POV Right			      POV Up
+      m_pitButtonBox->A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+      m_pitButtonBox->A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
+      m_pitButtonBox->B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
+      m_pitButtonBox->X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
+      m_pitButtonBox->Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
+
+      m_pitButtonBox->LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
+      m_pitButtonBox->RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
+      m_pitButtonBox->Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
+      m_pitButtonBox->Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+
+      m_pitButtonBox->LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
+      m_pitButtonBox->RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
+      m_pitButtonBox->LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
+      m_pitButtonBox->RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
+
+      auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+      m_pitButtonBox->POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
+      m_pitButtonBox->POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
+      //m_pitButtonBox->POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
+      //m_pitButtonBox->POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
+    }
+  }
+}
+#endif
+
+#ifdef BUTTON_BOX_DEVELOPMENT
 void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
 {
   auto& secondary = m_secondaryController;
@@ -248,6 +304,7 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   //secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
   //secondary.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
 }
+#endif
 
 SequentialCommandGroup* RobotContainer::GetParkCommand()
 {

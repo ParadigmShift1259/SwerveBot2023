@@ -1,8 +1,12 @@
 
 #pragma once
 
+#include <wpi/DataLog.h>
+
 #include <frc/Solenoid.h>
 #include <frc/Timer.h>
+#include <frc/DataLogManager.h>
+#include <frc/DutyCycleEncoder.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <rev/CANSparkMax.h>
@@ -91,11 +95,16 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         static constexpr double kTicksPerDegree = 1.01;
         static constexpr double kTickOffset = 0.0;
         // Initial tick position when the arm is in travel position
-        static constexpr double kInitialPosition = 2.9 * kTicksPerDegree;
+        static constexpr double kInitialPosition = 4.8 * kTicksPerDegree;
         static constexpr double kDegreesPerTick = 1.0 / kTicksPerDegree;
 
         static constexpr bool kArmSolenoidExtend = true;
         static constexpr bool kArmSolenoidRetract = false;
         static constexpr bool kBackPlateSolenoidExtend = true;
         static constexpr bool kBackPlateSolenoidRetract = false;
+
+        frc::DutyCycleEncoder m_absEnc;
+
+        wpi::log::DoubleLogEntry m_logArmAngle;
+        wpi::log::DoubleLogEntry m_logAbsEnc;
 };

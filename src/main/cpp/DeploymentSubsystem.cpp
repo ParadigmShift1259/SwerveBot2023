@@ -15,7 +15,15 @@ DeploymentSubsystem::DeploymentSubsystem()
     : m_motor(kDeploymentCANID, CANSparkMaxLowLevel::MotorType::kBrushless)
     , m_armSolenoid(PneumaticsModuleType::CTREPCM, kArmSolenoid)
     , m_backPlateSolenoid(PneumaticsModuleType::CTREPCM, kBackPlateSolenoid)
+    , m_absEnc(4)
 {
+    wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+    
+    m_logArmAngle = wpi::log::DoubleLogEntry(log, "/deployment/armAngle");
+    m_logAbsEnc = wpi::log::DoubleLogEntry(log, "/deployment/absEnc");
+
+    m_absEnc.SetConnectedFrequencyThreshold(200);
+    
     m_motor.RestoreFactoryDefaults();
 
     m_motor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
@@ -52,9 +60,14 @@ void DeploymentSubsystem::Periodic()
     double pos = m_enc.GetPosition();
     double currentAngle = TicksToDegreesDouble(pos);
     double err = pos - m_setpointTicks;
+    double absPos = m_absEnc.GetAbsolutePosition();
     SmartDashboard::PutNumber("Arm enc", pos);
     SmartDashboard::PutNumber("Arm angle", currentAngle);
     SmartDashboard::PutNumber("Arm error", err);
+    SmartDashboard::PutNumber("Arm Abs Enc", absPos);
+
+    m_logArmAngle.Append(currentAngle);
+    m_logAbsEnc.Append(absPos);
 
     double outputCurrent = m_motor.GetOutputCurrent();
     double motorOutput = m_motor.GetAppliedOutput();

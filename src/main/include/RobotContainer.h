@@ -77,7 +77,16 @@ private:
   void ConfigureBindings();
   void ConfigPrimaryButtonBindings();
   void ConfigSecondaryButtonBindings();
+//#define USE_PIT_BUTTON_BOX  
+#ifdef USE_PIT_BUTTON_BOX  
+  void ConfigPitButtonBoxBindings();
+#endif
+
+//#define BUTTON_BOX_DEVELOPMENT
+#ifdef BUTTON_BOX_DEVELOPMENT
   void ConfigSecondaryButtonBindingsNewWay();
+#endif
+
   SequentialCommandGroup* GetParkCommand();
   std::shared_ptr<ConditionalCommand> GetParkAndBalanceCommand();
   ConditionalCommand* GetParkAndBalanceCommand2();
@@ -97,6 +106,9 @@ private:
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};
+#ifdef USE_PIT_BUTTON_BOX  
+  std::unique_ptr<CommandXboxController> m_pitButtonBox;
+#endif
   // SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
   // SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s, -3 / 2_s};
@@ -109,6 +121,9 @@ private:
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
+#ifdef USE_PIT_BUTTON_BOX  
+  InstantCommand m_CfgPitButtonBoxCmd{[this] { ConfigPitButtonBoxBindings(); }, {}};
+#endif
 
 #ifdef USE_TEST_BUTTONS
   InstantCommand m_toggleDriveStraight{[this] 
