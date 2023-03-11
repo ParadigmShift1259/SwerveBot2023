@@ -57,6 +57,7 @@ void Robot::AutonomousPeriodic()
 void Robot::AutonomousExit()
 {
   m_container.SetIsAutoRunning(false);
+  CommandScheduler::GetInstance().CancelAll();
 }
 
 void Robot::TeleopInit()
