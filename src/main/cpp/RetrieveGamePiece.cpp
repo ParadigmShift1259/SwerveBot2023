@@ -8,6 +8,7 @@
 #include "ExtendArm.h"
 #include "IntakeDeploy.h"
 #include "PlaceHigh.h"
+#include "RetractArm.h"
 #include "RetrievePosition.h"
 #include "TravelPosition.h"
 
@@ -17,11 +18,13 @@
 
 RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess) 
   : m_retrieveGamePiece(
-        /*IntakeDeploy(subsystemAccess)
-      , */RetrievePosition(subsystemAccess)
+        /*IntakeDeploy(subsystemAccess)*/
+        RetractArm(subsystemAccess)
+      , WaitCommand{0.5_s}
+      , RetrievePosition(subsystemAccess)
       , ClawOpen(subsystemAccess)
       , ExtendArm(subsystemAccess)
-      , WaitCommand{1.2_s}
+      , WaitCommand{0.5_s}
       , ClawClose(subsystemAccess)
       , WaitCommand{0.5_s}
       // , ClearancePosition(subsystemAccess)

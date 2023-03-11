@@ -17,6 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
+          "WaitLong",
           "TravelPosition",
           "PlaceHigh"
         ],
@@ -54,11 +55,11 @@
     },
     {
       "anchorPoint": {
-        "x": 5.0,
+        "x": 6.5,
         "y": 5.0
       },
       "prevControl": {
-        "x": 5.376128232695637,
+        "x": 6.876128232695637,
         "y": 5.0
       },
       "nextControl": null,
@@ -68,8 +69,10 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "TravelPosition"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }

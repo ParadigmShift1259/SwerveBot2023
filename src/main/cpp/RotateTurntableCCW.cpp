@@ -16,17 +16,12 @@ void RotateTurntableCCW::Initialize()
 {
   m_logStartCommand.Append(true);
   m_deployment.ExtendBackPlate();
-  frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
+  frc2::WaitCommand(1.0_s); // Wait for backplate to extend and turntable motor to engage
 }
 
 void RotateTurntableCCW::Execute() 
 {
   m_turntable.SetTurnTable(kTurntableCCWSpeed);
-}
-
-bool RotateTurntableCCW::IsFinished()
-{
-  return true;
 }
 
 void RotateTurntableCCW::End(bool interrupted) 

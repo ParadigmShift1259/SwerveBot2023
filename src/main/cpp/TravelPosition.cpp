@@ -5,9 +5,10 @@
 #include "ConstantsDeploymentAngles.h"
 
 TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess) 
-  : m_deployment(subsystemAccess.GetDeployment())
+  : m_claw(subsystemAccess.GetClaw())
+  , m_deployment(subsystemAccess.GetDeployment())
 {
-  AddRequirements({&subsystemAccess.GetDeployment()});
+  AddRequirements({&subsystemAccess.GetClaw(), &subsystemAccess.GetDeployment()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/travelPosition/startCommand");
@@ -18,6 +19,7 @@ void TravelPosition::Initialize()
   m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
+  m_claw.Close();
   frc2::WaitCommand(0.5_s);
   m_deployment.RotateArmToAngle(kTravelAngle);
 }
