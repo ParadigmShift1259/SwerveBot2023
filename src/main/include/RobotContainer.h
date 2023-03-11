@@ -26,13 +26,6 @@
 #include "ISubsystemAccess.h"
 #include "DriveSubsystem.h"
 
-#include "ClawOpen.h"
-#include "ClawClose.h"
-#include "ClearancePosition.h"
-#include "IntakeDeploy.h"
-#include "RetrievePosition.h"
-#include "TravelPosition.h"
-
 #include "DebugFlag.h"
 
 using namespace frc;
@@ -50,7 +43,8 @@ public:
       kAutoPathPlaceAndBalance
     , kAutoPathPlaceAndExitTags1Or8
     , kAutoPathPlaceAndExitTags3Or6
-    //, kAutoPath
+    , kExitTags1Or8
+    , kNone
     // Keep the emun in sync with the LUT
   };
   std::vector<std::string> m_pathPlannerLUT
@@ -58,6 +52,8 @@ public:
       "PlaceAndBalance"       // These strings are the names of the PathPlanner .path files
     , "PlaceAndExitTags1Or8" 
     , "PlaceAndExitTags3Or6"
+    , "ExitTags1Or8"
+    , "None"
   };
   frc::SendableChooser<EAutoPath> m_chooser;
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }

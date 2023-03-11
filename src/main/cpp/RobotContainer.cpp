@@ -15,6 +15,13 @@
 #include <frc2/command/button/JoystickButton.h>
 
 #include "Balance.h"
+#include "ClawOpen.h"
+#include "ClawClose.h"
+#include "ClearancePosition.h"
+#include "IntakeDeploy.h"
+#include "RetrievePosition.h"
+#include "TravelPosition.h"
+#include "PopHookPosition.h"
 
 #include "IntakeDeploy.h"
 #include "IntakeIngest.h"
@@ -49,9 +56,11 @@ RobotContainer::RobotContainer()
   SetDefaultCommands();
   ConfigureBindings();
 
-  m_chooser.SetDefaultOption("Place and Balance", EAutoPath::kAutoPathPlaceAndBalance);
-  m_chooser.AddOption("Place and Exit Tag 1 or 8", EAutoPath::kAutoPathPlaceAndExitTags1Or8);
+  m_chooser.SetDefaultOption("Place and Exit Tag 1 or 8", EAutoPath::kAutoPathPlaceAndExitTags1Or8);
+  m_chooser.AddOption("Place and Balance", EAutoPath::kAutoPathPlaceAndBalance);
   m_chooser.AddOption("Place and Exit Tag 3 or 6", EAutoPath::kAutoPathPlaceAndExitTags3Or6);
+  m_chooser.AddOption("Exit Tags 1 Or 8", EAutoPath::kExitTags1Or8);
+  m_chooser.AddOption("None", EAutoPath::kNone);
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
 
   SmartDashboard::PutNumber("MaxAutoBalanceSpeed", 0.9);
@@ -82,6 +91,7 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
   eventMap.emplace("TravelPosition", std::make_shared<TravelPosition>(*this));
+  eventMap.emplace("PopHookPosition", std::make_shared<PopHookPosition>(*this));
   eventMap.emplace("PlaceHigh", std::make_shared<PlaceHigh>(*this));
   eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
   eventMap.emplace("ClawClose", std::make_shared<ClawClose>(*this));

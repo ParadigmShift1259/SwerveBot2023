@@ -18,7 +18,8 @@
       "stopEvent": {
         "names": [
           "WaitLong",
-          "TravelPosition",
+          "PopHookPosition",
+          "WaitLong",
           "PlaceHigh"
         ],
         "executionBehavior": "sequential",
