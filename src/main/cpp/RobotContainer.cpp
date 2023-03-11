@@ -246,7 +246,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.RightTrigger().WhileTrue();
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });
+  secondary.POVUp(loop).Rising().IfHigh([this] { m_deployment.ResetEncoder(); });
   secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 

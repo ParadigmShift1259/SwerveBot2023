@@ -18,18 +18,14 @@
 
 RetrieveGamePiece::RetrieveGamePiece(ISubsystemAccess& subsystemAccess) 
   : m_retrieveGamePiece(
-        /*IntakeDeploy(subsystemAccess)*/
-        RetractArm(subsystemAccess)
-      , WaitCommand{0.5_s}
+        TravelPosition(subsystemAccess)   // Retracts BackPlate and arm
       , RetrievePosition(subsystemAccess)
       , ClawOpen(subsystemAccess)
       , ExtendArm(subsystemAccess)
-      , WaitCommand{0.5_s}
+      , WaitCommand{0.5_s}                // Wait for arm to extend
       , ClawClose(subsystemAccess)
-      , WaitCommand{0.5_s}
-      // , ClearancePosition(subsystemAccess)
+      , WaitCommand{0.5_s}                // Wait for claw to close
       , TravelPosition(subsystemAccess) // Retracts BackPlate and arm
-      // , WaitCommand{1.2_s}
       )
 {
   AddRequirements({&subsystemAccess.GetClaw(), &subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});

@@ -74,7 +74,7 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         bool IsOkayToRetractIntake();
 
         /// Zero out the arm encoder count
-        void ResetEncoder() { m_enc.SetPosition(0.0); }
+        void ResetEncoder() { m_enc.SetPosition(0.0); RotateArmToAngle(degree_t(0.0)); }
 
     private:
         double DegreesToTicks(degree_t degrees) { return degrees.to<double>() * kTicksPerDegree + kTickOffset; }
@@ -90,6 +90,8 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         frc::Solenoid m_armSolenoid;
         frc::Solenoid m_backPlateSolenoid;
         frc::Timer m_timer;
+
+        bool m_resetingEncoder = false;
 
         // Empirically measured 4657 motor ticks for 140 degrees of arm rotation
         //static constexpr double kDegreesPerTick = 140.0 / 4657.0;

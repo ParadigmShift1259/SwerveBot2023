@@ -7,6 +7,7 @@
 TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess) 
   : m_claw(subsystemAccess.GetClaw())
   , m_deployment(subsystemAccess.GetDeployment())
+  , m_timer()
 {
   AddRequirements({&subsystemAccess.GetClaw(), &subsystemAccess.GetDeployment()});
 
@@ -20,13 +21,16 @@ void TravelPosition::Initialize()
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_claw.Close();
-  frc2::WaitCommand(0.5_s);
-  m_deployment.RotateArmToAngle(kTravelAngle);
+  m_timer.Reset();
+  m_timer.Start();
 }
 
 void TravelPosition::Execute()
 {
-
+  if (m_timer.Get() > 0.5_s)
+  {
+    m_deployment.RotateArmToAngle(kTravelAngle);
+  }
 }
 
 bool TravelPosition::IsFinished()

@@ -90,7 +90,17 @@ void DeploymentSubsystem::Periodic()
     }
     else if (IsReverseLimitSwitchClosed())
     {
+        m_enc.SetPosition(-2.5);
+        m_timer.Reset();
+        m_timer.Start();
+        m_resetingEncoder = true;
+        RotateArmToAngle(TicksToDegrees(-1.5));
+    }
+    
+    if (m_resetingEncoder && m_timer.Get() > 0.5_s)
+    {
         RotateArmToAngle(kLowestAngle);
+        m_resetingEncoder = false;
     }
 }
 
