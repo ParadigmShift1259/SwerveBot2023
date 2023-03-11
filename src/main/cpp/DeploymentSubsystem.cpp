@@ -21,6 +21,11 @@ DeploymentSubsystem::DeploymentSubsystem()
     
     m_logArmAngle = wpi::log::DoubleLogEntry(log, "/deployment/armAngle");
     m_logAbsEnc = wpi::log::DoubleLogEntry(log, "/deployment/absEnc");
+    m_logOutputCurrent = wpi::log::DoubleLogEntry(log, "/deployment/outputCurrent");
+    m_logMotorOutput = wpi::log::DoubleLogEntry(log, "/deployment/motorOutput");
+    m_logMotorTemp = wpi::log::DoubleLogEntry(log, "/deployment/motorTemp");
+    m_logFwdLimit = wpi::log::DoubleLogEntry(log, "/deployment/fwdLimit");
+    m_logRevLimit = wpi::log::DoubleLogEntry(log, "/deployment/revLimit");
 
     m_absEnc.SetConnectedFrequencyThreshold(200);
     
@@ -73,12 +78,19 @@ void DeploymentSubsystem::Periodic()
     double outputCurrent = m_motor.GetOutputCurrent();
     double motorOutput = m_motor.GetAppliedOutput();
     double motorTemp = m_motor.GetMotorTemperature();
+    m_logOutputCurrent.Append(outputCurrent);
+    m_logMotorOutput.Append(motorOutput);
+    m_logMotorTemp.Append(motorTemp);
     SmartDashboard::PutNumber("output current", outputCurrent);
     SmartDashboard::PutNumber("motor output", motorOutput);
     SmartDashboard::PutNumber("motor temp", motorTemp);
 
-    SmartDashboard::PutBoolean("fwd limit", IsForwardLimitSwitchClosed());
-    SmartDashboard::PutBoolean("rev limit", IsReverseLimitSwitchClosed());
+    bool fwdLimit = IsForwardLimitSwitchClosed();
+    bool revLimit = IsReverseLimitSwitchClosed();
+    m_logFwdLimit.Append(fwdLimit);
+    m_logRevLimit.Append(revLimit);
+    SmartDashboard::PutBoolean("fwd limit", fwdLimit);
+    SmartDashboard::PutBoolean("rev limit", revLimit);
 
     // double maxOutput = SmartDashboard::GetNumber("MaxOutput", 2.0);
     // m_pid.SetOutputRange(-maxOutput, maxOutput);

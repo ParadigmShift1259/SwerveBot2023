@@ -116,4 +116,9 @@ class DeploymentSubsystem : public frc2::SubsystemBase
 
         wpi::log::DoubleLogEntry m_logArmAngle;
         wpi::log::DoubleLogEntry m_logAbsEnc;
+        wpi::log::DoubleLogEntry m_logOutputCurrent;
+        wpi::log::DoubleLogEntry m_logMotorOutput;
+        wpi::log::DoubleLogEntry m_logMotorTemp;
+        wpi::log::DoubleLogEntry m_logFwdLimit;
+        wpi::log::DoubleLogEntry m_logRevLimit;
 };

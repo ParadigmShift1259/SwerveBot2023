@@ -1,5 +1,6 @@
 #pragma once
 
+#include <frc/Timer.h>
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
 
@@ -20,6 +21,7 @@ public:
 private:
   DeploymentSubsystem& m_deployment;
   TurntableSubsystem& m_turntable;
+  Timer m_timer;
 
   wpi::log::BooleanLogEntry m_logStartCommand;
 };

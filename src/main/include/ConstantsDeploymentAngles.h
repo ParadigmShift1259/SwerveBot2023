@@ -11,4 +11,5 @@ constexpr degree_t kRetrieveAngle = 10_deg;
 constexpr degree_t kClearanceAngle = 3_deg;
 constexpr degree_t kTravelAngle = 0_deg;
 constexpr degree_t kLowestAngle = 0_deg;
+constexpr degree_t kHookPopAngle = -5_deg;
 

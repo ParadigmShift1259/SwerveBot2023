@@ -16,12 +16,16 @@ void RotateTurntableCW::Initialize()
 {
   m_logStartCommand.Append(true);
   m_deployment.ExtendBackPlate();
-  frc2::WaitCommand(1.0_s); // Wait for backplate to extend and turntable motor to engage
+  m_timer.Reset();
+  m_timer.Start();
 }
 
 void RotateTurntableCW::Execute() 
 {
-  m_turntable.SetTurnTable(kTurntableCWSpeed);
+  if (m_timer.Get() > 0.5_s)
+  {
+   m_turntable.SetTurnTable(kTurntableCWSpeed);
+  }
 }
 
 void RotateTurntableCW::End(bool interrupted) 
