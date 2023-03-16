@@ -56,10 +56,17 @@ RobotContainer::RobotContainer()
   SetDefaultCommands();
   ConfigureBindings();
 
-  m_chooser.SetDefaultOption("Place and Exit Tag 1 or 8", EAutoPath::kAutoPathPlaceAndExitTags1Or8);
+  m_chooser.SetDefaultOption("Place and Balance Tag 1 or 8", EAutoPath::kAutoPathPlaceAndBalanceTags1Or8);
+  m_chooser.AddOption("Place and Balance Tag 3 or 6", EAutoPath::kAutoPathPlaceAndBalanceTags3Or6);
   m_chooser.AddOption("Place and Balance", EAutoPath::kAutoPathPlaceAndBalance);
+  m_chooser.AddOption("Place and Exit Tag 1 or 8", EAutoPath::kAutoPathPlaceAndExitTags1Or8);
   m_chooser.AddOption("Place and Exit Tag 3 or 6", EAutoPath::kAutoPathPlaceAndExitTags3Or6);
-  m_chooser.AddOption("Exit Tags 1 Or 8", EAutoPath::kExitTags1Or8);
+  m_chooser.AddOption("Exit Tag 1 or 8", EAutoPath::kAutoPathExitTags1Or8);
+  m_chooser.AddOption("Exit Tag 3 or 6", EAutoPath::kAutoPathExitTags3Or6);
+  m_chooser.AddOption("Balance Only Inside", EAutoPath::kAutoPathBalanceOnlyInside);
+  m_chooser.AddOption("Balance Only Tag 1 or 8", EAutoPath::kAutoPathBalanceOnlyTags1Or8);
+  m_chooser.AddOption("Balance Only Tag 3 or 6", EAutoPath::kAutoPathBalanceOnlyTags3Or6);
+  m_chooser.AddOption("Place Only", EAutoPath::kAutoPathPlaceOnly);
   m_chooser.AddOption("None", EAutoPath::kNone);
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
 

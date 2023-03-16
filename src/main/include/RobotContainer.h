@@ -40,21 +40,36 @@ public:
   CommandPtr GetAutonomousCommand();
   enum EAutoPath
   {
-      kAutoPathPlaceAndBalance
+      kAutoPathPlaceAndBalanceTags1Or8
+    , kAutoPathPlaceAndBalanceTags3Or6
+    , kAutoPathPlaceAndBalance
     , kAutoPathPlaceAndExitTags1Or8
     , kAutoPathPlaceAndExitTags3Or6
-    , kExitTags1Or8
+    , kAutoPathExitTags1Or8
+    , kAutoPathExitTags3Or6
+    , kAutoPathBalanceOnlyInside
+    , kAutoPathBalanceOnlyTags1Or8
+    , kAutoPathBalanceOnlyTags3Or6
+    , kAutoPathPlaceOnly
     , kNone
     // Keep the emun in sync with the LUT
   };
   std::vector<std::string> m_pathPlannerLUT
   { 
-      "PlaceAndBalance"       // These strings are the names of the PathPlanner .path files
+      "PlaceAndBalanceTags1Or8"   // These strings are the names of the PathPlanner .path files
+    , "PlaceAndBalanceTags3Or6"
+    , "PlaceAndBalance"       
     , "PlaceAndExitTags1Or8" 
     , "PlaceAndExitTags3Or6"
     , "ExitTags1Or8"
+    , "ExitTags3Or6"
+    , "BalanceOnlyInside"
+    , "BalanceOnlyTags1Or8"
+    , "BalanceOnlyTags3Or6"
+    , "PlaceOnly"
     , "None"
   };
+
   frc::SendableChooser<EAutoPath> m_chooser;
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }
 
