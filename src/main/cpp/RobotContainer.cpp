@@ -175,23 +175,23 @@ void RobotContainer::SetDefaultCommands()
     {&m_drive}
   ));
 
-  m_deployment.SetDefaultCommand(RunCommand
-  (
-    [this] 
-    {
-      // Don't send any input if autonomous is running
-      if (m_isAutoRunning == false)
-      {
-        const double kDeadband = 0.25;
-        const auto input = ApplyDeadband(m_secondaryController.GetLeftY(), kDeadband);
-        if (fabs(input) > kDeadband)
-        {
-          m_deployment.RotateArmRelative(m_armRotLimiter.Calculate(input));
-        }
-      }
-    },
-    {&m_deployment}
-  ));
+  // m_deployment.SetDefaultCommand(RunCommand
+  // (
+  //   [this] 
+  //   {
+  //     // Don't send any input if autonomous is running
+  //     if (m_isAutoRunning == false)
+  //     {
+  //       const double kDeadband = 0.25;
+  //       const auto input = ApplyDeadband(m_secondaryController.GetLeftY(), kDeadband);
+  //       if (fabs(input) > kDeadband)
+  //       {
+  //         m_deployment.RotateArmRelative(m_armRotLimiter.Calculate(input));
+  //       }
+  //     }
+  //   },
+  //   {&m_deployment}
+  // ));
 }
 
 void RobotContainer::ConfigureBindings()

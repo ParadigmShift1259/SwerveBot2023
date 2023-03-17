@@ -9,7 +9,8 @@
 #include <frc/DutyCycleEncoder.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include <rev/CANSparkMax.h>
+// #include <rev/CANSparkMax.h>
+#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
 
 #include "ConstantsDigitalOut.h"
 #include "ConstantsCANIDs.h"
@@ -17,7 +18,9 @@
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 
-using namespace rev;
+// using namespace rev;
+using namespace ctre::phoenix::motorcontrol::can;
+using namespace ctre::phoenix::motorcontrol;
 using namespace units;
 
 class DeploymentSubsystem : public frc2::SubsystemBase 
@@ -32,6 +35,10 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Drives the deployment arm to a specific angle
         /// \param angle  Desired angle to rotate to; see ConstantsDeploymentAngles.h
         void RotateArmToAngle(degree_t angle);
+
+        /// Drives the deployment arm to a specific tick value
+        /// \param ticks  Desired tick value to rotate to; see ConstantsDeploymentAngles.h
+        void RotateArmToTicks(double ticks);
 
         /// Drives the deployment arm to an angle relative to the current angle
         /// \param rotation  Percentage of max roation to apply [0, 1]
@@ -74,18 +81,14 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         bool IsOkayToRetractIntake();
 
         /// Zero out the arm encoder count
-        void ResetEncoder() { m_enc.SetPosition(0.0); RotateArmToAngle(degree_t(0.0)); }
+        void ResetEncoder() { m_motor.SetSelectedSensorPosition(0.0); RotateArmToAngle(degree_t(0.0)); }
 
     private:
         double DegreesToTicks(degree_t degrees) { return degrees.to<double>() * kTicksPerDegree + kTickOffset; }
         degree_t TicksToDegrees(double ticks) { return degree_t{(ticks - kTickOffset) * kDegreesPerTick}; }
         double TicksToDegreesDouble(double ticks) { return (ticks - kTickOffset) * kDegreesPerTick; }
 
-        CANSparkMax m_motor;
-        SparkMaxLimitSwitch m_forwardLimitSwitch = m_motor.GetForwardLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
-        SparkMaxLimitSwitch m_reverseLimitSwitch = m_motor.GetReverseLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
-        SparkMaxRelativeEncoder m_enc{m_motor.GetEncoder()};
-        SparkMaxPIDController m_pid{m_motor.GetPIDController()};
+        TalonSRX m_motor;
         double m_setpointTicks = 0.0;
         frc::Solenoid m_armSolenoid;
         frc::Solenoid m_backPlateSolenoid;

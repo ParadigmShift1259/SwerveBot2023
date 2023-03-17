@@ -10,9 +10,15 @@ using namespace frc;
 constexpr double kDefaultP = 3.0;
 constexpr double kDefaultI = 0.0;
 constexpr double kDefaultD = 0.0;
+constexpr int kMotionSCurveStrength = 1;
+
+constexpr double kMMCruiseVel = 30.0;
+constexpr double kMMAccel = 30.0;
+constexpr double KMinOut = 0.0;
+constexpr double kMaxOut = 0.3;
 
 DeploymentSubsystem::DeploymentSubsystem()
-    : m_motor(kDeploymentCANID, CANSparkMaxLowLevel::MotorType::kBrushless)
+    : m_motor(kDeploymentCANID)
     , m_armSolenoid(PneumaticsModuleType::CTREPCM, kArmSolenoid)
     , m_backPlateSolenoid(PneumaticsModuleType::CTREPCM, kBackPlateSolenoid)
     , m_absEnc(4)
@@ -29,26 +35,36 @@ DeploymentSubsystem::DeploymentSubsystem()
 
     m_absEnc.SetConnectedFrequencyThreshold(200);
     
-    m_motor.RestoreFactoryDefaults();
+    m_motor.ConfigFactoryDefault();
 
-    m_motor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
-    m_motor.SetInverted(true);
+    m_motor.ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0);
+    m_motor.SetNeutralMode(NeutralMode::Brake);
+    m_motor.SetSelectedSensorPosition(0.0);
+
+    m_motor.SetInverted(false);
     m_motor.EnableVoltageCompensation(true);
-    m_motor.SetSmartCurrentLimit(30);
+    m_motor.ConfigContinuousCurrentLimit(30);
+    m_motor.ConfigPeakCurrentLimit(0);
+    m_motor.EnableCurrentLimit(true);
  
-    // not available in brushless m_enc.SetInverted(true);
-    m_enc.SetPosition(kInitialPosition);
+    m_motor.Config_kP(0, kDefaultP);
+    m_motor.Config_kI(0, kDefaultI);
+    m_motor.Config_kD(0, kDefaultD);
+    m_motor.Config_kF(0, 0.0);
+    m_motor.ConfigMotionSCurveStrength(kMotionSCurveStrength);
 
-    // m_pid.SetOutputRange(-8.0, 8.0);
-    m_pid.SetOutputRange(-6.0, 6.0);
-    m_pid.SetP(kDefaultP);
-    m_pid.SetI(kDefaultI);
-    m_pid.SetD(kDefaultD);
-    m_pid.SetFF(0.0);
-    m_pid.SetIAccum(0.0);
-    m_pid.SetFeedbackDevice(m_enc);
+    // m_motor.ConfigForwardSoftLimitThreshold(DegreesToTicks(kHighestAngle));
+    // m_motor.ConfigReverseSoftLimitThreshold(DegreesToTicks(kLowestAngle));
+    // m_motor.ConfigForwardSoftLimitEnable(true);
+    // m_motor.ConfigReverseSoftLimitEnable(true);
+
+    m_motor.ConfigMotionCruiseVelocity(DegreesToTicks(degree_t(kMMCruiseVel / 10)));
+    m_motor.ConfigMotionAcceleration(DegreesToTicks(degree_t(kMMAccel / 10)));
+
+    m_motor.SetSelectedSensorPosition(kInitialPosition);
 
     SmartDashboard::PutNumber("GotoAngle", 0.0);
+    SmartDashboard::PutNumber("GotoTicks", 0.0);
     //SmartDashboard::PutNumber("MaxOutput", 2.0);
 //#define DEPLOY_PID_TUNING
 #ifdef DEPLOY_PID_TUNING
@@ -56,28 +72,27 @@ DeploymentSubsystem::DeploymentSubsystem()
     SmartDashboard::PutNumber("I", kDefaultI);
     SmartDashboard::PutNumber("D", kDefaultD);
 #endif
-
-    m_forwardLimitSwitch.EnableLimitSwitch(true);
-    m_reverseLimitSwitch.EnableLimitSwitch(true);
 }
 
 void DeploymentSubsystem::Periodic() 
 {
-    double pos = m_enc.GetPosition();
+    double pos = m_motor.GetSelectedSensorPosition();
     double currentAngle = TicksToDegreesDouble(pos);
     double err = pos - m_setpointTicks;
     double absPos = m_absEnc.GetAbsolutePosition();
+    double target = m_motor.GetClosedLoopTarget();
     SmartDashboard::PutNumber("Arm enc", pos);
     SmartDashboard::PutNumber("Arm angle", currentAngle);
     SmartDashboard::PutNumber("Arm error", err);
     SmartDashboard::PutNumber("Arm Abs Enc", absPos);
+    SmartDashboard::PutNumber("Arm Target", target);
 
     m_logArmAngle.Append(currentAngle);
     m_logAbsEnc.Append(absPos);
 
     double outputCurrent = m_motor.GetOutputCurrent();
-    double motorOutput = m_motor.GetAppliedOutput();
-    double motorTemp = m_motor.GetMotorTemperature();
+    double motorOutput = m_motor.GetMotorOutputPercent();
+    double motorTemp = m_motor.GetTemperature();
     m_logOutputCurrent.Append(outputCurrent);
     m_logMotorOutput.Append(motorOutput);
     m_logMotorTemp.Append(motorTemp);
@@ -93,27 +108,6 @@ void DeploymentSubsystem::Periodic()
     SmartDashboard::PutBoolean("rev limit", revLimit);
 
     // double maxOutput = SmartDashboard::GetNumber("MaxOutput", 2.0);
-    // m_pid.SetOutputRange(-maxOutput, maxOutput);
-
-    // Move arm to safer position if limit switch is hit
-    if (IsForwardLimitSwitchClosed())
-    {
-        RotateArmToAngle(kHighestAngle);
-    }
-    else if (IsReverseLimitSwitchClosed())
-    {
-        m_enc.SetPosition(-2.5);
-        m_timer.Reset();
-        m_timer.Start();
-        m_resetingEncoder = true;
-        RotateArmToAngle(TicksToDegrees(-1.5));
-    }
-    
-    if (m_resetingEncoder && m_timer.Get() > 0.5_s)
-    {
-        RotateArmToAngle(kLowestAngle);
-        m_resetingEncoder = false;
-    }
 }
 
 void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
@@ -124,7 +118,6 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     m_pid.SetD(SmartDashboard::GetNumber("D", kDefaultD));
 #endif
 
-    //m_motor.NeutralOutput();
     m_backPlateSolenoid.Set(false);
     m_setpointTicks = DegreesToTicks(angle);
 
@@ -135,15 +128,20 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     //  , currentAngle.to<double>()
     //  , (angle - currentAngle).to<double>()
     //  , m_setpointTicks);
-    m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
+    m_motor.Set(ControlMode::MotionMagic, m_setpointTicks);
+}
+
+void DeploymentSubsystem::RotateArmToTicks(double ticks)
+{
+    m_motor.Set(ControlMode::Position, ticks);
 }
 
 void DeploymentSubsystem::RotateArmRelative(double rotation)
 {
-    auto currentPos = m_enc.GetPosition();
+    auto currentPos = m_motor.GetSelectedSensorPosition();
     degree_t currentAngle = TicksToDegrees(currentPos);
     m_setpointTicks = DegreesToTicks(currentAngle + degree_t(rotation * kMaxOperatorDeg));
-    m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
+    m_motor.Set(ControlMode::MotionMagic, m_setpointTicks);
 }
 
 void DeploymentSubsystem::ExtendArm()
@@ -168,34 +166,34 @@ void DeploymentSubsystem::RetractBackPlate()
 
 bool DeploymentSubsystem::IsForwardLimitSwitchClosed()
 {
-    return m_forwardLimitSwitch.Get();
+    return false;
 }
 
 bool DeploymentSubsystem::IsReverseLimitSwitchClosed()
 {
-    return m_reverseLimitSwitch.Get();
+    return false;
 }
 
 void DeploymentSubsystem::Stop()
 {
-    m_motor.Set(0.0);
+    m_motor.Set(ControlMode::PercentOutput, 0.0);
 }
 
 bool DeploymentSubsystem::IsAtDegreeSetpoint(degree_t setpoint)
 {
     // TODO Figure out actual angle tolerance
-    degree_t currentAngle = TicksToDegrees(m_enc.GetPosition());
+    degree_t currentAngle = TicksToDegrees(m_motor.GetSelectedSensorPosition());
     //return (units::math::fabs(setpoint - currentAngle) < 0.1_deg);
     return (units::math::fabs(setpoint - currentAngle) < 0.5_deg);
 }
 
 degree_t DeploymentSubsystem::CurrentDegreePosition()
 {
-    return TicksToDegrees(m_enc.GetPosition());
+    return TicksToDegrees(m_motor.GetSelectedSensorPosition());
 }
 
 bool DeploymentSubsystem::IsOkayToRetractIntake()
 {
-    degree_t currentAngle = TicksToDegrees(m_enc.GetPosition());
+    degree_t currentAngle = TicksToDegrees(m_motor.GetSelectedSensorPosition());
     return currentAngle > kTravelAngle;
 }
