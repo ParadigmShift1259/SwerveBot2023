@@ -15,28 +15,20 @@
 #include <frc2/command/button/JoystickButton.h>
 
 #include "Balance.h"
-#include "ClawOpen.h"
-#include "ClawClose.h"
-#include "ClearancePosition.h"
+#include "ClawRelease.h"
+#include "ClawIngest.h"
 #include "IntakeDeploy.h"
-#include "RetrievePosition.h"
 #include "TravelPosition.h"
-#include "PopHookPosition.h"
 
 #include "IntakeDeploy.h"
 #include "IntakeIngest.h"
 #include "IntakeRelease.h"
 #include "IntakeStop.h"
 
-#include "RotateTurntableCW.h"
-#include "RotateTurntableCCW.h"
-
-#include "RetrieveGamePiece.h"
-
 #include "PlaceOnFloor.h"
 #include "PlaceLow.h"
 #include "PlaceHigh.h"
-#include "PlaceHighCube.h"
+#include "PickUp.h"
 
 #include "ReleaseCone.h"
 
@@ -91,17 +83,14 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
   eventMap.emplace("TravelPosition", std::make_shared<TravelPosition>(*this));
-  eventMap.emplace("PopHookPosition", std::make_shared<PopHookPosition>(*this));
   eventMap.emplace("PlaceHigh", std::make_shared<PlaceHigh>(*this));
-  eventMap.emplace("ClawOpen", std::make_shared<ClawOpen>(*this));
-  eventMap.emplace("ClawClose", std::make_shared<ClawClose>(*this));
+  eventMap.emplace("ClawRelease", std::make_shared<ClawRelease>(*this));
+  eventMap.emplace("ClawIngest", std::make_shared<ClawIngest>(*this));
   eventMap.emplace("IntakeDeploy", std::make_shared<IntakeDeploy>(*this));
   eventMap.emplace("ReleaseCone", std::make_shared<ReleaseCone>(*this));
-  eventMap.emplace("RetrievePosition", std::make_shared<RetrievePosition>(*this));
   eventMap.emplace("ExtendArm", std::make_shared<ExtendArm>(*this));
   eventMap.emplace("WaitLong", std::make_shared<WaitCommand>(1.2_s));
   eventMap.emplace("WaitShort", std::make_shared<WaitCommand>(0.5_s));
-  eventMap.emplace("ClearancePosition", std::make_shared<ClearancePosition>(*this));
 
   // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
   static SwerveAutoBuilder autoBuilder(
@@ -213,24 +202,21 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   primary.Y().OnTrue(&m_toggleDriveStraight);
   primary.Start().WhileTrue(&m_OverrideOn);
   primary.Back().WhileTrue(&m_OverrideOff);
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  primary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendArm(); });  // Green  row 3
+  primary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractArm(); });// Yellow row 3
 #else
-  primary.A().OnTrue(ClawOpen(*this).ToPtr());
-  primary.B().OnTrue(ClawClose(*this).ToPtr());
-  primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
+  primary.A().OnTrue(ClawRelease(*this).ToPtr());
+  primary.B().OnTrue(ClawIngest(*this).ToPtr());
+  // primary.X().OnTrue();
   primary.Y().OnTrue(ReleaseCone(*this).ToPtr());
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 
-  //primary.Back().OnTrue(&m_extendArm);   
-  //primary.().OnTrue(m_retractArm);   
-  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  primary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendArm(); });  // Green  row 3
-  primary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractArm(); });// Yellow row 3
-
 //  if (m_dbgFlagDrvrCtrlrPitOverride)
   {
-    primary.Start().WhileTrue(&m_rotateArm);
+    primary.Start().OnTrue(&m_rotateArm);
 #ifdef USE_PIT_BUTTON_BOX  
     // Initialize button box bindingd
     primary.Back().OnTrue(&m_CfgPitButtonBoxCmd); // Calls ConfigPitButtonBoxBindings()
@@ -252,9 +238,9 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
   secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
-  secondary.Start().WhileTrue(RotateTurntableCCW(*this).ToPtr());
-  secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());
-  secondary.RightTrigger().WhileTrue(RetrieveGamePiece(*this).ToPtr());
+  // secondary.Start().WhileTrue();
+  // secondary.Back().WhileTrue();
+  // secondary.RightTrigger().WhileTrue();
 
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           
@@ -298,7 +284,7 @@ void RobotContainer::ConfigPitButtonBoxBindings()
       m_pitButtonBox->LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
       m_pitButtonBox->RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
       m_pitButtonBox->LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
-      m_pitButtonBox->RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
+      // m_pitButtonBox->RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
 
       auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
       m_pitButtonBox->POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
@@ -324,17 +310,17 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
   secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
   secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
-  secondary.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
+  secondary.Y().OnTrue(PickUp(*this).ToPtr());                        // Yellow row 2
 
   secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
   secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
   secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-  secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+  secondary.Back().WhileTrue(ClawIngest(*this).ToPtr());                     // Black  row 1
 
   secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
   secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
-  secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
-  secondary.RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
+  secondary.LeftTrigger().OnTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
+  secondary.RightTrigger().WhileTrue(ClawRelease(*this).ToPtr());                      // Black  row 2
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3

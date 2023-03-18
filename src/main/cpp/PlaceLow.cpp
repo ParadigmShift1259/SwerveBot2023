@@ -1,6 +1,7 @@
 #include "PlaceLow.h"
 
-#include "ConstantsDeploymentAngles.h"
+#include "ConstantsDeploymentPositions.h"
+#include "ConstantsDeploymentAbsolutes.h"
 
 PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
@@ -16,17 +17,17 @@ void PlaceLow::Initialize()
   m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
-  m_deployment.RotateArmToAngle(kPlaceLowAngle);
+  m_deployment.RotateArm(kPlaceLowPosition);
 }
 
 void PlaceLow::Execute()
 {
-
+  m_deployment.ResetEncoderWithAbsolute();
 }
 
 bool PlaceLow::IsFinished()
 {
-  return m_deployment.IsAtDegreeSetpoint(kPlaceLowAngle);
+  return m_deployment.IsAtSetpoint(kPlaceLowAbsolute);
 }
 
 void PlaceLow::End(bool interrupted)

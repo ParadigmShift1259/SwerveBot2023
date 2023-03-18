@@ -5,10 +5,10 @@
 
 #include "ISubsystemAccess.h"
 
-class ClawOpen : public frc2::CommandHelper<frc2::CommandBase, ClawOpen>
+class ClawRelease : public frc2::CommandHelper<frc2::CommandBase, ClawRelease>
 {
 public:
-  explicit ClawOpen(ISubsystemAccess& subsystemAccess);
+  explicit ClawRelease(ISubsystemAccess& subsystemAccess);
 
   void Initialize() override;
   void Execute() override;

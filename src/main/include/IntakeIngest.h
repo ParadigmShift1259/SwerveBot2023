@@ -17,7 +17,6 @@ public:
 private:
   DeploymentSubsystem& m_deployment;
   IntakeSubsystem& m_intake;
-  TurntableSubsystem& m_turntable;
 
   wpi::log::BooleanLogEntry m_logStartCommand;
 };

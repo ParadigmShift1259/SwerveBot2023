@@ -1,27 +1,31 @@
 #pragma once
 
-#include <frc/Solenoid.h>
-#include <frc/Timer.h>
+#include <frc/DigitalInput.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
+#include <rev/CANSparkMax.h>
 
+#include "ConstantsCANIDs.h"
 #include "ConstantsDigitalOut.h"
 
-using namespace ctre::phoenix::motorcontrol;
-using namespace ctre::phoenix::motorcontrol::can;
+using namespace rev;
+using namespace frc;
+
+constexpr double kClawIngestSpeed = 1.0;
+constexpr double kClawReleaseSpeed = -0.2;
 
 class ClawSubsystem : public frc2::SubsystemBase
 {
 public:
     ClawSubsystem();
     void Periodic();
-    void Open();
-    void Close();
-
-    bool IsOpen() const { return m_solenoid.Get(); }
+    void Ingest();
+    void Release();
+    void Hold();
+    void Stop();
+    bool IsPhotoeyeActive();
         
 private:
-    frc::Solenoid m_solenoid;
-    frc::Timer m_timer;
+    CANSparkMax m_motor;
+    DigitalInput m_photoeye;
 };

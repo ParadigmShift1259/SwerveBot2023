@@ -1,13 +1,13 @@
 #include "DeploymentSubsystem.h"
 
-#include "ConstantsDeploymentAngles.h"
+#include "ConstantsDeploymentPositions.h"
 
 #include <units/math.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace frc;
 
-constexpr double kDefaultP = 1.0;
+constexpr double kDefaultP = 4.0;
 constexpr double kDefaultI = 0.0;
 constexpr double kDefaultD = 0.0;
 
@@ -32,17 +32,16 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_motor.RestoreFactoryDefaults();
 
     m_motor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
-    m_motor.SetInverted(false);
+    m_motor.SetInverted(true);
     m_motor.EnableVoltageCompensation(true);
     m_motor.SetSmartCurrentLimit(30);
  
     // not available in brushless m_enc.SetInverted(true);
-    m_enc.SetPosition(0.0);
     m_enc.SetMeasurementPeriod(100);
-    m_enc.SetInverted(true);
+    m_enc.SetInverted(false);
     printf("Alt enc CPR %u\n", m_enc.GetCountsPerRevolution());
 
-    m_pid.SetOutputRange(-1.0, 1.0);
+    m_pid.SetOutputRange(-4.0, 4.0);
     m_pid.SetP(kDefaultP);
     m_pid.SetI(kDefaultI);
     m_pid.SetD(kDefaultD);
@@ -52,27 +51,33 @@ DeploymentSubsystem::DeploymentSubsystem()
 
     SmartDashboard::PutNumber("GotoAngle", 0.0);
     SmartDashboard::PutNumber("GotoTicks", 0.0);
-    //SmartDashboard::PutNumber("MaxOutput", 2.0);
+    SmartDashboard::PutNumber("MaxOutput", 4.0);
 #define DEPLOY_PID_TUNING
 #ifdef DEPLOY_PID_TUNING
     SmartDashboard::PutNumber("P", kDefaultP);
     SmartDashboard::PutNumber("I", kDefaultI);
     SmartDashboard::PutNumber("D", kDefaultD);
 #endif
+
+    m_timer.Reset();
+    m_timer.Start();
 }
 
 void DeploymentSubsystem::Periodic() 
 {
+    auto time = m_timer.Get();
+    if (time < 2.0_s)
+    {
+        ResetEncoderWithAbsolute();
+    }
+ 
     double pos = m_enc.GetPosition();
-    double currentAngle = TicksToDegreesDouble(pos);
     double err = pos - m_setpointTicks;
     double absPos = m_absEnc.GetAbsolutePosition();
     SmartDashboard::PutNumber("Arm enc", pos);
-    SmartDashboard::PutNumber("Arm angle", currentAngle);
     SmartDashboard::PutNumber("Arm error", err);
     SmartDashboard::PutNumber("Arm Abs Enc", absPos);
 
-    m_logArmAngle.Append(currentAngle);
     m_logAbsEnc.Append(absPos);
 
     double outputCurrent = m_motor.GetOutputCurrent();
@@ -85,11 +90,11 @@ void DeploymentSubsystem::Periodic()
     SmartDashboard::PutNumber("motor output", motorOutput);
     SmartDashboard::PutNumber("motor temp", motorTemp);
 
-    // double maxOutput = SmartDashboard::GetNumber("MaxOutput", 2.0);
-    // m_pid.SetOutputRange(-maxOutput, maxOutput);
+    double maxOutput = SmartDashboard::GetNumber("MaxOutput", 4.0);
+    m_pid.SetOutputRange(-maxOutput, maxOutput);
 }
 
-void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
+void DeploymentSubsystem::RotateArm(double rotations)
 {
 #ifdef DEPLOY_PID_TUNING
     m_pid.SetP(SmartDashboard::GetNumber("P", kDefaultP));
@@ -97,35 +102,20 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     m_pid.SetD(SmartDashboard::GetNumber("D", kDefaultD));
 #endif
 
-    m_backPlateSolenoid.Set(false);
-    m_setpointTicks = DegreesToTicks(angle);
-
     //auto currentPos = m_enc.GetPosition();
-    //degree_t currentAngle = TicksToDegrees(currentPos);
     // printf("Rot angle %.3f currAngle %.3f delta %.3f ticks %.3f\n"
     //  , angle.to<double>()
     //  , currentAngle.to<double>()
     //  , (angle - currentAngle).to<double>()
-    //  , m_setpointTicks);
+    //  , m_setpointTicks);'
+    m_setpointTicks = rotations;
     m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
-}
-
-void DeploymentSubsystem::RotateArmToTicks(double ticks)
-{
-#ifdef DEPLOY_PID_TUNING
-    m_pid.SetP(SmartDashboard::GetNumber("P", kDefaultP));
-    m_pid.SetI(SmartDashboard::GetNumber("I", kDefaultI));
-    m_pid.SetD(SmartDashboard::GetNumber("D", kDefaultD));
-#endif
-
-    m_pid.SetReference(ticks, CANSparkMax::ControlType::kPosition);
 }
 
 void DeploymentSubsystem::RotateArmRelative(double rotation)
 {
     auto currentPos = m_enc.GetPosition();
-    degree_t currentAngle = TicksToDegrees(currentPos);
-    m_setpointTicks = DegreesToTicks(currentAngle + degree_t(rotation * kMaxOperatorDeg));
+    m_setpointTicks = std::clamp<double>(currentPos + rotation, kLowestPosition, kHighestPosition);
     m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
 }
 
@@ -154,21 +144,29 @@ void DeploymentSubsystem::Stop()
     m_motor.Set(0.0);
 }
 
-bool DeploymentSubsystem::IsAtDegreeSetpoint(degree_t setpoint)
+bool DeploymentSubsystem::IsAtSetpoint(double setpoint)
 {
-    // TODO Figure out actual angle tolerance
-    degree_t currentAngle = TicksToDegrees(m_enc.GetPosition());
-    //return (units::math::fabs(setpoint - currentAngle) < 0.1_deg);
-    return (units::math::fabs(setpoint - currentAngle) < 0.5_deg);
+    // TODO Figure out actual position tolerance
+    // double currentPosition = m_enc.GetPosition();
+    // return (fabs(setpoint - currentPosition) < 0.1);
+    double currentPosition = absEnc.GetPosition();
+    return (fabs(setpoint - absEnc) < 0.1);
 }
 
-degree_t DeploymentSubsystem::CurrentDegreePosition()
+void DeploymentSubsystem::ResetEncoderWithAbsolute()
 {
-    return TicksToDegrees(m_enc.GetPosition());
-}
-
-bool DeploymentSubsystem::IsOkayToRetractIntake()
-{
-    degree_t currentAngle = TicksToDegrees(m_enc.GetPosition());
-    return currentAngle > kTravelAngle;
+    double absPos = m_absEnc.GetAbsolutePosition();
+    double resetPosition;
+    if (absPos != 0.0)
+    {
+        if (absPos < 0.6)
+        {
+            resetPosition = kPlaceHighPosition / 0.48 * (0.85 - absPos);
+        }
+        else
+        {
+            resetPosition = kPlaceHighPosition / 0.48 * (0.75 - absPos);
+        }
+        m_enc.SetPosition(resetPosition);
+    }
 }

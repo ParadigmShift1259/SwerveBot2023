@@ -5,16 +5,17 @@
 
 #include "ISubsystemAccess.h"
 
-class RetrievePosition : public frc2::CommandHelper<frc2::CommandBase, RetrievePosition>
+class PickUp : public frc2::CommandHelper<frc2::CommandBase, PickUp>
 {
 public:
-    explicit RetrievePosition(ISubsystemAccess& subsystemAccess);
+    explicit PickUp(ISubsystemAccess& subsystemAccess);
 
     void Initialize() override;
     void Execute() override;
     bool IsFinished() override;
-    void End(bool interrupted) override;
 
+    void End(bool interrupted) override;
+     
 private:
     DeploymentSubsystem& m_deployment;
 

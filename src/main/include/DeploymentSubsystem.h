@@ -30,12 +30,8 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         void Periodic() override;
 
         /// Drives the deployment arm to a specific angle
-        /// \param angle  Desired angle to rotate to; see ConstantsDeploymentAngles.h
-        void RotateArmToAngle(degree_t angle);
-
-        /// Drives the deployment arm to a specific tick value
-        /// \param ticks  Desired tick value to rotate to; see ConstantsDeploymentAngles.h
-        void RotateArmToTicks(double ticks);
+        /// \param rotations  Desired rotation of the motor shaft to rotate to; see ConstantsDeploymentPositions.h
+        void RotateArm(double rotations);
 
         /// Drives the deployment arm to an angle relative to the current angle
         /// \param rotation  Percentage of max roation to apply [0, 1]
@@ -59,24 +55,15 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Checks to see if the deployment arm is at a specified degree setpoint
         /// \param setpoint intended setpoint to check current position against
         /// \returns if current position is within an accepted margin error of the setpoint 
-        bool IsAtDegreeSetpoint(degree_t setpoint);
-
-        /// Retrieves current position of deployment arm  
-        /// \returns position of deployment arm, in degrees 
-        degree_t CurrentDegreePosition();
-
-        /// Checks for interefence of the claw
-        /// \returns true if ready to retracts
-        bool IsOkayToRetractIntake();
+        bool IsAtSetpoint(double setpoint);
 
         /// Zero out the arm encoder count
-        void ResetEncoder() { m_enc.SetPosition(0.0); RotateArmToAngle(degree_t(0.0)); }
+        void ResetEncoder() { m_enc.SetPosition(0.0); RotateArm(0.0); }
+
+        /// Reset relative encoder based on the absolute encoder
+        void ResetEncoderWithAbsolute();
 
     private:
-        double DegreesToTicks(degree_t degrees) { return degrees.to<double>() * kTicksPerDegree + kTickOffset; }
-        degree_t TicksToDegrees(double ticks) { return degree_t{(ticks - kTickOffset) * kDegreesPerTick}; }
-        double TicksToDegreesDouble(double ticks) { return (ticks - kTickOffset) * kDegreesPerTick; }
-
         CANSparkMax m_motor;
         SparkMaxAlternateEncoder m_enc{m_motor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, 4096)};
         SparkMaxPIDController m_pid{m_motor.GetPIDController()};

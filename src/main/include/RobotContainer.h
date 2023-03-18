@@ -65,7 +65,6 @@ public:
   DeploymentSubsystem&    GetDeployment() override { return m_deployment; }
   IDriveSubsystem&        GetDrive() override { return m_drive; }
   IntakeSubsystem&        GetIntake() override { return m_intake; }
-  TurntableSubsystem&     GetTurntable() override { return m_turntable; }
   VisionSubsystem&        GetVision() override { return m_vision; }
 
   wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
@@ -75,12 +74,12 @@ private:
   void ConfigureBindings();
   void ConfigPrimaryButtonBindings();
   void ConfigSecondaryButtonBindings();
-//#define USE_PIT_BUTTON_BOX  
+// #define USE_PIT_BUTTON_BOX  
 #ifdef USE_PIT_BUTTON_BOX  
   void ConfigPitButtonBoxBindings();
 #endif
 
-//#define BUTTON_BOX_DEVELOPMENT
+#define BUTTON_BOX_DEVELOPMENT
 #ifdef BUTTON_BOX_DEVELOPMENT
   void ConfigSecondaryButtonBindingsNewWay();
 #endif
@@ -99,7 +98,6 @@ private:
   DeploymentSubsystem m_deployment;
   DriveSubsystem m_drive;
   IntakeSubsystem m_intake;
-  TurntableSubsystem m_turntable;
   VisionSubsystem m_vision;
 
   CommandXboxController m_primaryController{0};
@@ -132,21 +130,7 @@ private:
 
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };
-  InstantCommand m_rotateArm{[this] { m_deployment.RotateArmToTicks(SmartDashboard::GetNumber("GotoTicks", 0.0)); }, {&m_deployment} };
-
-  void ToggleClaw()
-  {
-      if (m_claw.IsOpen())
-      {
-          m_claw.Close();
-      }
-      else
-      {
-          m_claw.Open();
-      }
-  }
-
-  InstantCommand m_toggleClaw{[this] { ToggleClaw(); }, { &m_claw } };
+  InstantCommand m_rotateArm{[this] { m_deployment.RotateArm(SmartDashboard::GetNumber("GotoTicks", 0.0)); }, {&m_deployment} };
 
   InstantCommand m_wheelsForward{[this] { GetDrive().WheelsForward(); }, {&m_drive} };
   InstantCommand m_wheelsLeft{[this] { GetDrive().WheelsLeft(); }, {&m_drive} };

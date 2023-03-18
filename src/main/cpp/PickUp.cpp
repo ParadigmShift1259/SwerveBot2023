@@ -1,37 +1,36 @@
-
-#include "PlaceHigh.h"
+#include "PickUp.h"
 
 #include "ConstantsDeploymentPositions.h"
 #include "ConstantsDeploymentAbsolutes.h"
 
-PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess) 
+PickUp::PickUp(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
 {
   AddRequirements({&subsystemAccess.GetDeployment()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/placeHigh/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/PickUp/startCommand");
 }
 
-void PlaceHigh::Initialize()
+void PickUp::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_deployment.RetractBackPlate();
+  m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
-  m_deployment.RotateArm(kPlaceHighPosition);
+  m_deployment.RotateArm(kShelfPosition);
 }
 
-void PlaceHigh::Execute()
+void PickUp::Execute()
 {
   m_deployment.ResetEncoderWithAbsolute();
 }
 
-bool PlaceHigh::IsFinished()
+bool PickUp::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceHighAbsolute);
+  return m_deployment.IsAtSetpoint(kShelfAbsolute);
 }
 
-void PlaceHigh::End(bool interrupted)
+void PickUp::End(bool interrupted)
 {
   m_logStartCommand.Append(false);
 }

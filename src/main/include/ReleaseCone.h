@@ -4,6 +4,8 @@
 #include <frc2/command/CommandHelper.h>
 
 #include "ISubsystemAccess.h"
+#include "ConstantsDeploymentPositions.h"
+#include "ConstantsDeploymentAbsolutes.h"
 
 class ReleaseCone : public frc2::CommandHelper<frc2::CommandBase, ReleaseCone>
 {
@@ -20,8 +22,9 @@ private:
     ClawSubsystem& m_claw;
     DeploymentSubsystem& m_deployment;
 
-    degree_t m_releaseAngle;
+    double m_releasePosition = kTravelPosition; // Initialize to something safe
+    double m_releaseAbsolute = kTravelAbsolute; // Initialize to something safe
 
     wpi::log::BooleanLogEntry m_logStartCommand;
-    wpi::log::DoubleLogEntry m_logAngle;
+    wpi::log::DoubleLogEntry m_logPosition;
 };

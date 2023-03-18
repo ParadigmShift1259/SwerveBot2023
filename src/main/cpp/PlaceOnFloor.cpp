@@ -1,6 +1,7 @@
 #include "PlaceOnFloor.h"
 
-#include "ConstantsDeploymentAngles.h"
+#include "ConstantsDeploymentPositions.h"
+#include "ConstantsDeploymentAbsolutes.h"
 
 PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess) 
   : m_deployment(subsystemAccess.GetDeployment())
@@ -16,21 +17,20 @@ void PlaceOnFloor::Initialize()
   m_logStartCommand.Append(true);
   m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
-  m_deployment.RotateArmToAngle(kPlaceOnFloorAngle);
+  m_deployment.RotateArm(kPlaceOnFloorPosition);
 }
 
 void PlaceOnFloor::Execute()
 {
-
+  m_deployment.ResetEncoderWithAbsolute();
 }
 
 bool PlaceOnFloor::IsFinished()
 {
-  return m_deployment.IsAtDegreeSetpoint(kPlaceOnFloorAngle);
+  return m_deployment.IsAtSetpoint(kPlaceOnFloorAbsolute);
 }
 
 void PlaceOnFloor::End(bool interrupted)
 {
-  m_deployment.ExtendArm();
   m_logStartCommand.Append(false);
 }
