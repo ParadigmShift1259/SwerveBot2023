@@ -7,7 +7,7 @@
 
 using namespace frc;
 
-constexpr double kDefaultP = 3.0;
+constexpr double kDefaultP = 1.0;
 constexpr double kDefaultI = 0.0;
 constexpr double kDefaultD = 0.0;
 
@@ -32,15 +32,17 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_motor.RestoreFactoryDefaults();
 
     m_motor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
-    m_motor.SetInverted(true);
+    m_motor.SetInverted(false);
     m_motor.EnableVoltageCompensation(true);
     m_motor.SetSmartCurrentLimit(30);
  
     // not available in brushless m_enc.SetInverted(true);
-    m_enc.SetPosition(kInitialPosition);
+    m_enc.SetPosition(0.0);
+    m_enc.SetMeasurementPeriod(100);
+    m_enc.SetInverted(true);
+    printf("Alt enc CPR %u\n", m_enc.GetCountsPerRevolution());
 
-    // m_pid.SetOutputRange(-8.0, 8.0);
-    m_pid.SetOutputRange(-6.0, 6.0);
+    m_pid.SetOutputRange(-1.0, 1.0);
     m_pid.SetP(kDefaultP);
     m_pid.SetI(kDefaultI);
     m_pid.SetD(kDefaultD);
@@ -49,16 +51,14 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_pid.SetFeedbackDevice(m_enc);
 
     SmartDashboard::PutNumber("GotoAngle", 0.0);
+    SmartDashboard::PutNumber("GotoTicks", 0.0);
     //SmartDashboard::PutNumber("MaxOutput", 2.0);
-//#define DEPLOY_PID_TUNING
+#define DEPLOY_PID_TUNING
 #ifdef DEPLOY_PID_TUNING
     SmartDashboard::PutNumber("P", kDefaultP);
     SmartDashboard::PutNumber("I", kDefaultI);
     SmartDashboard::PutNumber("D", kDefaultD);
 #endif
-
-    m_forwardLimitSwitch.EnableLimitSwitch(true);
-    m_reverseLimitSwitch.EnableLimitSwitch(true);
 }
 
 void DeploymentSubsystem::Periodic() 
@@ -85,35 +85,8 @@ void DeploymentSubsystem::Periodic()
     SmartDashboard::PutNumber("motor output", motorOutput);
     SmartDashboard::PutNumber("motor temp", motorTemp);
 
-    bool fwdLimit = IsForwardLimitSwitchClosed();
-    bool revLimit = IsReverseLimitSwitchClosed();
-    m_logFwdLimit.Append(fwdLimit);
-    m_logRevLimit.Append(revLimit);
-    SmartDashboard::PutBoolean("fwd limit", fwdLimit);
-    SmartDashboard::PutBoolean("rev limit", revLimit);
-
     // double maxOutput = SmartDashboard::GetNumber("MaxOutput", 2.0);
     // m_pid.SetOutputRange(-maxOutput, maxOutput);
-
-    // Move arm to safer position if limit switch is hit
-    if (IsForwardLimitSwitchClosed())
-    {
-        RotateArmToAngle(kHighestAngle);
-    }
-    else if (IsReverseLimitSwitchClosed())
-    {
-        m_enc.SetPosition(-2.5);
-        m_timer.Reset();
-        m_timer.Start();
-        m_resetingEncoder = true;
-        RotateArmToAngle(TicksToDegrees(-1.5));
-    }
-    
-    if (m_resetingEncoder && m_timer.Get() > 0.5_s)
-    {
-        RotateArmToAngle(kLowestAngle);
-        m_resetingEncoder = false;
-    }
 }
 
 void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
@@ -124,7 +97,6 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     m_pid.SetD(SmartDashboard::GetNumber("D", kDefaultD));
 #endif
 
-    //m_motor.NeutralOutput();
     m_backPlateSolenoid.Set(false);
     m_setpointTicks = DegreesToTicks(angle);
 
@@ -136,6 +108,17 @@ void DeploymentSubsystem::RotateArmToAngle(degree_t angle)
     //  , (angle - currentAngle).to<double>()
     //  , m_setpointTicks);
     m_pid.SetReference(m_setpointTicks, CANSparkMaxLowLevel::ControlType::kPosition);
+}
+
+void DeploymentSubsystem::RotateArmToTicks(double ticks)
+{
+#ifdef DEPLOY_PID_TUNING
+    m_pid.SetP(SmartDashboard::GetNumber("P", kDefaultP));
+    m_pid.SetI(SmartDashboard::GetNumber("I", kDefaultI));
+    m_pid.SetD(SmartDashboard::GetNumber("D", kDefaultD));
+#endif
+
+    m_pid.SetReference(ticks, CANSparkMax::ControlType::kPosition);
 }
 
 void DeploymentSubsystem::RotateArmRelative(double rotation)
@@ -164,16 +147,6 @@ void DeploymentSubsystem::ExtendBackPlate()
 void DeploymentSubsystem::RetractBackPlate()
 {
     m_backPlateSolenoid.Set(kBackPlateSolenoidRetract);
-}
-
-bool DeploymentSubsystem::IsForwardLimitSwitchClosed()
-{
-    return m_forwardLimitSwitch.Get();
-}
-
-bool DeploymentSubsystem::IsReverseLimitSwitchClosed()
-{
-    return m_reverseLimitSwitch.Get();
 }
 
 void DeploymentSubsystem::Stop()

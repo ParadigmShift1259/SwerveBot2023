@@ -132,7 +132,7 @@ private:
 
   InstantCommand m_extendArm{[this] { m_deployment.ExtendArm(); }, {&m_deployment} };
   InstantCommand m_retractArm{[this] { m_deployment.RetractArm(); }, {&m_deployment} };
-  InstantCommand m_rotateArm{[this] { m_deployment.RotateArmToAngle(degree_t(SmartDashboard::GetNumber("GotoAngle", 0.0))); }, {&m_deployment} };
+  InstantCommand m_rotateArm{[this] { m_deployment.RotateArmToTicks(SmartDashboard::GetNumber("GotoTicks", 0.0)); }, {&m_deployment} };
 
   void ToggleClaw()
   {

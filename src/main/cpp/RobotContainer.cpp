@@ -222,6 +222,12 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 
+  //primary.Back().OnTrue(&m_extendArm);   
+  //primary.().OnTrue(m_retractArm);   
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  primary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendArm(); });  // Green  row 3
+  primary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractArm(); });// Yellow row 3
+
 //  if (m_dbgFlagDrvrCtrlrPitOverride)
   {
     primary.Start().WhileTrue(&m_rotateArm);

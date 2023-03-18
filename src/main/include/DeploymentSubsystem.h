@@ -33,6 +33,10 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// \param angle  Desired angle to rotate to; see ConstantsDeploymentAngles.h
         void RotateArmToAngle(degree_t angle);
 
+        /// Drives the deployment arm to a specific tick value
+        /// \param ticks  Desired tick value to rotate to; see ConstantsDeploymentAngles.h
+        void RotateArmToTicks(double ticks);
+
         /// Drives the deployment arm to an angle relative to the current angle
         /// \param rotation  Percentage of max roation to apply [0, 1]
         void RotateArmRelative(double rotation);
@@ -48,14 +52,6 @@ class DeploymentSubsystem : public frc2::SubsystemBase
 
         /// Retracts the back plate
         void RetractBackPlate();
-
-        /// Returns if the forward limit switch is currently closed
-        /// \returns true if the limit switch is closed, false if the limit switch is open
-        bool IsForwardLimitSwitchClosed();
-
-        /// Returns if the reverse limit switch is currently closed
-        /// \returns true if the limit switch is closed, false if the limit switch is open
-        bool IsReverseLimitSwitchClosed();
 
         /// Stops running the deployment arm motor
         void Stop();
@@ -82,9 +78,7 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         double TicksToDegreesDouble(double ticks) { return (ticks - kTickOffset) * kDegreesPerTick; }
 
         CANSparkMax m_motor;
-        SparkMaxLimitSwitch m_forwardLimitSwitch = m_motor.GetForwardLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
-        SparkMaxLimitSwitch m_reverseLimitSwitch = m_motor.GetReverseLimitSwitch(SparkMaxLimitSwitch::Type::kNormallyOpen);
-        SparkMaxRelativeEncoder m_enc{m_motor.GetEncoder()};
+        SparkMaxAlternateEncoder m_enc{m_motor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, 4096)};
         SparkMaxPIDController m_pid{m_motor.GetPIDController()};
         double m_setpointTicks = 0.0;
         frc::Solenoid m_armSolenoid;

@@ -17,4 +17,4 @@ constexpr int kIntakeCANID     = 11;
 constexpr int kTurntableCANID  = 22;
 
 // Subsystem SparkMaxs
-constexpr int kDeploymentCANID = 22;
+constexpr int kDeploymentCANID = 12;
