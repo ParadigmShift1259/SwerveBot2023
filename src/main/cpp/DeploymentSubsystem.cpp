@@ -7,15 +7,15 @@
 
 using namespace frc;
 
-constexpr double kDefaultP = 3.0;
+constexpr double kDefaultP = 1.0;
 constexpr double kDefaultI = 0.0;
 constexpr double kDefaultD = 0.0;
 constexpr int kMotionSCurveStrength = 1;
 
 constexpr double kMMCruiseVel = 30.0;
 constexpr double kMMAccel = 30.0;
-constexpr double KMinOut = 0.0;
-constexpr double kMaxOut = 0.3;
+constexpr double kMinOutput = 0.0;
+constexpr double kMaxOutput = 0.3;
 
 DeploymentSubsystem::DeploymentSubsystem()
     : m_motor(kDeploymentCANID)
@@ -42,6 +42,7 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_motor.SetSelectedSensorPosition(0.0);
 
     m_motor.SetInverted(false);
+    m_motor.SetSensorPhase(true);
     m_motor.EnableVoltageCompensation(true);
     m_motor.ConfigContinuousCurrentLimit(30);
     m_motor.ConfigPeakCurrentLimit(0);
@@ -53,13 +54,21 @@ DeploymentSubsystem::DeploymentSubsystem()
     m_motor.Config_kF(0, 0.0);
     m_motor.ConfigMotionSCurveStrength(kMotionSCurveStrength);
 
+    m_motor.ConfigMotionCruiseVelocity(DegreesToTicks(degree_t(kMMCruiseVel / 10)));
+    m_motor.ConfigMotionAcceleration(DegreesToTicks(degree_t(kMMAccel / 10)));
+
     // m_motor.ConfigForwardSoftLimitThreshold(DegreesToTicks(kHighestAngle));
     // m_motor.ConfigReverseSoftLimitThreshold(DegreesToTicks(kLowestAngle));
     // m_motor.ConfigForwardSoftLimitEnable(true);
     // m_motor.ConfigReverseSoftLimitEnable(true);
 
-    m_motor.ConfigMotionCruiseVelocity(DegreesToTicks(degree_t(kMMCruiseVel / 10)));
-    m_motor.ConfigMotionAcceleration(DegreesToTicks(degree_t(kMMAccel / 10)));
+    // Minimum motor output
+    m_motor.ConfigNominalOutputForward(kMinOutput);
+    m_motor.ConfigNominalOutputReverse(-kMinOutput);
+    
+    // Maximum motor output
+    m_motor.ConfigPeakOutputForward(kMaxOutput);
+    m_motor.ConfigPeakOutputReverse(-kMaxOutput);
 
     m_motor.SetSelectedSensorPosition(kInitialPosition);
 
@@ -80,12 +89,12 @@ void DeploymentSubsystem::Periodic()
     double currentAngle = TicksToDegreesDouble(pos);
     double err = pos - m_setpointTicks;
     double absPos = m_absEnc.GetAbsolutePosition();
-    double target = m_motor.GetClosedLoopTarget();
+    // double target = m_motor.GetClosedLoopTarget();
     SmartDashboard::PutNumber("Arm enc", pos);
     SmartDashboard::PutNumber("Arm angle", currentAngle);
     SmartDashboard::PutNumber("Arm error", err);
     SmartDashboard::PutNumber("Arm Abs Enc", absPos);
-    SmartDashboard::PutNumber("Arm Target", target);
+    // SmartDashboard::PutNumber("Arm Target", target);
 
     m_logArmAngle.Append(currentAngle);
     m_logAbsEnc.Append(absPos);
