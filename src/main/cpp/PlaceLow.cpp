@@ -27,7 +27,7 @@ void PlaceLow::Execute()
 
 bool PlaceLow::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceLowAbsolute);
+  return m_deployment.IsAtSetpoint(kPlaceLowPosition);
 }
 
 void PlaceLow::End(bool interrupted)

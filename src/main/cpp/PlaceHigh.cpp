@@ -28,7 +28,7 @@ void PlaceHigh::Execute()
 
 bool PlaceHigh::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceHighAbsolute);
+  return m_deployment.IsAtSetpoint(kPlaceHighPosition);
 }
 
 void PlaceHigh::End(bool interrupted)

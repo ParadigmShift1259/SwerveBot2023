@@ -7,5 +7,5 @@ constexpr double kShelfAbsolute = 0.50;
 constexpr double kPlaceLowAbsolute = 0.51;
 constexpr double kReleaseLowAbsolute = 0.55;
 constexpr double kPlaceOnFloorAbsolute = 0.69;
-constexpr double kTravelAbsolute = 0.75;
+constexpr double kTravelAbsolute = 0.73;
 constexpr double kLowestAbsolute = 0.75;

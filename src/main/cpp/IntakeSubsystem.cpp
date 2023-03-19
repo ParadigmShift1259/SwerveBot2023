@@ -11,7 +11,7 @@ IntakeSubsystem::IntakeSubsystem()
     , m_solenoid(PneumaticsModuleType::CTREPCM, kIntakeSolenoid)
 {
     m_motor.SetNeutralMode(NeutralMode::Coast);
-    m_motor.SetInverted(true);
+    m_motor.SetInverted(false);
 }
 
 void IntakeSubsystem::Periodic()

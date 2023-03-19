@@ -26,14 +26,14 @@ bool ClawIngest::IsFinished()
 
 void ClawIngest::End(bool interrupted)
 {
-  if (interrupted) // Button released
-  {
-    m_claw.Stop();
-  }
-  else
-  {
+  // if (interrupted) // Button released
+  // {
+  //   m_claw.Stop();
+  // }
+  // else
+  // {
     m_claw.Hold();
-  }
+  // }
 
   m_logStartCommand.Append(false);
 }
