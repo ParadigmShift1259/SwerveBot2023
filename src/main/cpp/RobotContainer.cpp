@@ -245,6 +245,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           
+  secondary.Start().OnTrue(&m_extendArm); 
+  secondary.Back().OnTrue(&m_retractArm);                                       
   secondary.LeftTrigger().OnTrue(ClawIngest(*this).ToPtr());
   // secondary.RightTrigger().WhileTrue();
 

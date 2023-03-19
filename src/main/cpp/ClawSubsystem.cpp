@@ -18,6 +18,7 @@ void ClawSubsystem::Periodic()
 {
     SmartDashboard::PutNumber("Claw Output Curret", m_motor.GetOutputCurrent());
     SmartDashboard::PutNumber("Claw RPM", m_enc.GetVelocity());
+    SmartDashboard::PutBoolean("Claw PhotoEye Active", IsPhotoeyeActive());
 }
 
 void ClawSubsystem::Ingest()
