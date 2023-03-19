@@ -30,7 +30,7 @@ void ClawSubsystem::Release()
 
 void ClawSubsystem::Hold()
 {
-    m_motor.Set(0.2);
+    m_motor.Set(kClawHoldSpeed);
 }
 
 void ClawSubsystem::Stop()

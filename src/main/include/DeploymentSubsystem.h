@@ -7,6 +7,7 @@
 #include <frc/Timer.h>
 #include <frc/DataLogManager.h>
 #include <frc/DutyCycleEncoder.h>
+#include <frc/controller/PIDController.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <rev/CANSparkMax.h>
@@ -36,6 +37,8 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Drives the deployment arm to an angle relative to the current angle
         /// \param rotation  Percentage of max roation to apply [0, 1]
         void RotateArmRelative(double rotation);
+        void RotateArmSetAbsPos(double absPos) { m_absPos = absPos; }
+        double m_absPos = 0.0;
 
         /// Extends the deployment arm
         void ExtendArm();
@@ -63,10 +66,14 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Reset relative encoder based on the absolute encoder
         void ResetEncoderWithAbsolute();
 
+        /// Converts absolute encoder value to relative encoder value
+        double AbsoluteToRelative(double absPos);
+
     private:
         CANSparkMax m_motor;
         SparkMaxAlternateEncoder m_enc{m_motor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, 4096)};
         SparkMaxPIDController m_pid{m_motor.GetPIDController()};
+        frc::PIDController m_absPid{40.0, 0.0, 0.0};
         double m_setpointTicks = 0.0;
         frc::Solenoid m_armSolenoid;
         frc::Solenoid m_backPlateSolenoid;

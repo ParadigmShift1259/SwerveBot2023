@@ -27,7 +27,7 @@ void PlaceOnFloor::Execute()
 
 bool PlaceOnFloor::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceOnFloorAbsolute);
+  return m_deployment.IsAtSetpoint(kPlaceOnFloorPosition);
 }
 
 void PlaceOnFloor::End(bool interrupted)

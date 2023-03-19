@@ -236,8 +236,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.X().OnTrue(TravelPosition(*this).ToPtr());                                
   secondary.Y().OnTrue(PlaceHigh(*this).ToPtr());                                    
 
-  secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
-  secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
+  // secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
+  // secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
   // secondary.Start().WhileTrue();
   // secondary.Back().WhileTrue();
   // secondary.RightTrigger().WhileTrue();
@@ -249,7 +249,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { m_deployment.ResetEncoder(); });
-  secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
+  // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 
 #ifdef USE_PIT_BUTTON_BOX  
@@ -307,14 +307,15 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
   // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
-  secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
-  secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
+  // secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  // secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
+  secondary.A().OnTrue(TravelPosition(*this).ToPtr());                          // Blue   row 3
   secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
   secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
   secondary.Y().OnTrue(PickUp(*this).ToPtr());                        // Yellow row 2
 
   secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
-  secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
+  // secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
   secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
   secondary.Back().WhileTrue(ClawIngest(*this).ToPtr());                     // Black  row 1
 

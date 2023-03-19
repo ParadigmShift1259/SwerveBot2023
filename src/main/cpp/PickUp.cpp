@@ -18,19 +18,24 @@ void PickUp::Initialize()
   m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
   m_deployment.RotateArm(kShelfPosition);
+//  m_deployment.RotateArm(kShelfAbsolute);
+  m_deployment.RotateArmSetAbsPos(kShelfAbsolute);
 }
 
 void PickUp::Execute()
 {
-  m_deployment.ResetEncoderWithAbsolute();
+  //m_deployment.ResetEncoderWithAbsolute();
+  //m_deployment.RotateArm(kShelfAbsolute);
 }
 
 bool PickUp::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kShelfAbsolute);
+  //return m_deployment.IsAtSetpoint(kShelfAbsolute);
+  return m_deployment.IsAtSetpoint(kShelfPosition);
 }
 
 void PickUp::End(bool interrupted)
 {
+//  m_deployment.RotateArmRelative(0.0);
   m_logStartCommand.Append(false);
 }

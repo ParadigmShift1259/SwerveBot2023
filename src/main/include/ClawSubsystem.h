@@ -11,8 +11,9 @@
 using namespace rev;
 using namespace frc;
 
-constexpr double kClawIngestSpeed = 1.0;
+constexpr double kClawIngestSpeed = 0.9;
 constexpr double kClawReleaseSpeed = -0.2;
+constexpr double kClawHoldSpeed = 0.2;
 
 class ClawSubsystem : public frc2::SubsystemBase
 {
