@@ -12,6 +12,7 @@ using namespace rev;
 using namespace frc;
 
 constexpr double kClawIngestSpeed = 0.9;
+constexpr double kClawIngestCubeSpeed = 0.4;
 constexpr double kClawReleaseSpeed = -0.2;
 constexpr double kClawHoldSpeed = 0.2;
 
@@ -21,6 +22,7 @@ public:
     ClawSubsystem();
     void Periodic();
     void Ingest();
+    void IngestCube();
     void Release();
     void Hold();
     void Stop();
@@ -28,5 +30,6 @@ public:
         
 private:
     CANSparkMax m_motor;
+    SparkMaxRelativeEncoder m_enc = m_motor.GetEncoder();
     DigitalInput m_photoeye;
 };

@@ -17,6 +17,8 @@
 #include "Balance.h"
 #include "ClawRelease.h"
 #include "ClawIngest.h"
+#include "ClawIngestCube.h"
+#include "ClawStop.h"
 #include "IntakeDeploy.h"
 #include "TravelPosition.h"
 
@@ -208,8 +210,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
   primary.A().OnTrue(ClawRelease(*this).ToPtr());
   primary.B().OnTrue(ClawIngest(*this).ToPtr());
-  // primary.X().OnTrue();
-  primary.Y().OnTrue(ReleaseCone(*this).ToPtr());
+  primary.X().OnTrue(ClawStop(*this).ToPtr());
+  // primary.Y().OnTrue();
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
@@ -236,15 +238,14 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.X().OnTrue(TravelPosition(*this).ToPtr());                                
   secondary.Y().OnTrue(PlaceHigh(*this).ToPtr());                                    
 
-  // secondary.LeftBumper().WhileTrue(IntakeIngest(*this).ToPtr());
+  secondary.LeftBumper().WhileTrue(ClawIngestCube(*this).ToPtr());
   // secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
   // secondary.Start().WhileTrue();
   // secondary.Back().WhileTrue();
-  // secondary.RightTrigger().WhileTrue();
 
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           
-  // secondary.LeftTrigger().WhileTrue();
+  secondary.LeftTrigger().OnTrue(ClawIngest(*this).ToPtr());
   // secondary.RightTrigger().WhileTrue();
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();

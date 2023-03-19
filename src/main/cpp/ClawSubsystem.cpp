@@ -9,6 +9,7 @@ ClawSubsystem::ClawSubsystem()
     , m_photoeye(kClawPhotoeye)
 {
     m_motor.RestoreFactoryDefaults();
+    m_motor.EnableVoltageCompensation(12.0);
     m_motor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_motor.SetSmartCurrentLimit(25);
 }
@@ -16,11 +17,17 @@ ClawSubsystem::ClawSubsystem()
 void ClawSubsystem::Periodic()
 {
     SmartDashboard::PutNumber("Claw Output Curret", m_motor.GetOutputCurrent());
+    SmartDashboard::PutNumber("Claw RPM", m_enc.GetVelocity());
 }
 
 void ClawSubsystem::Ingest()
 {
     m_motor.Set(kClawIngestSpeed);
+}
+
+void ClawSubsystem::IngestCube()
+{
+    m_motor.Set(kClawIngestCubeSpeed);
 }
 
 void ClawSubsystem::Release()

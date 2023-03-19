@@ -101,9 +101,11 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         static constexpr bool kBackPlateSolenoidRetract = false;
 
         frc::DutyCycleEncoder m_absEnc;
+        SparkMaxRelativeEncoder m_neoEnc = m_motor.GetEncoder();
 
-        wpi::log::DoubleLogEntry m_logArmAngle;
+        wpi::log::DoubleLogEntry m_logArmEnc;
         wpi::log::DoubleLogEntry m_logAbsEnc;
+        wpi::log::DoubleLogEntry m_logNeoEnc;
         wpi::log::DoubleLogEntry m_logOutputCurrent;
         wpi::log::DoubleLogEntry m_logMotorOutput;
         wpi::log::DoubleLogEntry m_logMotorTemp;

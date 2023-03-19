@@ -24,8 +24,9 @@ DeploymentSubsystem::DeploymentSubsystem()
 {
     wpi::log::DataLog& log = frc::DataLogManager::GetLog();
     
-    m_logArmAngle = wpi::log::DoubleLogEntry(log, "/deployment/armAngle");
+    m_logArmEnc = wpi::log::DoubleLogEntry(log, "/deployment/armEnc");
     m_logAbsEnc = wpi::log::DoubleLogEntry(log, "/deployment/absEnc");
+    m_logNeoEnc = wpi::log::DoubleLogEntry(log, "/deployment/neoEnc");
     m_logOutputCurrent = wpi::log::DoubleLogEntry(log, "/deployment/outputCurrent");
     m_logMotorOutput = wpi::log::DoubleLogEntry(log, "/deployment/motorOutput");
     m_logMotorTemp = wpi::log::DoubleLogEntry(log, "/deployment/motorTemp");
@@ -88,12 +89,15 @@ void DeploymentSubsystem::Periodic()
     double pos = m_enc.GetPosition();
     double err = pos - m_setpointTicks;
     double absPos = m_absEnc.GetAbsolutePosition();
+    double neoPos = m_neoEnc.GetPosition();
     SmartDashboard::PutNumber("Arm enc", pos);
     SmartDashboard::PutNumber("Arm error", err);
     SmartDashboard::PutNumber("Arm Abs Enc", absPos);
     SmartDashboard::PutNumber("Arm Setpoint", m_setpointTicks);
 
+    m_logArmEnc.Append(pos);
     m_logAbsEnc.Append(absPos);
+    m_logNeoEnc.Append(neoPos);
 
     double currentPosition = m_absEnc.GetAbsolutePosition();
     auto absError = -m_absPid.Calculate(currentPosition, m_absPos);
