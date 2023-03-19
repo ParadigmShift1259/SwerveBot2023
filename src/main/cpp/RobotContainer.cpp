@@ -271,15 +271,16 @@ void RobotContainer::ConfigPitButtonBoxBindings()
       // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
       // 3	  B				      A				      POV Left			    POV Right			      POV Up
       m_pitButtonBox->A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+      printf("Configured m_pitButtonBox A button binding\n");
       m_pitButtonBox->A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
       m_pitButtonBox->B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
       m_pitButtonBox->X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
-      m_pitButtonBox->Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
+      //m_pitButtonBox->Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
 
       m_pitButtonBox->LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
       m_pitButtonBox->RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
       m_pitButtonBox->Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-      m_pitButtonBox->Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+      //m_pitButtonBox->Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
 
       m_pitButtonBox->LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
       m_pitButtonBox->RightStick().OnTrue(&m_retractArm);                           // Yellow row 1

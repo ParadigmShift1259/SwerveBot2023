@@ -74,12 +74,12 @@ private:
   void ConfigureBindings();
   void ConfigPrimaryButtonBindings();
   void ConfigSecondaryButtonBindings();
-// #define USE_PIT_BUTTON_BOX  
+#define USE_PIT_BUTTON_BOX  
 #ifdef USE_PIT_BUTTON_BOX  
   void ConfigPitButtonBoxBindings();
 #endif
 
-#define BUTTON_BOX_DEVELOPMENT
+//#define BUTTON_BOX_DEVELOPMENT
 #ifdef BUTTON_BOX_DEVELOPMENT
   void ConfigSecondaryButtonBindingsNewWay();
 #endif
