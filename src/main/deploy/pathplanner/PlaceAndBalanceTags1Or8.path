@@ -49,7 +49,7 @@
           "ClawRelease"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "deadline",
+        "waitBehavior": "none",
         "waitTime": 2.0
       }
     },
@@ -155,5 +155,12 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 1.5,
+      "names": [
+        "TravelPosition"
+      ]
+    }
+  ]
 }
