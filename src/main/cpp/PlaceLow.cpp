@@ -15,22 +15,22 @@ PlaceLow::PlaceLow(ISubsystemAccess& subsystemAccess)
 void PlaceLow::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
   m_deployment.RotateArm(kPlaceLowPosition);
 }
 
 void PlaceLow::Execute()
 {
-  m_deployment.ResetEncoderWithAbsolute();
+
 }
 
 bool PlaceLow::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceLowPosition);
+  return m_deployment.IsAtAbsoluteSetpoint(kPlaceLowAbsolute);
 }
 
 void PlaceLow::End(bool interrupted)
 {
+  m_deployment.ResetEncoder(kPlaceLowPosition);
   m_logStartCommand.Append(false);
 }

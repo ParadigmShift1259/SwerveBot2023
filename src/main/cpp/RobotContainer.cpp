@@ -239,7 +239,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.Y().OnTrue(PlaceHigh(*this).ToPtr());                                    
 
   secondary.LeftBumper().WhileTrue(ClawIngestCube(*this).ToPtr());
-  // secondary.RightBumper().WhileTrue(IntakeStop(*this).ToPtr());
+  secondary.RightBumper().OnTrue(PickUp(*this).ToPtr());
   // secondary.Start().WhileTrue();
   // secondary.Back().WhileTrue();
 
@@ -250,8 +250,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.LeftTrigger().OnTrue(ClawIngest(*this).ToPtr());
   // secondary.RightTrigger().WhileTrue();
 
-  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  secondary.POVUp(loop).Rising().IfHigh([this] { m_deployment.ResetEncoder(); });
+  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  // secondary.POVUp(loop).Rising().IfHigh([this] { m_deployment.ResetEncoder(); });
   // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 
@@ -283,18 +283,18 @@ void RobotContainer::ConfigPitButtonBoxBindings()
       m_pitButtonBox->LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
       m_pitButtonBox->RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
       m_pitButtonBox->Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-      //m_pitButtonBox->Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+      //m_pitButtonBox->Back().WhileTrue();                     // Black  row 1
 
       m_pitButtonBox->LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
       m_pitButtonBox->RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
       m_pitButtonBox->LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
       // m_pitButtonBox->RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
 
-      auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-      m_pitButtonBox->POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
-      m_pitButtonBox->POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
-      //m_pitButtonBox->POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
-      //m_pitButtonBox->POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
+      // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+      // m_pitButtonBox->POVLeft(loop).Rising().IfHigh([this] {});  // Green  row 3
+      // m_pitButtonBox->POVRight(loop).Rising().IfHigh([this] {});// Yellow row 3
+      //m_pitButtonBox->POVUp(loop).Rising().IfHigh([this] {});      // Red    row 3
+      //m_pitButtonBox->POVUp(loop).Rising().IfHigh({});      // Red    row 3
     }
   }
 }
@@ -327,11 +327,11 @@ void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
   secondary.LeftTrigger().OnTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
   secondary.RightTrigger().WhileTrue(ClawRelease(*this).ToPtr());                      // Black  row 2
 
-  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
-  secondary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
+  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  // secondary.POVLeft(loop).Rising().IfHigh([this] {});  // Green  row 3
+  // secondary.POVRight(loop).Rising().IfHigh([this] {});// Yellow row 3
   //secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
-  //secondary.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
+  //secondary.POVUp(loop).Rising().IfHigh({});      // Red    row 3
 }
 #endif
 

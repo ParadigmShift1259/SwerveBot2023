@@ -15,22 +15,22 @@ PlaceOnFloor::PlaceOnFloor(ISubsystemAccess& subsystemAccess)
 void PlaceOnFloor::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArm(kPlaceOnFloorPosition);
 }
 
 void PlaceOnFloor::Execute()
 {
-  m_deployment.ResetEncoderWithAbsolute();
+
 }
 
 bool PlaceOnFloor::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceOnFloorPosition);
+  return m_deployment.IsAtAbsoluteSetpoint(kPlaceOnFloorAbsolute);
 }
 
 void PlaceOnFloor::End(bool interrupted)
 {
+  m_deployment.ResetEncoder(kPlaceOnFloorPosition);
   m_logStartCommand.Append(false);
 }

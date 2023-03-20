@@ -15,11 +15,10 @@ PickUp::PickUp(ISubsystemAccess& subsystemAccess)
 void PickUp::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_deployment.RetractBackPlate(); 
   m_deployment.RetractArm();
   m_deployment.RotateArm(kShelfPosition);
-//  m_deployment.RotateArm(kShelfAbsolute);
-  m_deployment.RotateArmSetAbsPos(kShelfAbsolute);
+  // m_deployment.RotateArm(kShelfAbsolute);
+  // m_deployment.RotateArmSetAbsPos(kShelfAbsolute);
 }
 
 void PickUp::Execute()
@@ -31,11 +30,11 @@ void PickUp::Execute()
 bool PickUp::IsFinished()
 {
   //return m_deployment.IsAtSetpoint(kShelfAbsolute);
-  return m_deployment.IsAtSetpoint(kShelfPosition);
+  return m_deployment.IsAtAbsoluteSetpoint(kShelfAbsolute);
 }
 
 void PickUp::End(bool interrupted)
 {
-//  m_deployment.RotateArmRelative(0.0);
+  m_deployment.ResetEncoder(kShelfPosition);
   m_logStartCommand.Append(false);
 }

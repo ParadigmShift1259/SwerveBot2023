@@ -20,7 +20,6 @@ TravelPosition::TravelPosition(ISubsystemAccess& subsystemAccess)
 void TravelPosition::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
 
   // if (!m_claw.IsPhotoeyeActive())
@@ -28,7 +27,7 @@ void TravelPosition::Initialize()
   //   m_claw.Stop();
   // }
 
-  m_deployment.RotateArmSetAbsPos(kTravelAbsolute);
+  // m_deployment.RotateArmSetAbsPos(kTravelAbsolute);
 
   m_timer.Reset();
   m_timer.Start();
@@ -40,19 +39,16 @@ void TravelPosition::Execute()
   if (m_timer.Get() > 0.5_s)
   {
     m_deployment.RotateArm(kTravelPosition);
-//    m_deployment.ResetEncoderWithAbsolute();
-//    m_deployment.RotateArm(kTravelAbsolute);
   }
 }
 
 bool TravelPosition::IsFinished()
 {
-  //return (m_timer.Get() > 0.5_s) && m_deployment.IsAtSetpoint(kTravelAbsolute);
-  return (m_timer.Get() > 0.5_s) && m_deployment.IsAtSetpoint(kTravelPosition);
+  return m_deployment.IsAtAbsoluteSetpoint(kTravelAbsolute);
 }
 
 void TravelPosition::End(bool interrupted)
 {
-//  m_deployment.RotateArmRelative(0.0);
+  m_deployment.ResetEncoder(kTravelPosition);
   m_logStartCommand.Append(false);
 }

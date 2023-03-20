@@ -16,22 +16,22 @@ PlaceHigh::PlaceHigh(ISubsystemAccess& subsystemAccess)
 void PlaceHigh::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_deployment.RetractBackPlate();
   m_deployment.RetractArm();
   m_deployment.RotateArm(kPlaceHighPosition);
 }
 
 void PlaceHigh::Execute()
 {
-  m_deployment.ResetEncoderWithAbsolute();
+
 }
 
 bool PlaceHigh::IsFinished()
 {
-  return m_deployment.IsAtSetpoint(kPlaceHighPosition);
+  return m_deployment.IsAtAbsoluteSetpoint(kPlaceHighAbsolute);
 }
 
 void PlaceHigh::End(bool interrupted)
 {
+  m_deployment.ResetEncoder(kPlaceHighPosition);
   m_logStartCommand.Append(false);
 }
