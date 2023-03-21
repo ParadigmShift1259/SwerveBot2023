@@ -228,7 +228,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 
 //  if (m_dbgFlagDrvrCtrlrPitOverride)
   {
-    primary.Start().OnTrue(&m_rotateArm);
+    //primary.Start().OnTrue(&m_rotateArm);
 #ifdef USE_PIT_BUTTON_BOX  
     // Initialize button box bindingd
     primary.Back().OnTrue(&m_CfgPitButtonBoxCmd); // Calls ConfigPitButtonBoxBindings()
