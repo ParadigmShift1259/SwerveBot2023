@@ -7,6 +7,7 @@ using namespace frc;
 ClawSubsystem::ClawSubsystem()
     : m_motor(kClawCANID, CANSparkMaxLowLevel::MotorType::kBrushless)
     , m_photoeye(kClawPhotoeye)
+    , m_solenoid(PneumaticsModuleType::CTREPCM, kClawSolenoid)
 {
     m_motor.RestoreFactoryDefaults();
     m_motor.EnableVoltageCompensation(12.0);
@@ -49,4 +50,16 @@ void ClawSubsystem::Stop()
 bool ClawSubsystem::IsPhotoeyeActive()
 {
     return m_photoeye.Get();
+}
+
+void ClawSubsystem::Unclamp()
+{
+    m_motor.Set(kClawHoldSpeed);
+    m_solenoid.Set(true);
+}
+
+void ClawSubsystem::Clamp()
+{
+    m_solenoid.Set(false);
+    m_motor.Set(0.0);
 }

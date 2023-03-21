@@ -9,6 +9,7 @@ using namespace frc;
 IntakeSubsystem::IntakeSubsystem() 
     : m_motor(kIntakeCANID)
     , m_solenoid(PneumaticsModuleType::CTREPCM, kIntakeSolenoid)
+    , m_photoeye(kIntakePhotoeye)
 {
     m_motor.SetNeutralMode(NeutralMode::Coast);
     m_motor.SetInverted(false);
@@ -32,4 +33,9 @@ void IntakeSubsystem::ExtendIntake()
 void IntakeSubsystem::RetractIntake()
 {
     m_solenoid.Set(kIntakeRetract);
+}
+
+bool IntakeSubsystem::IsPhotoeyeActive()
+{
+    return m_photoeye.Get();
 }

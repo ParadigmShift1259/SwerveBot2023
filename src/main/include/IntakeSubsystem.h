@@ -3,6 +3,7 @@
 
 #include <frc/Solenoid.h>
 #include <frc/Timer.h>
+#include <frc/DigitalInput.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
@@ -10,11 +11,12 @@
 #include "ConstantsDigitalOut.h"
 #include "ConstantsCANIDs.h"
 
+using namespace frc;
 using namespace ctre::phoenix::motorcontrol;
 using namespace ctre::phoenix::motorcontrol::can;
 
-constexpr double kIngestSpeed = 0.82;
-constexpr double kReleaseSpeed = -0.82;
+constexpr double kIngestSpeed = 1.0;
+constexpr double kReleaseSpeed = -1.0;
 
 class IntakeSubsystem : public frc2::SubsystemBase
 {
@@ -35,11 +37,14 @@ public:
     // Retracts the intake into the robot
     void RetractIntake();
 
+    bool IsPhotoeyeActive();
+
 private:
     /// 775 that runs intake
     TalonSRX m_motor;
-    frc::Solenoid m_solenoid;
-    frc::Timer m_timer;
+    Solenoid m_solenoid;
+    Timer m_timer;
+    DigitalInput m_photoeye;
 
     static constexpr bool kIntakeExtend = true;
     static constexpr bool kIntakeRetract = false;

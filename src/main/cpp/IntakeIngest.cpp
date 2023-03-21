@@ -23,6 +23,11 @@ void IntakeIngest::Execute()
   m_intake.Set(kIngestSpeed);
 }
 
+bool IntakeIngest::IsFinished()
+{
+  return m_intake.IsPhotoeyeActive();
+}
+
 void IntakeIngest::End(bool interrupted) 
 {
   m_intake.Set(0.0);

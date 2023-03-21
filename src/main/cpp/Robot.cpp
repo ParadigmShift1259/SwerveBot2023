@@ -42,6 +42,7 @@ void Robot::AutonomousInit()
   // Record both DS control and joystick data
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 
+  m_container.GetClaw().Unclamp();
   m_container.SetIsAutoRunning(true);
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
@@ -62,6 +63,7 @@ void Robot::AutonomousExit()
 
 void Robot::TeleopInit()
 {
+  m_container.GetClaw().Unclamp();
   m_container.SetIsAutoRunning(false);
   if (m_hasAutoRun == false)
   {

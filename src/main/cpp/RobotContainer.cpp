@@ -216,12 +216,15 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   primary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractArm(); });// Yellow row 3
 #else
   primary.A().OnTrue(ClawRelease(*this).ToPtr());
+  primary.A().OnFalse(ClawStop(*this).ToPtr());
   primary.B().OnTrue(ClawIngest(*this).ToPtr());
   primary.X().OnTrue(ClawStop(*this).ToPtr());
-  // primary.Y().OnTrue();
+  primary.Y().WhileTrue(IntakeRelease(*this).ToPtr());
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
+
+  primary.LeftTrigger().OnTrue(&m_cancelAll);
 
 //  if (m_dbgFlagDrvrCtrlrPitOverride)
   {
@@ -247,19 +250,17 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   secondary.LeftBumper().WhileTrue(ClawIngestCube(*this).ToPtr());
   secondary.RightBumper().OnTrue(PickUp(*this).ToPtr());
-  // secondary.Start().WhileTrue();
-  // secondary.Back().WhileTrue();
+  secondary.Start().OnTrue(IntakeStop(*this).ToPtr()); 
+  secondary.Back().OnTrue(IntakeIngest(*this).ToPtr());                                       
 
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           
-  secondary.Start().OnTrue(&m_extendArm); 
-  secondary.Back().OnTrue(&m_retractArm);                                       
   secondary.LeftTrigger().OnTrue(ClawIngest(*this).ToPtr());
-  // secondary.RightTrigger().WhileTrue();
+  // secondary.RightTrigger().OnTrue();
 
-  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  // secondary.POVUp(loop).Rising().IfHigh([this] { m_deployment.ResetEncoder(); });
-  // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVRight(loop).Rising().IfHigh([this] { m_deployment.ExtendArm(); });
+  secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.RetractArm(); });
 }
 
 #ifdef USE_PIT_BUTTON_BOX  

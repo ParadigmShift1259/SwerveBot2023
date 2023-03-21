@@ -155,6 +155,8 @@ private:
   InstantCommand m_OverrideOn{[this] { GetDrive().SetOverrideXboxInput(true); }, {&m_drive} };
   InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
 
+  InstantCommand m_cancelAll{[this] { CommandScheduler::GetInstance().CancelAll(); }, {} };
+
   // std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
   // SwerveAutoBuilder m_autoBuilder;
 

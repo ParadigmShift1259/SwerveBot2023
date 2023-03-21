@@ -15,16 +15,16 @@ void ClawRelease::Initialize()
 
 void ClawRelease::Execute()
 {
+  m_claw.Unclamp();
   m_claw.Release();
 }
 
 bool ClawRelease::IsFinished()
 {
-  return false;
+  return true;
 }
 
 void ClawRelease::End(bool interrupted)
 {
-  m_claw.Stop();
   m_logStartCommand.Append(false);
 }

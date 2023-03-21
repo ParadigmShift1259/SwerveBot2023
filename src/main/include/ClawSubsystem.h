@@ -1,5 +1,6 @@
 #pragma once
 
+#include <frc/Solenoid.h>
 #include <frc/DigitalInput.h>
 #include <frc2/command/SubsystemBase.h>
 
@@ -27,9 +28,12 @@ public:
     void Hold();
     void Stop();
     bool IsPhotoeyeActive();
+    void Unclamp();
+    void Clamp();
         
 private:
     CANSparkMax m_motor;
     SparkMaxRelativeEncoder m_enc = m_motor.GetEncoder();
     DigitalInput m_photoeye;
+    frc::Solenoid m_solenoid;
 };

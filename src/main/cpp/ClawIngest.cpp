@@ -16,6 +16,7 @@ void ClawIngest::Initialize()
 
 void ClawIngest::Execute()
 {
+  m_claw.Unclamp();
   m_claw.Ingest();
 }
 
@@ -32,8 +33,13 @@ void ClawIngest::End(bool interrupted)
   // }
   // else
   // {
-    m_claw.Hold();
+    // m_claw.Hold();
   // }
+
+  if (!interrupted)
+  {
+    m_claw.Clamp();
+  }
 
   m_logStartCommand.Append(false);
 }
