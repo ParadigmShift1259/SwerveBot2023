@@ -95,7 +95,8 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   eventMap.emplace("PlaceHigh", std::make_shared<PlaceHigh>(*this));
   eventMap.emplace("ClawRelease", std::make_shared<ClawRelease>(*this));
   eventMap.emplace("ClawIngest", std::make_shared<ClawIngest>(*this));
-  eventMap.emplace("IntakeDeploy", std::make_shared<IntakeDeploy>(*this));
+  eventMap.emplace("IntakeIngest", std::make_shared<IntakeIngest>(*this));
+  eventMap.emplace("IntakeStop", std::make_shared<IntakeStop>(*this));
   eventMap.emplace("ReleaseCone", std::make_shared<ReleaseCone>(*this));
   eventMap.emplace("ExtendArm", std::make_shared<ExtendArm>(*this));
   eventMap.emplace("WaitLong", std::make_shared<WaitCommand>(1.2_s));

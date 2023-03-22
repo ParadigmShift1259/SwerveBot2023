@@ -17,10 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "WaitLong",
-          "PopHookPosition",
-          "WaitLong",
-          "PlaceHigh"
+          "TravelPosition"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -43,12 +40,21 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "IntakeStop"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.4,
+      "names": [
+        "IntakeIngest"
+      ]
+    }
+  ]
 }

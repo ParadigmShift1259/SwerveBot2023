@@ -1,8 +1,8 @@
 
 #include "IntakeSubsystem.h"
 
-//#include <frc/SmartDashBoard/SmartDashboard.h>
-//#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/SmartDashBoard/SmartDashboard.h>
+// #include <frc/shuffleboard/Shuffleboard.h>
 
 using namespace frc;
 
@@ -18,6 +18,7 @@ IntakeSubsystem::IntakeSubsystem()
 void IntakeSubsystem::Periodic()
 {
     // SmartDashboard::PutNumber("D_I_Motor", m_motor.Get());
+    SmartDashboard::PutBoolean("Intake PhotoEye Active", IsPhotoeyeActive());
 }
 
 void IntakeSubsystem::Set(double speed)

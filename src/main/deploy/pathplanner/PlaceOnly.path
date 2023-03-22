@@ -17,7 +17,6 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "TravelPosition",
           "PlaceHigh"
         ],
         "executionBehavior": "sequential",
@@ -42,10 +41,12 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ReleaseCone"
+          "ExtendArm",
+          "WaitShort",
+          "ClawRelease"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "before",
+        "waitBehavior": "none",
         "waitTime": 0.5
       }
     }

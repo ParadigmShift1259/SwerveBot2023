@@ -3,12 +3,12 @@
     {
       "anchorPoint": {
         "x": 2.41,
-        "y": 0.5
+        "y": 0.93
       },
       "prevControl": null,
       "nextControl": {
         "x": 3.2434502620259424,
-        "y": 0.5
+        "y": 0.93
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -16,7 +16,9 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "TravelPosition"
+        ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -24,12 +26,12 @@
     },
     {
       "anchorPoint": {
-        "x": 6.5,
-        "y": 0.5
+        "x": 6.699375013951928,
+        "y": 0.9330084218363207
       },
       "prevControl": {
-        "x": 6.876128232695637,
-        "y": 0.5
+        "x": 7.075503246647566,
+        "y": 0.9330084218363207
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -38,12 +40,21 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "IntakeStop"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.40000000000000624,
+      "names": [
+        "IntakeIngest"
+      ]
+    }
+  ]
 }
