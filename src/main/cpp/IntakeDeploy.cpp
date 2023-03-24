@@ -1,9 +1,10 @@
 #include "IntakeDeploy.h"
 
 IntakeDeploy::IntakeDeploy(ISubsystemAccess& subsystemAccess) 
-  : m_intake(subsystemAccess.GetIntake())
+  : m_deployment(subsystemAccess.GetDeployment())
+  , m_intake(subsystemAccess.GetIntake())
 {
-  AddRequirements({&subsystemAccess.GetIntake()});
+  AddRequirements({&subsystemAccess.GetDeployment(), &subsystemAccess.GetIntake()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeDeploy/startCommand");
@@ -16,7 +17,10 @@ void IntakeDeploy::Initialize()
 
 void IntakeDeploy::Execute() 
 {
-  m_intake.ExtendIntake();
+  if (m_deployment.IsInFrame())
+  {
+    m_intake.ExtendIntake();
+  }
 }
 
 bool IntakeDeploy::IsFinished()

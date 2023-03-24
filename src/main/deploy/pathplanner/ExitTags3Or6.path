@@ -40,21 +40,12 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "IntakeStop"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
-  "markers": [
-    {
-      "position": 0.4,
-      "names": [
-        "IntakeIngest"
-      ]
-    }
-  ]
+  "markers": []
 }

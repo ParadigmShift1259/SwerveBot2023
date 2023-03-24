@@ -15,6 +15,7 @@ public:
   void End(bool interrupted) override;
   
 private:
+  DeploymentSubsystem& m_deployment;
   IntakeSubsystem& m_intake;
 
   wpi::log::BooleanLogEntry m_logStartCommand;

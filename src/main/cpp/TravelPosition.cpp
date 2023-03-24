@@ -49,6 +49,9 @@ bool TravelPosition::IsFinished()
 
 void TravelPosition::End(bool interrupted)
 {
-  m_deployment.ResetEncoder(kTravelPosition);
+  if (!interrupted)
+  {
+    m_deployment.ResetEncoder(kTravelPosition);
+  }
   m_logStartCommand.Append(false);
 }

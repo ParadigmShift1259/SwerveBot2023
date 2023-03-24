@@ -31,6 +31,9 @@ bool PlaceOnFloor::IsFinished()
 
 void PlaceOnFloor::End(bool interrupted)
 {
-  m_deployment.ResetEncoder(kPlaceOnFloorPosition);
+  if (!interrupted)
+  {
+    m_deployment.ResetEncoder(kPlaceOnFloorPosition);
+  }
   m_logStartCommand.Append(false);
 }

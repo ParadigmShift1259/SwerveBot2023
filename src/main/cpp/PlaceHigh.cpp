@@ -32,6 +32,9 @@ bool PlaceHigh::IsFinished()
 
 void PlaceHigh::End(bool interrupted)
 {
-  m_deployment.ResetEncoder(kPlaceHighPosition);
+  if (!interrupted)
+  {
+    m_deployment.ResetEncoder(kPlaceHighPosition);
+  }
   m_logStartCommand.Append(false);
 }

@@ -12,6 +12,7 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/RunCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/ParallelCommandGroup.h>
 #include <frc2/command/ConditionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SwerveControllerCommand.h>
@@ -20,6 +21,9 @@
 #include <pathplanner/lib/PathPlanner.h>
 #include <pathplanner/lib/auto/SwerveAutoBuilder.h>
 #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
+
+#include "TravelPosition.h"
+#include "IntakeIngest.h"
 
 #include <unordered_map>
 
@@ -156,6 +160,9 @@ private:
   InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
 
   InstantCommand m_cancelAll{[this] { CommandScheduler::GetInstance().CancelAll(); }, {} };
+
+  // std::shared_ptr<ParallelCommandGroup> m_travelWithIntakeIngest
+  // = std::make_shared<ParallelCommandGroup>(TravelPosition(*this), IntakeIngest(*this));
 
   // std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
   // SwerveAutoBuilder m_autoBuilder;

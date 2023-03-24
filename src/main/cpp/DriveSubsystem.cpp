@@ -134,7 +134,9 @@ void DriveSubsystem::Periodic()
   m_logRobotSpeed.Append(m_velocity);
   m_logRobotAccel.Append(m_acceleration);
   frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
-  m_logGyroPitch.Append(m_gyro.GetPitch()); 
+  m_logGyroPitch.Append(m_gyro.GetPitch());
+
+  frc::SmartDashboard::PutBoolean("SlowSpeed", m_currentMaxSpeed == kSlowSpeed);
 }
 
 frc::Pose2d DriveSubsystem::GetPose()

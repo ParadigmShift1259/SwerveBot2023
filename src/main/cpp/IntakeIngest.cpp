@@ -19,8 +19,11 @@ void IntakeIngest::Initialize()
 
 void IntakeIngest::Execute()
 {
-  m_intake.ExtendIntake();
-  m_intake.Set(kIngestSpeed);
+  if (m_deployment.IsInFrame())
+  {
+    m_intake.ExtendIntake();
+    m_intake.Set(kIngestSpeed);
+  }
 }
 
 bool IntakeIngest::IsFinished()

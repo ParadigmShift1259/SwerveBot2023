@@ -20,10 +20,8 @@
 #include "ClawIngestCube.h"
 #include "ClawStop.h"
 #include "IntakeDeploy.h"
-#include "TravelPosition.h"
 
 #include "IntakeDeploy.h"
-#include "IntakeIngest.h"
 #include "IntakeRelease.h"
 #include "IntakeStop.h"
 
@@ -92,6 +90,8 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   eventMap.emplace("Balance", std::make_shared<Balance>(m_drive, *this));
   eventMap.emplace("TravelPosition", std::make_shared<TravelPosition>(*this));
+//  eventMap.emplace("TravelWithIntakeIngest", m_travelWithIntakeIngest);
+//  eventMap.emplace("TravelWithIntakeIngest", std::make_shared<ParallelCommandGroup>(TravelPosition(*this), IntakeIngest(*this)));
   eventMap.emplace("PlaceHigh", std::make_shared<PlaceHigh>(*this));
   eventMap.emplace("ClawRelease", std::make_shared<ClawRelease>(*this));
   eventMap.emplace("ClawIngest", std::make_shared<ClawIngest>(*this));
@@ -118,12 +118,14 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 }
 #endif
 
-void RobotContainer::Periodic() {
+void RobotContainer::Periodic()
+{
   m_drive.Periodic();
   m_vision.Periodic();
 
   // m_pitchFactor = SmartDashboard::GetNumber("PitchFactor", m_pitchFactor);
   // m_maxAutoBalanceSpeed = SmartDashboard::GetNumber("MaxAutoBalanceSpeed", m_maxAutoBalanceSpeed);
+  SmartDashboard::PutBoolean("FieldRelative", m_fieldRelative);
 }
 
 void RobotContainer::SetDefaultCommands()
@@ -251,8 +253,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   secondary.LeftBumper().WhileTrue(ClawIngestCube(*this).ToPtr());
   secondary.RightBumper().OnTrue(PickUp(*this).ToPtr());
-  secondary.Start().OnTrue(IntakeStop(*this).ToPtr()); 
-  secondary.Back().OnTrue(IntakeIngest(*this).ToPtr());                                       
+  secondary.Start().OnTrue(IntakeIngest(*this).ToPtr());                                       
+  secondary.Back().OnTrue(IntakeStop(*this).ToPtr()); 
 
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           

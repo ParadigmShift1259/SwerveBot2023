@@ -31,6 +31,9 @@ bool PlaceLow::IsFinished()
 
 void PlaceLow::End(bool interrupted)
 {
-  m_deployment.ResetEncoder(kPlaceLowPosition);
+  if (!interrupted)
+  {
+    m_deployment.ResetEncoder(kPlaceLowPosition);
+  }
   m_logStartCommand.Append(false);
 }

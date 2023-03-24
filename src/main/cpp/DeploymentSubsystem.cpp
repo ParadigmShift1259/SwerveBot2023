@@ -99,8 +99,6 @@ void DeploymentSubsystem::Periodic()
     // m_logNeoEnc.Append(neoPos);
     m_logEncVal.Append({pos, absPos, neoPos});
 
-    double currentPosition = m_absEnc.GetAbsolutePosition();
-
     double outputCurrent = m_motor.GetOutputCurrent();
     double motorOutput = m_motor.GetAppliedOutput();
     double motorTemp = m_motor.GetMotorTemperature();
@@ -175,6 +173,11 @@ bool DeploymentSubsystem::IsAtAbsoluteSetpoint(double setpoint)
     }
 
     return fabs(currentAbsolutePosition - setpoint) < 0.005;
+}
+
+bool DeploymentSubsystem::IsInFrame()
+{
+    return m_absEnc.GetAbsolutePosition() > kInFrameAbsolute;
 }
 
 void DeploymentSubsystem::ResetEncoderWithAbsolute()

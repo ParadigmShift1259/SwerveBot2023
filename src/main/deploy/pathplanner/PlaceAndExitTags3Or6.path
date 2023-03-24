@@ -95,9 +95,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "IntakeStop"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -109,12 +107,6 @@
       "position": 1.5,
       "names": [
         "TravelPosition"
-      ]
-    },
-    {
-      "position": 2.0,
-      "names": [
-        "IntakeIngest"
       ]
     }
   ]

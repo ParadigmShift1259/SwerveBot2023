@@ -68,6 +68,8 @@ class DeploymentSubsystem : public frc2::SubsystemBase
         /// Only valid if arm is close to travel position
         double AbsoluteToRelative(double absPos);
 
+        bool IsInFrame();
+
     private:
         CANSparkMax m_motor;
         SparkMaxAlternateEncoder m_enc{m_motor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, 4096)};

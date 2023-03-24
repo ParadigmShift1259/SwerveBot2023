@@ -35,6 +35,9 @@ bool PickUp::IsFinished()
 
 void PickUp::End(bool interrupted)
 {
-  m_deployment.ResetEncoder(kShelfPosition);
+  if (!interrupted)
+  {
+    m_deployment.ResetEncoder(kShelfPosition);
+  }
   m_logStartCommand.Append(false);
 }
