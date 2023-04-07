@@ -103,8 +103,8 @@ private:
   // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
 
   // Mk4 swerve modules with L3 gear set
-  static constexpr double kFLoffset = 0.212;/*0.002;*/    static constexpr double kFRoffset = 0.248;/*0.242;*/
-  static constexpr double kBLoffset = 0.482;/*0.469;*/    static constexpr double kBRoffset = 0.759;/*0.762;*/
+  static constexpr double kFLoffset = 0.207;/*0.212;*/    static constexpr double kFRoffset = 0.248;/*0.242;*/
+  static constexpr double kBLoffset = 0.480;/*0.482;*/    static constexpr double kBRoffset = 0.760;/*0.759;*/
 #endif
 
   SwerveModule m_frontLeft  { kFrontLeftDriveCANID, kFrontLeftTurningCANID, kFLoffset, false };
