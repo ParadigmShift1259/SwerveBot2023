@@ -22,7 +22,8 @@ void ClawIngest::Execute()
 
 bool ClawIngest::IsFinished()
 {
-  return m_claw.IsPhotoeyeActive();
+  // return m_claw.IsPhotoeyeActive(); TODO Figure out why photoeye doesn't work
+  return false;
 }
 
 void ClawIngest::End(bool interrupted)
@@ -36,10 +37,10 @@ void ClawIngest::End(bool interrupted)
     // m_claw.Hold();
   // }
 
-  if (!interrupted)
-  {
+  // if (!interrupted)
+  // {
     m_claw.Clamp();
-  }
+  // }
 
   m_logStartCommand.Append(false);
 }
