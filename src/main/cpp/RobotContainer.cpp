@@ -220,8 +220,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
   primary.A().OnTrue(ClawRelease(*this).ToPtr());
   primary.A().OnFalse(ClawStop(*this).ToPtr());
-  // primary.B().OnTrue(ClawIngest(*this).ToPtr()); Doesn't work because photoeye doesn't work
-  primary.B().WhileTrue(ClawIngest(*this).ToPtr());
+  primary.B().OnTrue(ClawIngest(*this).ToPtr());
+  // primary.B().WhileTrue(ClawIngest(*this).ToPtr());
   primary.X().OnTrue(ClawStop(*this).ToPtr());
   primary.Y().WhileTrue(IntakeRelease(*this).ToPtr());
 #endif
@@ -259,8 +259,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   // secondary.LeftStick().OnTrue();                            
   // secondary.RightStick().OnTrue();                           
-  // secondary.LeftTrigger().OnTrue(ClawIngest(*this).ToPtr()); Doesn't work because photoeye doesn't work
-  secondary.LeftTrigger().WhileTrue(ClawIngest(*this).ToPtr());
+  secondary.LeftTrigger().OnTrue(ClawIngest(*this).ToPtr());
+  // secondary.LeftTrigger().WhileTrue(ClawIngest(*this).ToPtr());
   // secondary.RightTrigger().OnTrue();
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
